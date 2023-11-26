@@ -1,5 +1,8 @@
 const allRoles = {
   user: [],
+  receptionist: [],
+  branch_manager: [],
+  owner: [],
   admin: ['getUsers', 'manageUsers'],
 };
 
