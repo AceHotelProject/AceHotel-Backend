@@ -1,5 +1,6 @@
 {
   "version": 2,
   "name": "backend",
-  "buildCommand": "yarn dev"
+  "buildCommand": "yarn install",
+  "devCommand": "yarn dev"
 }
