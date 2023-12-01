@@ -3,6 +3,7 @@ const config = require('../config/config');
 
 const swaggerDef = {
   openapi: '3.0.0',
+  validatorUrl: null,
   info: {
     title: 'node-express-boilerplate API documentation',
     version,
