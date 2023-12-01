@@ -2,7 +2,19 @@
 # More GitHub Actions for Azure: https://github.com/Azure/actions
 
 name: Build and deploy Node.js app to Azure Web App - ace-hotel-backend
-
+env:
+  PORT: 3000
+  MONGODB_URL: 'mongodb+srv://acehotelind:kwgGwJsNHwhreCzH@cluster0.5wiu16c.mongodb.net/?retryWrites=true&w=majority'
+  JWT_SECRET: thisisasamplesecret
+  JWT_ACCESS_EXPIRATION_MINUTES: 30
+  JWT_REFRESH_EXPIRATION_DAYS: 30
+  JWT_RESET_PASSWORD_EXPIRATION_MINUTES: 10
+  JWT_VERIFY_EMAIL_EXPIRATION_MINUTES: 10
+  SMTP_HOST: email-server
+  SMTP_PORT: 587
+  SMTP_USERNAME: email-server-username
+  SMTP_PASSWORD: email-server-password
+  EMAIL_FROM: support@yourapp.com
 on:
   push:
     branches:
