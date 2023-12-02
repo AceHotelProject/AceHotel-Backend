@@ -6,38 +6,38 @@ const { inventoryService } = require('../services');
 
 const createInventory = catchAsync(async (req, res) => {
   const inventory = await inventoryService.createInventory(req.body);
-  res.status(httpStatus.CREATED).send(user);
+  res.status(httpStatus.CREATED).send(inventory);
 });
 
-// const getUsers = catchAsync(async (req, res) => {
-//   const filter = pick(req.query, ['name', 'role']);
-//   const options = pick(req.query, ['sortBy', 'limit', 'page']);
-//   const result = await userService.queryUsers(filter, options);
-//   res.send(result);
-// });
+const getInventories = catchAsync(async (req, res) => {
+  const filter = pick(req.query, ['name', 'type']);
+  const options = pick(req.query, ['sortBy', 'limit', 'page']);
+  const result = await inventoryService.queryInventories(filter, options);
+  res.send(result);
+});
 
-// const getUser = catchAsync(async (req, res) => {
-//   const user = await userService.getUserById(req.params.userId);
-//   if (!user) {
-//     throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
-//   }
-//   res.send(user);
-// });
+const getInventory = catchAsync(async (req, res) => {
+  const inventory = await inventoryService.getInventoryById(req.params.inventoryId);
+  if (!inventory) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Inventory not found');
+  }
+  res.send(inventory);
+});
 
-// const updateUser = catchAsync(async (req, res) => {
-//   const user = await userService.updateUserById(req.params.userId, req.body);
-//   res.send(user);
-// });
+const updateInventory = catchAsync(async (req, res) => {
+  const inventory = await inventoryService.updateInventoryById(req.params.inventoryId, req.body);
+  res.send(inventory);
+});
 
-// const deleteUser = catchAsync(async (req, res) => {
-//   await userService.deleteUserById(req.params.userId);
-//   res.status(httpStatus.NO_CONTENT).send();
-// });
+const deleteInventory = catchAsync(async (req, res) => {
+  await inventoryService.deleteInventoryById(req.params.inventoryId);
+  res.status(httpStatus.NO_CONTENT).send();
+});
 
 module.exports = {
   createInventory,
-  // getUsers,
-  // getUser,
-  // updateUser,
-  // deleteUser,
+  getInventories,
+  getInventory,
+  updateInventory,
+  deleteInventory,
 };

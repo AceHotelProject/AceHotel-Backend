@@ -1,23 +1,21 @@
 const express = require('express');
 const auth = require('../../middlewares/auth');
 const validate = require('../../middlewares/validate');
-// const visitorValidation = require('../../validations/visitor.validation');
+const inventoryValidation = require('../../validations/inventory.validation');
 const inventoryController = require('../../controllers/inventory.controller');
 
 const router = express.Router();
 
 router
   .route('/')
-  //.post(auth('addVisitor'), validate(visitorValidation.createUser), visitorController.createUser)
-  .post(inventoryController.createInventory);
-// .get(inventoryController.getInventory);
-//.get(auth('getVisitor'), validate(visitorValidation.getUsers), visitorController.getUsers);
+  .post(auth('addInventory'), validate(inventoryValidation.createInventory), inventoryController.createInventory)
+  .get(auth('getInventory'), validate(inventoryValidation.getInventories), inventoryController.getInventories);
 
-// router
-//   .route('/:userId')
-//   .get(auth('getUsers'), validate(userValidation.getUser), userController.getUser)
-//   .patch(auth('manageUsers'), validate(userValidation.updateUser), userController.updateUser)
-//   .delete(auth('manageUsers'), validate(userValidation.deleteUser), userController.deleteUser);
+router
+  .route('/:inventoryId')
+  .get(auth('getInventory'), validate(inventoryValidation.getInventory), inventoryController.getInventory)
+  .patch(auth('manageInventory'), validate(inventoryValidation.updateInventory), inventoryController.updateInventory)
+  .delete(auth('manageInventory'), validate(inventoryValidation.deleteInventory), inventoryController.deleteInventory);
 
 module.exports = router;
 
@@ -70,7 +68,7 @@ module.exports = router;
  *         content:
  *           application/json:
  *             schema:
- *                $ref: '#/components/schemas/User'
+ *                $ref: '#/components/schemas/inventory'
  *       "400":
  *         $ref: '#/components/responses/DuplicateEmail'
  *       "401":
@@ -79,9 +77,9 @@ module.exports = router;
  *         $ref: '#/components/responses/Forbidden'
  *
  *   get:
- *     summary: Get all users
- *     description: Only admins can retrieve all users.
- *     tags: [Users]
+ *     summary: Get all inventorys
+ *     description: Only admins can retrieve all inventorys.
+ *     tags: [Inventorys]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -89,12 +87,12 @@ module.exports = router;
  *         name: name
  *         schema:
  *           type: string
- *         description: User name
+ *         description: inventory name
  *       - in: query
  *         name: role
  *         schema:
  *           type: string
- *         description: User role
+ *         description: inventory role
  *       - in: query
  *         name: sortBy
  *         schema:
@@ -106,7 +104,7 @@ module.exports = router;
  *           type: integer
  *           minimum: 1
  *         default: 10
- *         description: Maximum number of users
+ *         description: Maximum number of inventorys
  *       - in: query
  *         name: page
  *         schema:
@@ -125,7 +123,7 @@ module.exports = router;
  *                 results:
  *                   type: array
  *                   items:
- *                     $ref: '#/components/schemas/User'
+ *                     $ref: '#/components/schemas/inventory'
  *                 page:
  *                   type: integer
  *                   example: 1
@@ -146,11 +144,11 @@ module.exports = router;
 
 /**
  * @swagger
- * /users/{id}:
+ * /inventorys/{id}:
  *   get:
- *     summary: Get a user
- *     description: Logged in users can fetch only their own user information. Only admins can fetch other users.
- *     tags: [Users]
+ *     summary: Get a inventory
+ *     description: Logged in inventorys can fetch only their own inventory information. Only admins can fetch other inventorys.
+ *     tags: [Inventorys]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -159,14 +157,14 @@ module.exports = router;
  *         required: true
  *         schema:
  *           type: string
- *         description: User id
+ *         description: inventory id
  *     responses:
  *       "200":
  *         description: OK
  *         content:
  *           application/json:
  *             schema:
- *                $ref: '#/components/schemas/User'
+ *                $ref: '#/components/schemas/inventory'
  *       "401":
  *         $ref: '#/components/responses/Unauthorized'
  *       "403":
@@ -175,9 +173,9 @@ module.exports = router;
  *         $ref: '#/components/responses/NotFound'
  *
  *   patch:
- *     summary: Update a user
- *     description: Logged in users can only update their own information. Only admins can update other users.
- *     tags: [Users]
+ *     summary: Update a inventory
+ *     description: Logged in inventorys can only update their own information. Only admins can update other inventorys.
+ *     tags: [Inventorys]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -186,7 +184,7 @@ module.exports = router;
  *         required: true
  *         schema:
  *           type: string
- *         description: User id
+ *         description: inventory id
  *     requestBody:
  *       required: true
  *       content:
@@ -215,7 +213,7 @@ module.exports = router;
  *         content:
  *           application/json:
  *             schema:
- *                $ref: '#/components/schemas/User'
+ *                $ref: '#/components/schemas/inventory'
  *       "400":
  *         $ref: '#/components/responses/DuplicateEmail'
  *       "401":
@@ -226,9 +224,9 @@ module.exports = router;
  *         $ref: '#/components/responses/NotFound'
  *
  *   delete:
- *     summary: Delete a user
- *     description: Logged in users can delete only themselves. Only admins can delete other users.
- *     tags: [Users]
+ *     summary: Delete a inventory
+ *     description: Logged in inventorys can delete only themselves. Only admins can delete other inventorys.
+ *     tags: [Inventorys]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -237,7 +235,7 @@ module.exports = router;
  *         required: true
  *         schema:
  *           type: string
- *         description: User id
+ *         description: inventory id
  *     responses:
  *       "200":
  *         description: No content

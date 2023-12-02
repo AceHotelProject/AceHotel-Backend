@@ -1,7 +1,7 @@
 const allRoles = {
   owner: ['getUsers', 'manageUsers'],
   franchise: ['getUsers', 'manageUsers'],
-  receptionist: ['getUsers', 'manageUsers'],
+  receptionist: ['getUsers', 'manageUsers', 'addInventory', 'getInventory', 'manageInventory'],
   admin: ['getUsers', 'manageUsers'],
 };
 
