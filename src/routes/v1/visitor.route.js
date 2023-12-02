@@ -1,17 +1,25 @@
 const express = require('express');
-const auth = require('../../middlewares/auth');
-const validate = require('../../middlewares/validate');
+// const auth = require('../../middlewares/auth');
+// const validate = require('../../middlewares/validate');
+const multer = require('multer');
 // const visitorValidation = require('../../validations/visitor.validation');
 const visitorController = require('../../controllers/visitor.controller');
+
+const multerConfig = multer({
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 5 * 1024 * 1024, // 5MB limit (adjust as needed)
+  },
+});
 
 const router = express.Router();
 
 router
   .route('/')
-  //.post(auth('addVisitor'), validate(visitorValidation.createUser), visitorController.createUser)
-  .post(visitorController.createVisitor)
+  // .post(auth('addVisitor'), validate(visitorValidation.createUser), visitorController.createUser)
+  .post(multerConfig.single('identity_image'), visitorController.createVisitor)
   .get(visitorController.getVisitors);
-  //.get(auth('getVisitor'), validate(visitorValidation.getUsers), visitorController.getUsers);
+// .get(auth('getVisitor'), validate(visitorValidation.getUsers), visitorController.getUsers);
 
 // router
 //   .route('/:userId')
