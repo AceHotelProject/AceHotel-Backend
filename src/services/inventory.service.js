@@ -46,7 +46,23 @@ const updateInventoryById = async (inventoryId, updateBody) => {
     throw new ApiError(httpStatus.NOT_FOUND, 'Inventory not found');
   }
 
-  Object.assign(inventory, updateBody);
+  // Determine if there is a stock change
+  const stockChange = updateBody.stock ? updateBody.stock - inventory.stock : 0;
+
+  // Add a new record to inventory_update_history if there is relevant info
+  if (updateBody.title || updateBody.description || stockChange !== 0) {
+    inventory.inventory_update_history.push({
+      title: updateBody.title,
+      description: updateBody.description,
+      stockChange: stockChange,
+      date: new Date(), // This will set the date to the current date and time
+    });
+  }
+  // Update inventory fields (name and type)
+  if (updateBody.name) inventory.name = updateBody.name;
+  if (updateBody.type) inventory.type = updateBody.type;
+  if (updateBody.stock) inventory.stock = updateBody.stock;
+
   await inventory.save();
   return inventory;
 };

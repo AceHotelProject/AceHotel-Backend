@@ -32,13 +32,13 @@ const updateInventory = {
   params: Joi.object().keys({
     inventoryId: Joi.required().custom(objectId),
   }),
-  body: Joi.object()
-    .keys({
-      name: Joi.string(),
-      type: Joi.string().valid(...types),
-      stock: Joi.number().integer(),
-    })
-    .min(1),
+  body: Joi.object().keys({
+    name: Joi.string(),
+    type: Joi.string().valid(...types),
+    stock: Joi.number().integer().required(),
+    title: Joi.string().required().required(),
+    description: Joi.string().required(),
+  }),
 };
 
 const deleteInventory = {
