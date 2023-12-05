@@ -1,8 +1,8 @@
 const allRoles = {
-  owner: ['getUsers', 'manageUsers'],
-  franchise: ['getUsers', 'manageUsers'],
-  receptionist: ['getUsers', 'manageUsers'],
-  admin: ['getUsers', 'manageUsers'],
+  owner: ['getUsers', 'manageUsers', 'manageVisitors', 'getVisitors'],
+  branch_manager: ['getUsers', 'manageUsers', 'manageVisitors', 'getVisitors'],
+  receptionist: ['getUsers', 'manageUsers', 'manageVisitors', 'getVisitors'],
+  admin: ['getUsers', 'manageUsers', 'manageVisitors', 'getVisitors'],
 };
 
 const roles = Object.keys(allRoles);

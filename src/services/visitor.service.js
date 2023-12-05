@@ -40,7 +40,7 @@ const getVisitorById = async (id) => {
  * @param {Object} updateBody
  * @returns {Promise<Visitor>}
  */
-const updateViitorById = async (visitorId, updateBody) => {
+const updateVisitorById = async (visitorId, updateBody) => {
   const visitor = await getVisitorById(visitorId);
   if (!visitor) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Visitor not found');
@@ -68,6 +68,6 @@ module.exports = {
   createVisitor,
   queryVisitors,
   getVisitorById,
-  updateViitorById,
+  updateVisitorById,
   deleteVisitorById,
 };
