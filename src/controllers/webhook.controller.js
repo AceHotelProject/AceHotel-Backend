@@ -1,6 +1,6 @@
 const httpStatus = require('http-status');
 const catchAsync = require('../utils/catchAsync');
-
+const config = require('../config/config');
 const update = catchAsync(async (req, res) => {
   // Optional: Validate the secret
   if (config.env === 'production') {
