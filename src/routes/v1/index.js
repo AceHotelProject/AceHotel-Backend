@@ -3,6 +3,7 @@ const authRoute = require('./auth.route');
 const userRoute = require('./user.route');
 const docsRoute = require('./docs.route');
 const visitorRoute = require('./visitor.route');
+const webhookRoute = require('./webhook.route');
 const inventoryRoute = require('./inventory.route');
 const config = require('../../config/config');
 
@@ -24,6 +25,10 @@ const defaultRoutes = [
   {
     path: '/inventory',
     route: inventoryRoute,
+  },
+  {
+    path: '/webhook',
+    route: webhookRoute,
   },
 ];
 
