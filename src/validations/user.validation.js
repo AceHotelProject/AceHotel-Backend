@@ -5,14 +5,14 @@ const createUser = {
   body: Joi.object().keys({
     email: Joi.string().required().email(),
     password: Joi.string().required().custom(password),
-    name: Joi.string().required(),
-    role: Joi.string().required().valid('receptionist', 'franchise', 'owner', 'admin'),
+    username: Joi.string().required(),
+    role: Joi.string().required().valid('receptionist', 'branch_manager', 'owner', 'admin'),
   }),
 };
 
 const getUsers = {
   query: Joi.object().keys({
-    name: Joi.string(),
+    username: Joi.string(),
     role: Joi.string(),
     sortBy: Joi.string(),
     limit: Joi.number().integer(),

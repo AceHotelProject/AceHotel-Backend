@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const validator = require('validator');
 const { toJSON, paginate } = require('./plugins');
 
 const visitorSchema = mongoose.Schema(
@@ -27,6 +28,26 @@ const visitorSchema = mongoose.Schema(
     },
     path_identity_image: {
       type: String,
+      required: true,
+    },
+    phone: {
+      type: String,
+      trim: true,
+      validate(value) {
+        if (!value.match(/^08[0-9]{9,12}$/)) {
+          throw new Error('Format Nomor Telepon Anda Salah');
+        }
+      },
+    },
+    email: {
+      type: String,
+      trim: true,
+      lowercase: true,
+      validate(value) {
+        if (!validator.isEmail(value)) {
+          throw new Error('Format Email Anda Salah');
+        }
+      },
     },
   },
   {

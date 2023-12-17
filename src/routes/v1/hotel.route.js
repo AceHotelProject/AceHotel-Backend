@@ -1,9 +1,11 @@
 const express = require('express');
 const multer = require('multer');
 const auth = require('../../middlewares/auth');
-const validate = require('../../middlewares/validate');
-const visitorValidation = require('../../validations/visitor.validation');
-const visitorController = require('../../controllers/visitor.controller');
+// const validate = require('../../middlewares/validate');
+// const hotelValidation = require('../../validations/hotel.validation');
+const hotelController = require('../../controllers/hotel.controller');
+
+const router = express.Router();
 
 const multerConfig = multer({
   storage: multer.memoryStorage(),
@@ -12,30 +14,30 @@ const multerConfig = multer({
   },
 });
 
-const router = express.Router();
-
 router
   .route('/')
   .post(
-    auth('manageVisitors'),
-    multerConfig.single('identity_image'),
-    validate(visitorValidation.createVisitor),
-    visitorController.createVisitor
+    auth('manageFranchise'),
+    multerConfig.fields([
+      { name: 'regular_room_image', maxCount: 1 },
+      { name: 'exclusive_room_image', maxCount: 1 },
+    ]),
+    hotelController.createHotel
   )
-  .get(auth('getVisitors'), validate(visitorValidation.getVisitors), visitorController.getVisitors);
+  .get(auth('getFranchise'), hotelController.getHotels);
 
 router
-  .route('/:visitorId')
-  .get(auth('getVisitors'), validate(visitorValidation.getVisitor), visitorController.getVisitor)
-  .patch(auth('manageVisitors'), validate(visitorValidation.updateVisitor), visitorController.updateVisitor)
-  .delete(auth('manageVisitors'), validate(visitorValidation.deleteVisitor), visitorController.deleteVisitor);
+  .route('/:hotelId')
+  .get(auth('getFranchise'), hotelController.getHotel)
+  .patch(auth('manageFranchise'), hotelController.updateHotel)
+  .delete(auth('manageFranchise'), hotelController.deleteHotel);
 
 module.exports = router;
 
 /**
  * @swagger
  * tags:
- *   name: Visitors
+ *   name: Users
  *   description: User management and retrieval
  */
 

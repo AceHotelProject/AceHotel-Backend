@@ -1,41 +1,31 @@
 const express = require('express');
-const multer = require('multer');
 const auth = require('../../middlewares/auth');
-const validate = require('../../middlewares/validate');
-const visitorValidation = require('../../validations/visitor.validation');
-const visitorController = require('../../controllers/visitor.controller');
-
-const multerConfig = multer({
-  storage: multer.memoryStorage(),
-  limits: {
-    fileSize: 5 * 1024 * 1024, // 5MB limit (adjust as needed)
-  },
-});
+// const validate = require('../../middlewares/validate');
+const roomController = require('../../controllers/room.controller');
 
 const router = express.Router();
 
-router
-  .route('/')
-  .post(
-    auth('manageVisitors'),
-    multerConfig.single('identity_image'),
-    validate(visitorValidation.createVisitor),
-    visitorController.createVisitor
-  )
-  .get(auth('getVisitors'), validate(visitorValidation.getVisitors), visitorController.getVisitors);
+router.route('/').post(auth('manageRoom'), roomController.createRoom).get(auth('getRoom'), roomController.getRooms);
 
 router
-  .route('/:visitorId')
-  .get(auth('getVisitors'), validate(visitorValidation.getVisitor), visitorController.getVisitor)
-  .patch(auth('manageVisitors'), validate(visitorValidation.updateVisitor), visitorController.updateVisitor)
-  .delete(auth('manageVisitors'), validate(visitorValidation.deleteVisitor), visitorController.deleteVisitor);
+  .route('/:roomId')
+  .get(auth('getRoom'), roomController.getRoom)
+  .patch(auth('manageRoom'), roomController.updateRoom)
+  .delete(auth('manageRoom'), roomController.deleteRoom);
+
+router
+  .route('/hotel/:hotelId')
+  .post(auth('manageRoom'), roomController.populateRooms)
+  .get(auth('getRoom'), roomController.getRoomsByHotelId)
+  .patch(auth('manageRoom'), roomController.updateRoomByHotelId)
+  .delete(auth('manageRoom'), roomController.deleteRoomByHotelId);
 
 module.exports = router;
 
 /**
  * @swagger
  * tags:
- *   name: Visitors
+ *   name: Users
  *   description: User management and retrieval
  */
 
