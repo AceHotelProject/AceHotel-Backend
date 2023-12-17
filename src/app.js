@@ -18,7 +18,7 @@ const app = express();
 
 app.get('/', (req, res) => {
   res.json({
-    message: '🦄🌈✨👋🌎🌍🌏✨🌈🦄',
+    message: '🦄🌈✨👋🌎🌍🌏✨🌈🦄its change, right now',
   });
 });
 
@@ -59,9 +59,7 @@ if (config.env === 'production') {
 // v1 api routes
 app.use('/v1', routes);
 // health check
-app.get('/', (req, resp) => {
-  resp.send('App is Working');
-});
+
 // send back a 404 error for any unknown api request
 app.use((req, res, next) => {
   next(new ApiError(httpStatus.NOT_FOUND, 'Not found'));
