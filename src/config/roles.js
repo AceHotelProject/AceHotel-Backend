@@ -1,7 +1,19 @@
 const allRoles = {
   owner: ['getFranchise', 'manageFranchise', 'getUsers', 'manageUsers', 'manageVisitors', 'getVisitors'],
   branch_manager: ['getFranchise', 'manageFranchise', 'getUsers', 'manageUsers', 'manageVisitors', 'getVisitors'],
-  receptionist: ['getFranchise', 'getUsers', 'manageUsers', 'manageVisitors', 'getVisitors'],
+  receptionist: [
+    'getInventory',
+    'manageInventory',
+    'getRoom',
+    'manageRoom',
+    'getNotes',
+    'manageNotes',
+    'getFranchise',
+    'getUsers',
+    'manageUsers',
+    'manageVisitors',
+    'getVisitors',
+  ],
   admin: ['getFranchise', 'manageFranchise', 'getUsers', 'manageUsers', 'manageVisitors', 'getVisitors'],
 };
 
