@@ -2,12 +2,9 @@ const httpStatus = require('http-status');
 const pick = require('../utils/pick');
 const ApiError = require('../utils/ApiError');
 const catchAsync = require('../utils/catchAsync');
-const gcs = require('../utils/cloudStorage');
 const { noteService } = require('../services');
 
 const createNote = catchAsync(async (req, res) => {
-  const { file } = req;
-  req.body.path_identity_image = await gcs.upload(file);
   const note = await noteService.createNote(req.body);
   res.status(httpStatus.CREATED).send(note);
 });
