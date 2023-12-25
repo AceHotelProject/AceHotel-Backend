@@ -13,9 +13,9 @@ const getRooms = catchAsync(async (req, res) => {
   const filter = pick(req.query, ['name', 'type', 'hotel_id']);
   const options = pick(req.query, ['sortBy', 'limit', 'page']);
   const result = await roomService.queryRooms(filter, options);
-    if (result.totalResults === 0) {
-        throw new ApiError(httpStatus.NOT_FOUND, 'No rooms found');
-    }
+  if (result.totalResults === 0) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'No rooms found');
+  }
   res.send(result);
 });
 
