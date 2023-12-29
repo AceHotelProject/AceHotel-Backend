@@ -1,37 +1,45 @@
 const express = require('express');
 const auth = require('../../middlewares/auth');
 const validate = require('../../middlewares/validate');
-const inventoryValidation = require('../../validations/inventory.validation');
-const inventoryController = require('../../controllers/inventory.controller');
+// const addonValidation = require('../../validations/addon.validation');
+const addonController = require('../../controllers/addon.controller');
 
 const router = express.Router();
 
-router
-  .route('/')
-  .post(auth('manageInventory'), validate(inventoryValidation.createInventory), inventoryController.createInventory)
-  .get(auth('getInventory'), validate(inventoryValidation.getInventories), inventoryController.getInventories);
+// router
+//   .route('/')
+//   .post(auth('manageAddons'), validate(addonValidation.createAddon), addonController.createAddon)
+//   .get(auth('getAddons'), validate(addonValidation.getAddons), addonController.getAddons);
+
+// router
+//   .route('/:addonId')
+//   .get(auth('getAddons'), validate(addonValidation.getAddon), addonController.getAddon)
+//   .patch(auth('manageAddons'), validate(addonValidation.updateAddon), addonController.updateAddon)
+//   .delete(auth('manageAddons'), validate(addonValidation.deleteAddon), addonController.deleteAddon);
+router.route('/').post(auth('manageAddons'), addonController.createAddon).get(auth('getAddons'), addonController.getAddons);
 
 router
-  .route('/:inventoryId')
-  .get(auth('getInventory'), validate(inventoryValidation.getInventory), inventoryController.getInventory)
-  .patch(auth('manageInventory'), validate(inventoryValidation.updateInventory), inventoryController.updateInventory)
-  .delete(auth('manageInventory'), validate(inventoryValidation.deleteInventory), inventoryController.deleteInventory);
+  .route('/:addonId')
+  .get(auth('getAddons'), addonController.getAddon)
+  .patch(auth('manageAddons'), addonController.updateAddon)
+  .delete(auth('manageAddons'), addonController.deleteAddon);
 
 module.exports = router;
 
 /**
  * @swagger
  * tags:
- *   name: Inventory
- *   description: Inventory management and retrieval
+ *   name: Addons
+ *   description: Addon management and retrieval
  */
 
 /**
  * @swagger
- * /inventory:
+ * /addons:
  *   post:
- *     summary: Create a new inventory item
- *     description: Can only add inventory to managable hotel
+ *     summary: Create a addon
+ *     description: Only admins can create other addons.
+ *     tags: [Addons]
  *     security:
  *       - bearerAuth: []
  *     requestBody:
@@ -42,33 +50,36 @@ module.exports = router;
  *             type: object
  *             required:
  *               - name
- *               - type
- *               - date
- *               - stock
+ *               - email
+ *               - password
+ *               - role
  *             properties:
  *               name:
  *                 type: string
- *               type:
+ *               email:
  *                 type: string
- *                 enum: [linen, kasur]
- *               date:
+ *                 format: email
+ *                 description: must be unique
+ *               password:
  *                 type: string
- *                 format: date
- *                 description: date of last inventory update
- *               stock:
- *                  type: int
+ *                 format: password
+ *                 minLength: 8
+ *                 description: At least one number and one letter
+ *               role:
+ *                  type: string
+ *                  enum: [addon, admin]
  *             example:
- *               name: sprei
- *               type: linen
- *               date: 12-2-2022
- *               stock: 5
+ *               name: fake name
+ *               email: fake@example.com
+ *               password: password1
+ *               role: addon
  *     responses:
  *       "201":
  *         description: Created
  *         content:
  *           application/json:
  *             schema:
- *                $ref: '#/components/schemas/inventory'
+ *                $ref: '#/components/schemas/Addon'
  *       "400":
  *         $ref: '#/components/responses/DuplicateEmail'
  *       "401":
@@ -77,9 +88,9 @@ module.exports = router;
  *         $ref: '#/components/responses/Forbidden'
  *
  *   get:
- *     summary: Get all inventorys
- *     description: Only admins can retrieve all inventorys.
- *     tags: [Inventorys]
+ *     summary: Get all addons
+ *     description: Only admins can retrieve all addons.
+ *     tags: [Addons]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -87,12 +98,12 @@ module.exports = router;
  *         name: name
  *         schema:
  *           type: string
- *         description: inventory name
+ *         description: Addon name
  *       - in: query
  *         name: role
  *         schema:
  *           type: string
- *         description: inventory role
+ *         description: Addon role
  *       - in: query
  *         name: sortBy
  *         schema:
@@ -104,7 +115,7 @@ module.exports = router;
  *           type: integer
  *           minimum: 1
  *         default: 10
- *         description: Maximum number of inventorys
+ *         description: Maximum number of addons
  *       - in: query
  *         name: page
  *         schema:
@@ -123,7 +134,7 @@ module.exports = router;
  *                 results:
  *                   type: array
  *                   items:
- *                     $ref: '#/components/schemas/inventory'
+ *                     $ref: '#/components/schemas/Addon'
  *                 page:
  *                   type: integer
  *                   example: 1
@@ -144,11 +155,11 @@ module.exports = router;
 
 /**
  * @swagger
- * /inventorys/{id}:
+ * /addons/{id}:
  *   get:
- *     summary: Get a inventory
- *     description: Logged in inventorys can fetch only their own inventory information. Only admins can fetch other inventorys.
- *     tags: [Inventorys]
+ *     summary: Get a addon
+ *     description: Logged in addons can fetch only their own addon information. Only admins can fetch other addons.
+ *     tags: [Addons]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -157,14 +168,14 @@ module.exports = router;
  *         required: true
  *         schema:
  *           type: string
- *         description: inventory id
+ *         description: Addon id
  *     responses:
  *       "200":
  *         description: OK
  *         content:
  *           application/json:
  *             schema:
- *                $ref: '#/components/schemas/inventory'
+ *                $ref: '#/components/schemas/Addon'
  *       "401":
  *         $ref: '#/components/responses/Unauthorized'
  *       "403":
@@ -173,9 +184,9 @@ module.exports = router;
  *         $ref: '#/components/responses/NotFound'
  *
  *   patch:
- *     summary: Update a inventory
- *     description: Logged in inventorys can only update their own information. Only admins can update other inventorys.
- *     tags: [Inventorys]
+ *     summary: Update a addon
+ *     description: Logged in addons can only update their own information. Only admins can update other addons.
+ *     tags: [Addons]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -184,7 +195,7 @@ module.exports = router;
  *         required: true
  *         schema:
  *           type: string
- *         description: inventory id
+ *         description: Addon id
  *     requestBody:
  *       required: true
  *       content:
@@ -213,7 +224,7 @@ module.exports = router;
  *         content:
  *           application/json:
  *             schema:
- *                $ref: '#/components/schemas/inventory'
+ *                $ref: '#/components/schemas/Addon'
  *       "400":
  *         $ref: '#/components/responses/DuplicateEmail'
  *       "401":
@@ -224,9 +235,9 @@ module.exports = router;
  *         $ref: '#/components/responses/NotFound'
  *
  *   delete:
- *     summary: Delete a inventory
- *     description: Logged in inventorys can delete only themselves. Only admins can delete other inventorys.
- *     tags: [Inventorys]
+ *     summary: Delete a addon
+ *     description: Logged in addons can delete only themselves. Only admins can delete other addons.
+ *     tags: [Addons]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -235,7 +246,7 @@ module.exports = router;
  *         required: true
  *         schema:
  *           type: string
- *         description: inventory id
+ *         description: Addon id
  *     responses:
  *       "200":
  *         description: No content
