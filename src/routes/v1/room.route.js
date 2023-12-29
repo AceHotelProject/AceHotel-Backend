@@ -5,20 +5,20 @@ const roomController = require('../../controllers/room.controller');
 
 const router = express.Router();
 
-router.route('/').post(auth('manageRoom'), roomController.createRoom).get(auth('getRoom'), roomController.getRooms);
+router.route('/').get(auth('getRooms'), roomController.getRooms);
 
 router
   .route('/:roomId')
-  .get(auth('getRoom'), roomController.getRoom)
-  .patch(auth('manageRoom'), roomController.updateRoom)
-  .delete(auth('manageRoom'), roomController.deleteRoom);
+  .get(auth('getRooms'), roomController.getRoom)
+  .patch(auth('manageRooms'), roomController.updateRoom)
+  .delete(auth('manageRooms'), roomController.deleteRoom);
 
 router
   .route('/hotel/:hotelId')
-  .post(auth('manageRoom'), roomController.populateRooms)
-  .get(auth('getRoom'), roomController.getRoomsByHotelId)
-  .patch(auth('manageRoom'), roomController.updateRoomByHotelId)
-  .delete(auth('manageRoom'), roomController.deleteRoomByHotelId);
+  .post(auth('manageRooms'), roomController.populateRooms)
+  .get(auth('getRooms'), roomController.getRoomsByHotelId)
+  .patch(auth('manageRooms'), roomController.updateRoomByHotelId)
+  .delete(auth('manageRooms'), roomController.deleteRoomByHotelId);
 
 module.exports = router;
 
