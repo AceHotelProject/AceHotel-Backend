@@ -6,6 +6,7 @@ const catchAsync = require('../utils/catchAsync');
 const { hotelService, roomService } = require('../services');
 
 const createHotel = catchAsync(async (req, res) => {
+  req.body.owner_id = req.user._id;
   const regularRoomImage = req.files.regular_room_image[0];
   req.body.regular_room_image_path = await gcs.upload(regularRoomImage);
   const exclusiveRoomImage = req.files.exclusive_room_image[0];
@@ -32,9 +33,12 @@ const createHotel = catchAsync(async (req, res) => {
 });
 
 const getHotels = catchAsync(async (req, res) => {
-  const filter = pick(req.query, ['name', 'role']);
+  const filter = pick(req.query, ['name', 'owner_id']);
   const options = pick(req.query, ['sortBy', 'limit', 'page']);
   const result = await hotelService.queryHotels(filter, options);
+  if (result.totalResults === 0) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'No hotels found');
+  }
   res.send(result);
 });
 
