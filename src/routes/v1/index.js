@@ -8,6 +8,7 @@ const roomRoute = require('./room.route');
 const webhookRoute = require('./webhook.route');
 const inventoryRoute = require('./inventory.route');
 const noteRoute = require('./note.route');
+const tagRoute = require('./tag.route');
 const config = require('../../config/config');
 
 const router = express.Router();
@@ -40,6 +41,10 @@ const defaultRoutes = [
   {
     path: '/note',
     route: noteRoute,
+  },
+  {
+    path: '/tag',
+    route: tagRoute,
   },
   {
     path: '/webhook',
