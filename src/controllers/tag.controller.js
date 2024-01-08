@@ -10,7 +10,13 @@ const createTag = catchAsync(async (req, res) => {
 });
 
 const getTags = catchAsync(async (req, res) => {
+  const filter = pick(req.query, ['']);
+  const options = pick(req.query, ['sortBy', 'limit', 'page']);
   const result = await tagService.queryTags(filter, options);
+  if (result.totalResults === 0) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'No tags found');
+  }
+
   res.send(result);
 });
 

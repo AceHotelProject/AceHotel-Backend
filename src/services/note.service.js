@@ -20,8 +20,8 @@ const createNote = async (noteBody) => {
  * @param {number} [options.page] - Current page (default = 1)
  * @returns {Promise<QueryResult>}
  */
-const queryNotes = async (filter, options) => {
-  const notes = await Note.paginate(filter, options);
+const queryNotes = async (options) => {
+  const notes = await Note.paginate('', options);
   return notes;
 };
 

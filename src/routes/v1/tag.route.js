@@ -16,7 +16,7 @@ const router = express.Router();
 //   .get(auth('getTags'), validate(tagValidation.getTag), tagController.getTag)
 //   .patch(auth('manageTags'), validate(tagValidation.updateTag), tagController.updateTag)
 //   .delete(auth('manageTags'), validate(tagValidation.deleteTag), tagController.deleteTag);
-router.route('/').post(auth('manageTags'), tagController.createTag).get(auth('getTags'), tagController.getTags);
+router.route('/').post(auth('manageTags'), tagController.createTag).get(auth('manageTags'), tagController.getTags);
 
 router
   .route('/:tagId')
