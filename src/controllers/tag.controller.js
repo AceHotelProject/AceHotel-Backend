@@ -45,3 +45,8 @@ module.exports = {
   updateTag,
   deleteTag,
 };
+/*
+
+mosquitto_sub -d -q 1 -h 35.202.12.122 -p 1883 -t tbmq/demo/+ -i 'backend-client' -u 'backend-client' -P 'an1m3w1bu' -c -v
+mosquitto_pub -d -q 1 -h 35.202.12.122 -p 1883 -t tbmq/demo/topic -i 'backend-client' -u 'backend-client' -P 'an1m3w1bu' -c -m 'Hello World'
+*/

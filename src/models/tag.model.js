@@ -4,9 +4,13 @@ const { toJSON, paginate } = require('./plugins');
 
 const tagSchema = mongoose.Schema(
   {
-    hex: {
+    tid: {
       type: String,
       required: true,
+    },
+    status: {
+      type: Number,
+      default: 0,
     },
     inventory_id: [
       {
