@@ -5,7 +5,7 @@ const catchAsync = require('../utils/catchAsync');
 const { inventoryService } = require('../services');
 
 const createInventory = catchAsync(async (req, res) => {
-  const inventory = await inventoryService.createInventory(req.body);
+  const inventory = await inventoryService.createInventory(req.body, req.user);
   res.status(httpStatus.CREATED).send(inventory);
 });
 
@@ -25,7 +25,7 @@ const getInventory = catchAsync(async (req, res) => {
 });
 
 const updateInventory = catchAsync(async (req, res) => {
-  const inventory = await inventoryService.updateInventoryById(req.params.inventoryId, req.body);
+  const inventory = await inventoryService.updateInventoryById(req.params.inventoryId, req.body, req.user);
   res.send(inventory);
 });
 
