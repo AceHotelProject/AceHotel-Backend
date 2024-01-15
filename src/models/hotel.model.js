@@ -24,18 +24,18 @@ const hotelSchema = mongoose.Schema(
       type: Number,
       required: true,
     },
-    regular_room_image_path: {
+    regular_room_image_path: [{
       type: String,
       required: true,
-    },
+    }],
     exclusive_room_count: {
       type: Number,
       required: true,
     },
-    exclusive_room_image_path: {
+    exclusive_room_image_path: [{
       type: String,
       required: true,
-    },
+    }],
     room_id: [
       {
         type: mongoose.SchemaTypes.ObjectId,

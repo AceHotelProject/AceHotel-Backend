@@ -1,36 +1,24 @@
 const express = require('express');
-const multer = require('multer');
 const auth = require('../../middlewares/auth');
 // const validate = require('../../middlewares/validate');
-// const hotelValidation = require('../../validations/hotel.validation');
-const hotelController = require('../../controllers/hotel.controller');
+const bookingController = require('../../controllers/booking.controller');
 
 const router = express.Router();
 
-const multerConfig = multer({
-  storage: multer.memoryStorage(),
-  limits: {
-    fileSize: 5 * 1024 * 1024, // 5MB limit (adjust as needed)
-  },
-});
+router.route('/').get(auth('getBookings'), bookingController.getBookings);
 
 router
-  .route('/')
-  .post(
-    auth('manageFranchise'),
-    multerConfig.fields([
-      { name: 'regular_room_image', maxCount: 3 },
-      { name: 'exclusive_room_image', maxCount: 3 },
-    ]),
-    hotelController.createHotel
-  )
-  .get(auth('getFranchise'), hotelController.getHotels);
+  .route('/:bookingId')
+  .get(auth('getBookings'), bookingController.getBookingById)
+  .patch(auth('manageBookings'), bookingController.updateBookingById)
+  .delete(auth('manageBooking'), bookingController.deleteBookingById);
 
 router
-  .route('/:hotelId')
-  .get(auth('getFranchise'), hotelController.getHotel)
-  .patch(auth('manageFranchise'), hotelController.updateHotel)
-  .delete(auth('manageFranchise'), hotelController.deleteHotel);
+  .route('/visitor/:visitorId')
+  .post(auth('manageBookings'), bookingController.createBooking)
+  .get(auth('getBookings'), bookingController.getBookingsByVisitorId)
+  .patch(auth('manageBookings'), bookingController.updateBookingByVisitorId)
+  .delete(auth('manageBookings'), bookingController.deleteBookingByVisitorId);
 
 module.exports = router;
 
