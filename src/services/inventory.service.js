@@ -8,7 +8,19 @@ const ApiError = require('../utils/ApiError');
  * @returns {Promise<Inventory>}
  */
 const createInventory = async (inventoryBody) => {
-  return Inventory.create(inventoryBody);
+  const newInventory = {
+    name: inventoryBody.name,
+    type: inventoryBody.type,
+    stock: inventoryBody.stock,
+    inventory_update_history: {
+      title: 'Penambahan bahan',
+      description: 'Awal penambahan barang baru dalam gudang',
+      // 'date' will automatically be set to Date.now
+      stockChange: inventoryBody.stock, // Assuming initial stock change is 0
+    },
+  };
+
+  return Inventory.create(newInventory);
 };
 
 /**

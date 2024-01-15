@@ -39,7 +39,9 @@ const inventorySchema = mongoose.Schema(
       type: Number,
       required: true,
     },
-    inventory_update_history: [inventoryUpdateRecordSchema], // Array of update records
+    inventory_update_history: {
+      type: [inventoryUpdateRecordSchema], // Array of update records
+    },
   },
   {
     timestamps: true,
