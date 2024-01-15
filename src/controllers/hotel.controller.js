@@ -9,10 +9,10 @@ const createHotel = catchAsync(async (req, res) => {
   req.body.owner_id = req.user._id;
   req.body.regular_room_image_path = [];
   req.body.exclusive_room_image_path = [];
-  for (const image of req.files['regular_room_image']) {
+  for (const image of req.files.regular_room_image) {
     req.body.regular_room_image_path.push(await gcs.upload(image));
   }
-  for (const image of req.files['exclusive_room_image']) {
+  for (const image of req.files.exclusive_room_image) {
     req.body.exclusive_room_image_path.push(await gcs.upload(image));
   }
   const hotel = await hotelService.createHotel(req.body);

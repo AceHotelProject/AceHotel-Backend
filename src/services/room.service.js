@@ -129,7 +129,7 @@ const getAvailableRoomsByType = async (type, hotelId, count) => {
   return Room.find({
     type: type.toLowerCase(),
     hotel_id: hotelId,
-    is_booked: false
+    is_booked: false,
   }).limit(count);
 };
 

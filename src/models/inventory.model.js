@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const { toJSON, paginate } = require('./plugins');
 const { types } = require('../config/inventory.types');
+
 const inventoryUpdateRecordSchema = mongoose.Schema({
   title: {
     type: String,
@@ -17,7 +18,7 @@ const inventoryUpdateRecordSchema = mongoose.Schema({
     default: Date.now, // Automatically set to current date
   },
   stockChange: {
-    //jumlah perubahan
+    // jumlah perubahan
     type: Number,
     required: true,
   },

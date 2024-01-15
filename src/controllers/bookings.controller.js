@@ -5,10 +5,10 @@ const catchAsync = require('../utils/catchAsync');
 const { bookingService, roomService } = require('../services');
 
 const createBooking = catchAsync(async (req, res) => {
-  req.body.room_id = roomService.getAvailableRoomsByType(req.body.type, req.body.hotel_id, req.body.room_count)
+  req.body.room_id = roomService.getAvailableRoomsByType(req.body.type, req.body.hotel_id, req.body.room_count);
   checkout_date = new Date(req.body.checkin_date + req.body.duration * 24 * 60 * 60 * 1000);
   total_price = req.body.room_count * req.body.room_id[0].price * req.body.duration;
-  if(req.body.add_on_id){
+  if (req.body.add_on_id) {
     for (const add_on_id of req.body.add_on_id) {
       const add_on = await addOnService.getAddOnById(add_on_id);
       total_price += add_on.price;
@@ -62,12 +62,12 @@ const deleteBookingByVisitorId = catchAsync(async (req, res) => {
 });
 
 module.exports = {
-    createBooking,
-    getBookings,
-    getBookingById,
-    updateBookingById,
-    deleteBookingById,
-    getBookingsByVisitorId,
-    updateBookingByVisitorId,
-    deleteBookingByVisitorId,
+  createBooking,
+  getBookings,
+  getBookingById,
+  updateBookingById,
+  deleteBookingById,
+  getBookingsByVisitorId,
+  updateBookingByVisitorId,
+  deleteBookingByVisitorId,
 };

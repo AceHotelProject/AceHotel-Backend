@@ -5,7 +5,7 @@ const catchAsync = require('../utils/catchAsync');
 const { roomService, hotelService } = require('../services');
 
 const createRoom = catchAsync(async (req, res) => {
-  const {hotel_id, type} = req.body;
+  const { hotel_id, type } = req.body;
   const hotel = await hotelService.getHotelById(hotel_id);
   if (!hotel) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Hotel not found');
