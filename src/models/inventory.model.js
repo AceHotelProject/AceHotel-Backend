@@ -16,6 +16,12 @@ const inventoryUpdateRecordSchema = mongoose.Schema({
     type: Date,
     default: Date.now, // Automatically set to current date
   },
+  personInCharge: {
+    // Name of user in charge of update
+    type: String,
+    required: true,
+    trim: true,
+  },
   stockChange: {
     //jumlah perubahan
     type: Number,
