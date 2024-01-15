@@ -15,7 +15,29 @@ const { errorConverter, errorHandler } = require('./middlewares/error');
 const ApiError = require('./utils/ApiError');
 
 const app = express();
+// Handle MQTT
+const mqtt = require('mqtt');
+const host = '35.202.12.122';
+const port = '1883';
+const clientId = `backend-client`;
+const topic = '/nodejs/mqtt/rx';
+const connectUrl = `mqtt://${host}:${port}`;
 
+const client = mqtt.connect(connectUrl, {
+  clientId,
+  clean: true,
+  username: 'backend-client',
+  password: 'an1m3w1bu',
+});
+client.on('connect', () => {
+  console.log('Connected');
+  // Subscribe to the topic only if not already subscribed
+
+  client.subscribe(topic, () => {
+    console.log(`Subscribed to topic '${topic}'`);
+    isSubscribed = true; // Set the flag to true after subscribing
+  });
+});
 app.get('/', (req, res) => {
   res.json({
     message: '🦄🌈✨👋🌎🌍🌏✨🌈🦄its change, right now',

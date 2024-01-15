@@ -1,7 +1,13 @@
 const httpStatus = require('http-status');
 const { Tag } = require('../models');
 const ApiError = require('../utils/ApiError');
+const mqtt = require('mqtt');
+const topic = '/nodejs/mqtt/rx';
+const host = '35.202.12.122';
+const port = '1883';
+const clientId = `backend-client`;
 
+const connectUrl = `mqtt://${host}:${port}`;
 /**
  * Create a tag
  * @param {Object} tagBody
@@ -26,11 +32,26 @@ const queryTags = async (filter, options) => {
 };
 /**
  * Get TID by publish to ESP32
- * @param {ObjectId} id
  * @returns {Promise<Tag>}
  */
-const getTagId = async (id) => {
-  return Tag.findById(id);
+
+const getTagId = async () => {
+  const client = mqtt.connect(connectUrl, {
+    clientId,
+    username: 'backend-client',
+    password: 'an1m3w1bu',
+  });
+  client.publish(topic, 'nodejs mqtt test', { qos: 0, retain: false }, (error) => {
+    if (error) {
+      throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, 'Error at adding tag');
+    }
+  });
+  const result = {
+    payload: 'done',
+  };
+  console.log(result);
+
+  return JSON.stringify(result);
 };
 /**
  * Get tag by id
@@ -72,6 +93,7 @@ const deleteTagById = async (tagId) => {
 };
 
 module.exports = {
+  getTagId,
   createTag,
   queryTags,
   getTagById,
