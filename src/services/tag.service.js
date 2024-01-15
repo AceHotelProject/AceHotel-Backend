@@ -24,7 +24,14 @@ const queryTags = async (filter, options) => {
   const tags = await Tag.paginate(filter, options);
   return tags;
 };
-
+/**
+ * Get TID by publish to ESP32
+ * @param {ObjectId} id
+ * @returns {Promise<Tag>}
+ */
+const getTagId = async (id) => {
+  return Tag.findById(id);
+};
 /**
  * Get tag by id
  * @param {ObjectId} id
