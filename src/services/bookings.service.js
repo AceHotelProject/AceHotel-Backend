@@ -1,7 +1,7 @@
 /* eslint-disable no-restricted-syntax, camelcase, no-plusplus, no-await-in-loop */
 
 const httpStatus = require('http-status');
-const { Room } = require('../models');
+const { Booking } = require('../models');
 const ApiError = require('../utils/ApiError');
 
 /**
@@ -9,12 +9,12 @@ const ApiError = require('../utils/ApiError');
  * @param {Object} hotelBody
  * @returns {Promise<Hotel>}
  */
-const createRoom = async (roomBody) => {
-  return Room.create(roomBody);
+const createBooking = async (bookingBody) => {
+  return Booking.create(bookingBody);
 };
 
 /**
- * Query for rooms
+ * Query for bookings
  * @param {Object} filter - Mongo filter
  * @param {Object} options - Query options
  * @param {string} [options.sortBy] - Sort option in the format: sortField:(desc|asc)
@@ -22,123 +22,74 @@ const createRoom = async (roomBody) => {
  * @param {number} [options.page] - Current page (default = 1)
  * @returns {Promise<QueryResult>}
  */
-const queryRooms = async (filter, options) => {
-  const rooms = await Room.paginate(filter, options);
-  return rooms;
+const queryBookings = async (filter, options) => {
+  const bookings = await Booking.paginate(filter, options);
+  return bookings;
 };
 
 /**
- * Get room by id
+ * Get booking by id
  * @param {ObjectId} id
- * @returns {Promise<Room>}
+ * @returns {Promise<Booking>}
  */
-const getRoomById = async (id) => {
-  return Room.findById(id);
+const getBookingById = async (id) => {
+  const booking = await Booking.findById(id);
+  return booking;
 };
 
 /**
- * Update room by id
- * @param {ObjectId} roomId
- * @param {Object} updateBody
- * @returns {Promise<Room>}
+ * Delete booking by id
+ * @param {ObjectId} bookingId
+ * @returns {Promise<Booking>}
  */
-const updateRoomById = async (roomId, updateBody) => {
-  const room = await getRoomById(roomId);
-  if (!room) {
-    throw new ApiError(httpStatus.NOT_FOUND, 'Room not found');
+
+const deleteBookingById = async (bookingId) => {
+  const booking = await getBookingById(bookingId);
+  if (!booking) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Booking not found');
   }
-  Object.assign(room, updateBody);
-  await room.save();
-  return room;
+  await booking.remove();
+  return booking;
 };
 
 /**
- * Delete hotel by id
+ * Get bookings by visitor id
+ * @param {ObjectId} visitorId
  * @param {ObjectId} hotelId
- * @returns {Promise<Hotel>}
+ * @returns {Promise<Booking>}
  */
-const deleteRoomById = async (roomId) => {
-  const room = await getRoomById(roomId);
-  if (!room) {
-    throw new ApiError(httpStatus.NOT_FOUND, 'Room not found');
-  }
-  await room.remove();
-  return room;
+
+const getBookingsByVisitorId = async (visitorId, hotelId) => {
+  const bookings = await Booking.find({
+    visitor_id: visitorId,
+    hotel_id: hotelId,
+  });
+  return bookings;
 };
 
 /**
- * Populate rooms
+ * Delete bookings by visitor id
+ * @param {ObjectId} visitorId
  * @param {ObjectId} hotelId
- * @param {Object} updateBody
- * @returns {Promise<Hotel>}
+ * @returns {Promise<Booking>}
  */
-const populateRooms = async (hotelId, ...roomDataArray) => {
-  const roomIds = [];
 
-  for (const roomData of roomDataArray) {
-    const { type, price, image_path, room_count } = roomData;
-
-    // Create rooms based on the room_count
-    for (let i = 0; i < room_count; i++) {
-      const room = new Room({
-        hotel_id: hotelId,
-        type: type.toLowerCase(), // Assuming your enum values are lowercase
-        is_booked: false,
-        is_clean: true,
-        price,
-      });
-
-      // Set the image path if provided
-      if (image_path) {
-        room.image_path = image_path;
-      }
-
-      // Save the room to the database
-      await room.save();
-
-      // Add the room ID to the array
-      roomIds.push(room._id);
-    }
+const deleteBookingsByVisitorId = async (visitorId, hotelId) => {
+  const bookings = await Booking.find({
+    visitor_id: visitorId,
+    hotel_id: hotelId,
+  });
+  for (const b of bookings) {
+    await b.remove();
   }
-
-  return roomIds;
-};
-
-const getRoomsByHotelId = async (hotelId) => {
-  return Room.find({ hotel_id: hotelId });
-};
-
-const updateRoomByHotelId = async (hotelId, updateBody) => {
-  const rooms = await getRoomsByHotelId(hotelId);
-  if (!rooms) {
-    throw new ApiError(httpStatus.NOT_FOUND, 'Room not found');
-  }
-  for (const room of rooms) {
-    Object.assign(room, updateBody);
-    await room.save();
-  }
-  return rooms;
-};
-
-const deleteRoomByHotelId = async (hotelId) => {
-  const rooms = await getRoomsByHotelId(hotelId);
-  if (!rooms) {
-    throw new ApiError(httpStatus.NOT_FOUND, 'Room not found');
-  }
-  for (const room of rooms) {
-    await room.remove();
-  }
-  return rooms;
+  return bookings;
 };
 
 module.exports = {
-  createRoom,
-  queryRooms,
-  getRoomById,
-  updateRoomById,
-  deleteRoomById,
-  populateRooms,
-  getRoomsByHotelId,
-  updateRoomByHotelId,
-  deleteRoomByHotelId,
+  createBooking,
+  queryBookings,
+  getBookingById,
+  deleteBookingById,
+  getBookingsByVisitorId,
+  deleteBookingsByVisitorId,
 };

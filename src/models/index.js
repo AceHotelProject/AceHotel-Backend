@@ -5,3 +5,4 @@ module.exports.Hotel = require('./hotel.model');
 module.exports.Room = require('./room.model');
 module.exports.Inventory = require('./inventory.model');
 module.exports.Note = require('./note.model');
+module.exports.Booking = require('./booking.model');

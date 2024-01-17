@@ -51,9 +51,13 @@ const bookingSchema = mongoose.Schema(
         ref: 'AddOn',
       },
     ],
+    is_proof_uploaded: {
+      type: Boolean,
+      required: true,
+      default: false,
+    },
     path_transaction_proof: {
       type: String,
-      required: true,
     },
   },
   {
@@ -62,8 +66,8 @@ const bookingSchema = mongoose.Schema(
 );
 
 // add plugin that converts mongoose to json
-roomSchema.plugin(toJSON);
-roomSchema.plugin(paginate);
+bookingSchema.plugin(toJSON);
+bookingSchema.plugin(paginate);
 
 /**
  * @typedef Booking

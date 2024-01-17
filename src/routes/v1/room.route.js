@@ -15,7 +15,6 @@ router
 
 router
   .route('/hotel/:hotelId')
-  .post(auth('manageRooms'), roomController.populateRooms)
   .get(auth('getRooms'), roomController.getRoomsByHotelId)
   .patch(auth('manageRooms'), roomController.updateRoomByHotelId)
   .delete(auth('manageRooms'), roomController.deleteRoomByHotelId);

@@ -8,6 +8,8 @@ const allRoles = {
     'manageUsers',
     'manageVisitors',
     'getVisitors',
+    'getBookings',
+    'manageBookings',
   ],
   branch_manager: [
     'getRooms',
@@ -17,8 +19,10 @@ const allRoles = {
     'getUsers',
     'manageVisitors',
     'getVisitors',
+    'getBookings',
+    'manageBookings',
   ],
-  receptionist: ['getRooms', 'getFranchise', 'getUsers', 'manageVisitors', 'getVisitors'],
+  receptionist: ['getRooms', 'getFranchise', 'getUsers', 'manageVisitors', 'getVisitors', 'getBookings', 'manageBookings'],
   admin: [
     'getRooms',
     'manageRooms',
@@ -28,6 +32,8 @@ const allRoles = {
     'manageUsers',
     'manageVisitors',
     'getVisitors',
+    'getBookings',
+    'manageBookings',
   ],
 };
 
