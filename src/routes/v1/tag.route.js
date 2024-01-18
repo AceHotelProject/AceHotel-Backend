@@ -17,7 +17,8 @@ const router = express.Router();
 //   .patch(auth('manageTags'), validate(tagValidation.updateTag), tagController.updateTag)
 //   .delete(auth('manageTags'), validate(tagValidation.deleteTag), tagController.deleteTag);
 router.route('/').post(auth('manageTags'), tagController.createTag).get(auth('manageTags'), tagController.getTags);
-
+router.route('/id').get(auth('manageTags'), tagController.getTagId);
+router.route('/query').post(auth('manageTags'), tagController.setQuery);
 router
   .route('/:tagId')
   .get(auth('manageTags'), tagController.getTag)
