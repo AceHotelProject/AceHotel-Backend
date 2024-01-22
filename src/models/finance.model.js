@@ -1,34 +1,21 @@
 const mongoose = require('mongoose');
 const { toJSON, paginate } = require('./plugins');
-const { types } = require('../config/finance.types');
-const financeUpdateRecordSchema = mongoose.Schema({
-  revenue: {
-    // total revenue in a day
-    type: Number,
-    required: true,
-  },
-  booking: {
-    //total booking in a day
-    type: Number,
-    required: true,
-  },
-  date: {
-    type: Date,
-    default: Date.now, // Automatically set to current date
-  },
-});
+
 const financeSchema = mongoose.Schema(
   {
-    totalRevenue: {
+    revenue: {
+      // total revenue in a day
       type: Number,
       required: true,
     },
-    totalBooking: {
+    booking: {
+      //total booking in a day
       type: Number,
       required: true,
     },
-    finance_update_history: {
-      type: [financeUpdateRecordSchema], // Array of update records
+    date: {
+      type: Date,
+      default: Date.now, // Automatically set to current date
     },
   },
   {

@@ -1,5 +1,6 @@
 const allRoles = {
   owner: [
+    'manageFinances',
     'getRooms',
     'manageRooms',
     'getFranchise',
@@ -10,6 +11,7 @@ const allRoles = {
     'getVisitors',
   ],
   branch_manager: [
+    'manageFinances',
     'getRooms',
     'manageRooms',
     'getFranchise',
@@ -20,6 +22,7 @@ const allRoles = {
     'getVisitors',
   ],
   receptionist: [
+    'manageFinances',
     'manageTags',
     'getRooms',
     'manageRooms',
