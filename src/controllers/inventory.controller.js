@@ -10,6 +10,7 @@ const createInventory = catchAsync(async (req, res) => {
 });
 
 const getInventories = catchAsync(async (req, res) => {
+  console.log(req.user);
   const filter = pick(req.query, ['name', 'type']);
   const options = pick(req.query, ['sortBy', 'limit', 'page']);
   const result = await inventoryService.queryInventories(filter, options);
