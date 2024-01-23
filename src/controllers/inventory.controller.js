@@ -2,10 +2,11 @@ const httpStatus = require('http-status');
 const pick = require('../utils/pick');
 const ApiError = require('../utils/ApiError');
 const catchAsync = require('../utils/catchAsync');
-const { inventoryService } = require('../services');
+const { inventoryService, hotelService } = require('../services');
 
 const createInventory = catchAsync(async (req, res) => {
   const inventory = await inventoryService.createInventory(req.body, req.user);
+  hotelService.addInventoryId(req.body.hotel_id, inventory._id);
   res.status(httpStatus.CREATED).send(inventory);
 });
 

@@ -9,6 +9,7 @@ const createInventory = {
       .required()
       .valid(...types),
     stock: Joi.number().integer().required(),
+    hotel_id: Joi.required().custom(objectId),
   }),
 };
 

@@ -51,6 +51,22 @@ const updateHotelById = async (hotelId, updateBody) => {
 };
 
 /**
+ * Add inventory id to hotel
+ * @param {ObjectId} hotelId
+ * @param {ObjectId} inventoryId
+ * @returns {null}
+ */
+const addInventoryId = async (hotelId, inventoryId) => {
+  const hotel = await getHotelById(hotelId);
+  if (!hotel) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Hotel not found');
+  }
+  hotel.inventory_id.push(inventoryId);
+  await hotel.save();
+  return;
+};
+
+/**
  * Delete hotel by id
  * @param {ObjectId} hotelId
  * @returns {Promise<Hotel>}
@@ -70,4 +86,5 @@ module.exports = {
   getHotelById,
   updateHotelById,
   deleteHotelById,
+  addInventoryId,
 };
