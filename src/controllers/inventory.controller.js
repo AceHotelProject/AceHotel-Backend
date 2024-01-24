@@ -11,10 +11,15 @@ const createInventory = catchAsync(async (req, res) => {
 });
 
 const getInventories = catchAsync(async (req, res) => {
-  console.log(req.user);
+  const hotel = await hotelService.getHotelById(req.body.hotel_id);
+  const inventory_id = hotel.inventory_id;
   const filter = pick(req.query, ['name', 'type']);
+  const combinedFilter = {
+    ...filter,
+    _id: { $in: inventory_id },
+  };
   const options = pick(req.query, ['sortBy', 'limit', 'page']);
-  const result = await inventoryService.queryInventories(filter, options);
+  const result = await inventoryService.queryInventories(combinedFilter, options);
   res.send(result);
 });
 
@@ -32,6 +37,8 @@ const updateInventory = catchAsync(async (req, res) => {
 });
 
 const deleteInventory = catchAsync(async (req, res) => {
+  await hotelService.removeInventoryId(req.body.hotel_id, req.params.inventoryId);
+
   await inventoryService.deleteInventoryById(req.params.inventoryId);
   res.status(httpStatus.NO_CONTENT).send();
 });
