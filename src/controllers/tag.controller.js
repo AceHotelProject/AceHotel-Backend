@@ -13,6 +13,7 @@ const getTagId = catchAsync(async (req, res) => {
   if (!tag) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Failed to get tag id');
   }
+
   res.status(httpStatus.CREATED).send(tag);
 });
 

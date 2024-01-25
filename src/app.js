@@ -32,7 +32,7 @@ const host = '35.202.12.122';
 const port = '1883';
 const clientId = `backend2`;
 const topic = '/nodejs/mqtt/rx';
-
+const timeOutValue = 3000;
 const connectUrl = `mqtt://${host}:${port}`;
 
 const mqttClient = mqtt.connect(connectUrl, {
@@ -51,17 +51,38 @@ mqttClient.on('connect', function () {
 app.use(function (req, res, next) {
   // Publish messages
   req.mqttPublish = function (topic, message) {
-    mqttClient.publish(topic, message);
+    mqttClient.publish(topic, message, {
+      qos: 0,
+      retain: false,
+    });
   };
 
   // Subscribe to topic
-  req.mqttSubscribe = function (topic, callback) {
-    mqttClient.subscribe(topic);
-    mqttClient.on('message', function (t, m) {
-      if (t === topic) {
-        callback(m.toString());
-      }
+  req.mqttSubscribe = function (topic, timeout = 3000) {
+    return new Promise((resolve, reject) => {
+      let timeoutHandle;
+
+      const onMessage = (t, m) => {
+        if (t === topic) {
+          clearTimeout(timeoutHandle);
+          mqttClient.removeListener('message', onMessage);
+          resolve(m.toString());
+        }
+      };
+
+      mqttClient.subscribe(topic);
+      mqttClient.on('message', onMessage);
+
+      timeoutHandle = setTimeout(() => {
+        mqttClient.removeListener('message', onMessage);
+        next(new ApiError(httpStatus.REQUEST_TIMEOUT, 'MQTT message timeout'));
+      }, timeout);
     });
+  };
+
+  // Subscribe to topic
+  req.mqttUnsubscribe = function (topic, callback) {
+    mqttClient.unsubscribe(topic);
   };
   next();
 });

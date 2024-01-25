@@ -8,6 +8,7 @@ const allRoles = {
     'manageUsers',
     'manageVisitors',
     'getVisitors',
+    'manageTags',
   ],
   branch_manager: [
     'getRooms',
