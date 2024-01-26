@@ -10,7 +10,7 @@ const update = catchAsync(async (req, res) => {
 
   // Perform git fetch and restart the Node app
   exec(
-    'cd ~/AceHotel-Backend && git fetch https://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@github.com/AceHotelProject/AceHotel-Backend.git  && git reset --hard origin/main   && pm2 delete app && yarn start',
+    'cd ~/AceHotel-Backend && git fetch && git reset --hard origin/main   && pm2 delete app && yarn start',
     (err, stdout, stderr) => {
       if (err) {
         console.error(err);
@@ -24,3 +24,9 @@ const update = catchAsync(async (req, res) => {
 module.exports = {
   update,
 };
+/*
+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
+git clone https://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@github.com/AceHotelProject/AceHotel-Backend.git
+git fetch https://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@github.com/AceHotelProject/AceHotel-Backend.git
+
+*/
