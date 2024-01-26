@@ -15,12 +15,31 @@ const { errorConverter, errorHandler } = require('./middlewares/error');
 const ApiError = require('./utils/ApiError');
 
 const app = express();
-// Handle MQTT
+// See commit head
 
-app.get('/', (req, res) => {
-  res.json({
-    message: '🦄🌈✨👋🌎🌍🌏✨🌈🦄its change, right now, yeah',
+const { exec } = require('child_process');
+
+const getCurrentGitCommit = () => {
+  return new Promise((resolve, reject) => {
+    exec('git rev-parse HEAD', (error, stdout) => {
+      if (error) {
+        reject(error);
+        return;
+      }
+      resolve(stdout.trim());
+    });
   });
+};
+
+app.get('/', async (req, res) => {
+  try {
+    const commitHash = await getCurrentGitCommit();
+    res.json({
+      message: `🦄🌈✨👋🌎🌍🌏✨🌈🦄 Current Git HEAD: ${commitHash}`,
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to get Git HEAD commit' });
+  }
 });
 
 if (config.env !== 'test') {
