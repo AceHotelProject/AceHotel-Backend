@@ -10,7 +10,7 @@ const update = catchAsync(async (req, res) => {
 
   // Perform git fetch and restart the Node app
   exec(
-    'cd ~/AceHotel-Backend && git fetch && git reset --hard origin/main   && pm2 delete app && yarn start',
+    'cd ~/AceHotel-Backend && git fetch && git reset --hard origin/main   && pm2 delete app ; yarn start',
     (err, stdout, stderr) => {
       if (err) {
         console.error(err);
