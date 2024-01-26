@@ -1,46 +1,38 @@
 const express = require('express');
 const auth = require('../../middlewares/auth');
 const validate = require('../../middlewares/validate');
-// const tagValidation = require('../../validations/tag.validation');
-const tagController = require('../../controllers/tag.controller');
+// const financeValidation = require('../../validations/finance.validation');
+const financeController = require('../../controllers/finance.controller');
 
 const router = express.Router();
 
-// router
-//   .route('/')
-//   .post(auth('manageTags'), validate(tagValidation.createTag), tagController.createTag)
-//   .get(auth('getTags'), validate(tagValidation.getTags), tagController.getTags);
+router
+  .route('/')
+  .post(auth('manageFinances'), financeController.createFinance)
+  .get(auth('manageFinances'), financeController.getFinanceData);
 
 // router
-//   .route('/:tagId')
-//   .get(auth('getTags'), validate(tagValidation.getTag), tagController.getTag)
-//   .patch(auth('manageTags'), validate(tagValidation.updateTag), tagController.updateTag)
-//   .delete(auth('manageTags'), validate(tagValidation.deleteTag), tagController.deleteTag);
-router.route('/').post(auth('manageTags'), tagController.createTag).get(auth('manageTags'), tagController.getTags);
-router.route('/id').get(auth('manageTags'), tagController.getTagId);
-router.route('/query').post(auth('manageTags'), tagController.setQuery);
-router
-  .route('/:tagId')
-  .get(auth('manageTags'), tagController.getTag)
-  .patch(auth('manageTags'), tagController.updateTag)
-  .delete(auth('manageTags'), tagController.deleteTag);
+//   .route('/:financeId')
+//   .get(auth('getFinances'), financeController.getFinance)
+//   .patch(auth('manageFinances'), financeController.updateFinance)
+//   .delete(auth('manageFinances'), financeController.deleteFinance);
 
 module.exports = router;
 
 /**
  * @swagger
  * tags:
- *   name: Tags
- *   description: Tag management and retrieval
+ *   name: Finances
+ *   description: Finance management and retrieval
  */
 
 /**
  * @swagger
- * /tags:
+ * /finances:
  *   post:
- *     summary: Create a tag
- *     description: Only admins can create other tags.
- *     tags: [Tags]
+ *     summary: Create a finance
+ *     description: Only admins can create other finances.
+ *     tags: [Finances]
  *     security:
  *       - bearerAuth: []
  *     requestBody:
@@ -68,19 +60,19 @@ module.exports = router;
  *                 description: At least one number and one letter
  *               role:
  *                  type: string
- *                  enum: [tag, admin]
+ *                  enum: [finance, admin]
  *             example:
  *               name: fake name
  *               email: fake@example.com
  *               password: password1
- *               role: tag
+ *               role: finance
  *     responses:
  *       "201":
  *         description: Created
  *         content:
  *           application/json:
  *             schema:
- *                $ref: '#/components/schemas/Tag'
+ *                $ref: '#/components/schemas/Finance'
  *       "400":
  *         $ref: '#/components/responses/DuplicateEmail'
  *       "401":
@@ -89,9 +81,9 @@ module.exports = router;
  *         $ref: '#/components/responses/Forbidden'
  *
  *   get:
- *     summary: Get all tags
- *     description: Only admins can retrieve all tags.
- *     tags: [Tags]
+ *     summary: Get all finances
+ *     description: Only admins can retrieve all finances.
+ *     tags: [Finances]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -99,12 +91,12 @@ module.exports = router;
  *         name: name
  *         schema:
  *           type: string
- *         description: Tag name
+ *         description: Finance name
  *       - in: query
  *         name: role
  *         schema:
  *           type: string
- *         description: Tag role
+ *         description: Finance role
  *       - in: query
  *         name: sortBy
  *         schema:
@@ -116,7 +108,7 @@ module.exports = router;
  *           type: integer
  *           minimum: 1
  *         default: 10
- *         description: Maximum number of tags
+ *         description: Maximum number of finances
  *       - in: query
  *         name: page
  *         schema:
@@ -135,7 +127,7 @@ module.exports = router;
  *                 results:
  *                   type: array
  *                   items:
- *                     $ref: '#/components/schemas/Tag'
+ *                     $ref: '#/components/schemas/Finance'
  *                 page:
  *                   type: integer
  *                   example: 1
@@ -156,11 +148,11 @@ module.exports = router;
 
 /**
  * @swagger
- * /tags/{id}:
+ * /finances/{id}:
  *   get:
- *     summary: Get a tag
- *     description: Logged in tags can fetch only their own tag information. Only admins can fetch other tags.
- *     tags: [Tags]
+ *     summary: Get a finance
+ *     description: Logged in finances can fetch only their own finance information. Only admins can fetch other finances.
+ *     tags: [Finances]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -169,14 +161,14 @@ module.exports = router;
  *         required: true
  *         schema:
  *           type: string
- *         description: Tag id
+ *         description: Finance id
  *     responses:
  *       "200":
  *         description: OK
  *         content:
  *           application/json:
  *             schema:
- *                $ref: '#/components/schemas/Tag'
+ *                $ref: '#/components/schemas/Finance'
  *       "401":
  *         $ref: '#/components/responses/Unauthorized'
  *       "403":
@@ -185,9 +177,9 @@ module.exports = router;
  *         $ref: '#/components/responses/NotFound'
  *
  *   patch:
- *     summary: Update a tag
- *     description: Logged in tags can only update their own information. Only admins can update other tags.
- *     tags: [Tags]
+ *     summary: Update a finance
+ *     description: Logged in finances can only update their own information. Only admins can update other finances.
+ *     tags: [Finances]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -196,7 +188,7 @@ module.exports = router;
  *         required: true
  *         schema:
  *           type: string
- *         description: Tag id
+ *         description: Finance id
  *     requestBody:
  *       required: true
  *       content:
@@ -225,7 +217,7 @@ module.exports = router;
  *         content:
  *           application/json:
  *             schema:
- *                $ref: '#/components/schemas/Tag'
+ *                $ref: '#/components/schemas/Finance'
  *       "400":
  *         $ref: '#/components/responses/DuplicateEmail'
  *       "401":
@@ -236,9 +228,9 @@ module.exports = router;
  *         $ref: '#/components/responses/NotFound'
  *
  *   delete:
- *     summary: Delete a tag
- *     description: Logged in tags can delete only themselves. Only admins can delete other tags.
- *     tags: [Tags]
+ *     summary: Delete a finance
+ *     description: Logged in finances can delete only themselves. Only admins can delete other finances.
+ *     tags: [Finances]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -247,7 +239,7 @@ module.exports = router;
  *         required: true
  *         schema:
  *           type: string
- *         description: Tag id
+ *         description: Finance id
  *     responses:
  *       "200":
  *         description: No content

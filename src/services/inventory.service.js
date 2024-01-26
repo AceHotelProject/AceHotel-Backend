@@ -7,8 +7,21 @@ const ApiError = require('../utils/ApiError');
  * @param {Object} inventoryBody
  * @returns {Promise<Inventory>}
  */
-const createInventory = async (inventoryBody) => {
-  return Inventory.create(inventoryBody);
+const createInventory = async (inventoryBody, user) => {
+  const newInventory = {
+    name: inventoryBody.name,
+    type: inventoryBody.type,
+    stock: inventoryBody.stock,
+    inventory_update_history: {
+      title: 'Penambahan bahan',
+      description: 'Awal penambahan barang baru dalam gudang',
+      personInCharge: user.username,
+      // 'date' will automatically be set to Date.now
+      stockChange: inventoryBody.stock, // Assuming initial stock change is 0
+    },
+  };
+
+  return Inventory.create(newInventory);
 };
 
 /**
@@ -40,7 +53,7 @@ const getInventoryById = async (id) => {
  * @param {Object} updateBody
  * @returns {Promise<Inventory>}
  */
-const updateInventoryById = async (inventoryId, updateBody) => {
+const updateInventoryById = async (inventoryId, updateBody, user) => {
   const inventory = await getInventoryById(inventoryId);
   if (!inventory) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Inventory not found');
@@ -54,7 +67,10 @@ const updateInventoryById = async (inventoryId, updateBody) => {
     inventory.inventory_update_history.push({
       title: updateBody.title,
       description: updateBody.description,
-      stockChange,
+
+      personInCharge: user.username,
+      stockChange: stockChange,
+
       date: new Date(), // This will set the date to the current date and time
     });
   }

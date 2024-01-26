@@ -40,6 +40,12 @@ const userSchema = mongoose.Schema(
       enum: roles,
       default: 'receptionist',
     },
+    hotel_id: [
+      {
+        type: mongoose.SchemaTypes.ObjectId,
+        ref: 'Hotel',
+      },
+    ],
     isEmailVerified: {
       type: Boolean,
       default: false,

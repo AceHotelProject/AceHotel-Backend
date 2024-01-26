@@ -51,6 +51,22 @@ const updateHotelById = async (hotelId, updateBody) => {
 };
 
 /**
+ * Add inventory id to hotel
+ * @param {ObjectId} hotelId
+ * @param {ObjectId} inventoryId
+ * @returns {null}
+ */
+const addInventoryId = async (hotelId, inventoryId) => {
+  const hotel = await getHotelById(hotelId);
+  if (!hotel) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Hotel not found');
+  }
+  hotel.inventory_id.push(inventoryId);
+  await hotel.save();
+  return;
+};
+
+/**
  * Delete hotel by id
  * @param {ObjectId} hotelId
  * @returns {Promise<Hotel>}
@@ -63,6 +79,30 @@ const deleteHotelById = async (hotelId) => {
   await hotel.remove();
   return hotel;
 };
+/**
+ * Remove inventory id from hotel
+ * @param {ObjectId} hotelId
+ * @param {ObjectId} inventoryId
+ * @returns {Promise<void>}
+ */
+const removeInventoryId = async (hotelId, inventoryId) => {
+  const hotel = await getHotelById(hotelId);
+  if (!hotel) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Hotel not found');
+  }
+
+  // Find the index of the inventoryId in the inventory_id array
+  const index = hotel.inventory_id.indexOf(inventoryId);
+  console.log(inventoryId, ' ', index);
+  // If the inventoryId exists in the array, remove it
+  if (index > -1) {
+    hotel.inventory_id.splice(index, 1);
+    await hotel.save();
+  } else {
+    // Handle the case where the inventoryId is not found in the array
+    throw new ApiError(httpStatus.NOT_FOUND, 'Inventory ID not found in hotel');
+  }
+};
 
 module.exports = {
   createHotel,
@@ -70,4 +110,6 @@ module.exports = {
   getHotelById,
   updateHotelById,
   deleteHotelById,
+  addInventoryId,
+  removeInventoryId,
 };
