@@ -22,9 +22,3 @@ const update = catchAsync(async (req, res) => {
 module.exports = {
   update,
 };
-/*
-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
-git clone https://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@github.com/AceHotelProject/AceHotel-Backend.git
-git fetch https://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@github.com/AceHotelProject/AceHotel-Backend.git
-
-*/
