@@ -9,8 +9,9 @@ const allRoles = {
     'manageUsers',
     'manageVisitors',
     'getVisitors',
+    'manageTags',
     'getInventory',
-    'manageInventory',
+    'manageInventory'
   ],
   branch_manager: [
     'manageFinances',
