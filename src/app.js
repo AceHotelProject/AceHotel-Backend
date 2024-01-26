@@ -49,16 +49,16 @@ if (config.env !== 'test') {
 const mqtt = require('mqtt');
 const host = '35.202.12.122';
 const port = '1883';
-const clientId = `backend2`;
+const clientId = `backend3`;
 const topic = '/nodejs/mqtt/rx';
 const timeOutValue = 3000;
 const connectUrl = `mqtt://${host}:${port}`;
-
+//mosquitto_pub -d -q 1 -h 35.202.12.122 -p 1883 -t tbmq/demo/topic -i 'backend3' -u 'backend3' -P 'an1m3w1bu' -c -m 'Hello World'
 const mqttClient = mqtt.connect(connectUrl, {
   clientId,
   clean: true,
   connectTimeout: 4000,
-  username: 'backend2',
+  username: 'backend3',
   password: 'an1m3w1bu',
   reconnectPeriod: 1000,
 });

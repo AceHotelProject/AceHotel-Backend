@@ -82,6 +82,22 @@ const updateInventoryById = async (inventoryId, updateBody, user) => {
 };
 
 /**
+ * Add tag id to inventory
+ * @param {ObjectId} inventoryId
+ * @param {ObjectId} tagId
+ * @returns {null}
+ */
+const addTagId = async (inventoryId, tagId) => {
+  const inventory = await getInventoryById(inventoryId);
+  if (!inventory) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Inventory not found');
+  }
+  inventory.tag_id.push(tagId);
+  await inventory.save();
+  return;
+};
+
+/**
  * Delete inventory by id
  * @param {ObjectId} inventoryId
  * @returns {Promise<Inventory>}
@@ -101,4 +117,5 @@ module.exports = {
   getInventoryById,
   updateInventoryById,
   deleteInventoryById,
+  addTagId,
 };
