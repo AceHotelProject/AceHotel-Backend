@@ -51,6 +51,11 @@ const getTagId = async (req) => {
     method: 'getTag',
     params: '',
   };
+  // const dummyResponseJson = {
+  //   tid: ['FF2428302'],
+  //   status: '1',
+  // };
+
   let queryCommandJson = {
     method: 'setQuery',
     params: 'false',
@@ -59,6 +64,8 @@ const getTagId = async (req) => {
   req.mqttPublish(topic, query);
   const command = JSON.stringify(commandJson);
   req.mqttPublish(topic, command);
+  // const dummy = JSON.stringify(dummyResponseJson);
+  // req.mqttPublish(topic, dummy);
 
   req.mqttSubscribe(topic, function (message) {
     console.log('Received message: ' + message);

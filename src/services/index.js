@@ -8,3 +8,4 @@ module.exports.roomService = require('./room.service');
 module.exports.inventoryService = require('./inventory.service');
 module.exports.noteService = require('./note.service');
 module.exports.tagService = require('./tag.service');
+module.exports.financeService = require('./finance.service');
