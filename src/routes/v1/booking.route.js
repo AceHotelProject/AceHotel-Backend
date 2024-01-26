@@ -1,24 +1,24 @@
 const express = require('express');
 const auth = require('../../middlewares/auth');
 // const validate = require('../../middlewares/validate');
-const roomController = require('../../controllers/room.controller');
+const bookingController = require('../../controllers/booking.controller');
 
 const router = express.Router();
 
-router.route('/').get(auth('getRooms'), roomController.getRooms).post(auth('manageRooms'), roomController.createRoom);
+router.route('/').get(auth('getBookings'), bookingController.getBookings);
 
 router
-  .route('/:roomId')
-  .get(auth('getRooms'), roomController.getRoom)
-  .patch(auth('manageRooms'), roomController.updateRoom)
-  .delete(auth('manageRooms'), roomController.deleteRoom);
+  .route('/:bookingId')
+  .get(auth('getBookings'), bookingController.getBookingById)
+  .patch(auth('manageBookings'), bookingController.updateBookingById)
+  .delete(auth('manageBooking'), bookingController.deleteBookingById);
 
 router
-  .route('/hotel/:hotelId')
-  .post(auth('manageRooms'), roomController.populateRooms)
-  .get(auth('getRooms'), roomController.getRoomsByHotelId)
-  .patch(auth('manageRooms'), roomController.updateRoomByHotelId)
-  .delete(auth('manageRooms'), roomController.deleteRoomByHotelId);
+  .route('/visitor/:visitorId')
+  .post(auth('manageBookings'), bookingController.createBooking)
+  .get(auth('getBookings'), bookingController.getBookingsByVisitorId)
+  .patch(auth('manageBookings'), bookingController.updateBookingByVisitorId)
+  .delete(auth('manageBookings'), bookingController.deleteBookingByVisitorId);
 
 module.exports = router;
 

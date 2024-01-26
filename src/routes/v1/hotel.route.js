@@ -19,8 +19,8 @@ router
   .post(
     auth('manageFranchise'),
     multerConfig.fields([
-      { name: 'regular_room_image', maxCount: 1 },
-      { name: 'exclusive_room_image', maxCount: 1 },
+      { name: 'regular_room_image', maxCount: 3 },
+      { name: 'exclusive_room_image', maxCount: 3 },
     ]),
     hotelController.createHotel
   )

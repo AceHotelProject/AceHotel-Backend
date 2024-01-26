@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const { toJSON, paginate } = require('./plugins');
 const { types } = require('../config/inventory.types');
+
 const inventoryUpdateRecordSchema = mongoose.Schema({
   title: {
     type: String,
@@ -23,7 +24,7 @@ const inventoryUpdateRecordSchema = mongoose.Schema({
     trim: true,
   },
   stockChange: {
-    //jumlah perubahan
+    // jumlah perubahan
     type: Number,
     required: true,
   },

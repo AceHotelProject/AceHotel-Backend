@@ -1,7 +1,8 @@
 const httpStatus = require('http-status');
+const { exec } = require('child_process');
 const catchAsync = require('../utils/catchAsync');
 const config = require('../config/config');
-var exec = require('child_process').exec;
+
 const update = catchAsync(async (req, res) => {
   // Optional: Validate the secret
   if (config.env === 'production') {

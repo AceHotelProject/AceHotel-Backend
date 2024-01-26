@@ -76,7 +76,7 @@ const populateRooms = async (hotelId, ...roomDataArray) => {
   const roomIds = [];
 
   for (const roomData of roomDataArray) {
-    const { type, price, room_count } = roomData;
+    const { type, price, image_path, room_count } = roomData;
 
     // Create rooms based on the room_count
     for (let i = 0; i < room_count; i++) {
@@ -88,6 +88,11 @@ const populateRooms = async (hotelId, ...roomDataArray) => {
         price,
       });
 
+      // Set the image path if provided
+      if (image_path) {
+        room.image_path = image_path;
+      }
+
       // Save the room to the database
       await room.save();
 
@@ -95,6 +100,7 @@ const populateRooms = async (hotelId, ...roomDataArray) => {
       roomIds.push(room._id);
     }
   }
+
   return roomIds;
 };
 
@@ -125,14 +131,6 @@ const deleteRoomByHotelId = async (hotelId) => {
   return rooms;
 };
 
-const getAvailableRoomsByType = async (type, hotelId, count) => {
-  return Room.find({
-    type: type.toLowerCase(),
-    hotel_id: hotelId,
-    is_booked: false,
-  }).limit(count);
-};
-
 module.exports = {
   createRoom,
   queryRooms,
@@ -143,5 +141,4 @@ module.exports = {
   getRoomsByHotelId,
   updateRoomByHotelId,
   deleteRoomByHotelId,
-  getAvailableRoomsByType,
 };
