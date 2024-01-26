@@ -9,10 +9,14 @@ const createInventory = {
       .required()
       .valid(...types),
     stock: Joi.number().integer().required(),
+    hotel_id: Joi.required().custom(objectId),
   }),
 };
 
 const getInventories = {
+  body: Joi.object().keys({
+    hotel_id: Joi.string().custom(objectId),
+  }),
   query: Joi.object().keys({
     name: Joi.string(),
     type: Joi.string(),
@@ -44,6 +48,9 @@ const updateInventory = {
 const deleteInventory = {
   params: Joi.object().keys({
     inventoryId: Joi.string().custom(objectId),
+  }),
+  body: Joi.object().keys({
+    hotel_id: Joi.string().custom(objectId),
   }),
 };
 

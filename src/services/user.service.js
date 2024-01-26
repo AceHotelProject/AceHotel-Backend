@@ -66,6 +66,22 @@ const updateUserById = async (userId, updateBody) => {
 };
 
 /**
+ * Add hotel id to user
+ * @param {ObjectId} userId
+ * @param {ObjectId} hotelId
+ * @returns {null}
+ */
+const addHotelId = async (userId, hotelId) => {
+  const user = await getUserById(userId);
+  if (!user) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
+  }
+  user.hotel_id.push(hotelId);
+  await user.save();
+  return;
+};
+
+/**
  * Delete user by id
  * @param {ObjectId} userId
  * @returns {Promise<User>}
@@ -86,4 +102,5 @@ module.exports = {
   getUserByEmail,
   updateUserById,
   deleteUserById,
+  addHotelId,
 };
