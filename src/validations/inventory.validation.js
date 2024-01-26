@@ -15,7 +15,7 @@ const createInventory = {
 
 const getInventories = {
   body: Joi.object().keys({
-    hotel_id: Joi.string().custom(objectId),
+    hotel_id: Joi.string().custom(objectId).required(),
   }),
   query: Joi.object().keys({
     name: Joi.string(),
