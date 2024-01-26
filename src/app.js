@@ -35,7 +35,7 @@ app.get('/', async (req, res) => {
   try {
     const commitHash = await getCurrentGitCommit();
     res.json({
-      message: `🦄🌈✨👋🌎🌍🌏✨🌈🦄 Current Git HEAD: ${commitHash}`,
+      message: `🦄🌈✨👋🌎🌍🌏✨🌈🦄  Current Git HEAD: ${commitHash}`,
     });
   } catch (error) {
     res.status(500).json({ error: 'Failed to get Git HEAD commit' });
