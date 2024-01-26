@@ -10,16 +10,13 @@ const update = catchAsync(async (req, res) => {
   }
 
   // Perform git fetch and restart the Node app
-  exec(
-    'cd ~/AceHotel-Backend && git fetch && git reset --hard origin/main   && pm2 delete app ; yarn start',
-    (err, stdout, stderr) => {
-      if (err) {
-        console.error(err);
-        return res.status(500).send('Internal Server Error');
-      }
-      res.status(200).send('Successfully fetched and restarted');
+  exec('cd ~/AceHotel-Backend && git fetch && git reset --hard origin/main   && yarn start', (err, stdout, stderr) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).send('Internal Server Error');
     }
-  );
+    res.status(200).send('Successfully fetched and restarted');
+  });
 });
 
 module.exports = {
