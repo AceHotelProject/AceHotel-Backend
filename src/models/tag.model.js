@@ -12,12 +12,11 @@ const tagSchema = mongoose.Schema(
       type: Number,
       default: 0,
     },
-    inventory_id: [
-      {
-        type: mongoose.SchemaTypes.ObjectId,
-        ref: 'Inventory',
-      },
-    ],
+    inventory_id: {
+      type: mongoose.SchemaTypes.ObjectId,
+      ref: 'Inventory',
+      required: true,
+    },
   },
   {
     timestamps: true,
