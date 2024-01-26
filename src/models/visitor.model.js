@@ -14,6 +14,7 @@ const visitorSchema = mongoose.Schema(
     },
     identity_num: {
       type: String,
+      unique: true,
       required: true,
       trim: true,
       validate(value) {
@@ -58,6 +59,16 @@ const visitorSchema = mongoose.Schema(
 // add plugin that converts mongoose to json
 visitorSchema.plugin(toJSON);
 visitorSchema.plugin(paginate);
+
+visitorSchema.statics.isEmailTaken = async function (email, excludeUserId) {
+  const user = await this.findOne({ email, _id: { $ne: excludeUserId } });
+  return !!user;
+};
+
+visitorSchema.statics.isNIKTaken = async function (identity_num, excludeUserId) {
+  const user = await this.findOne({ identity_num, _id: { $ne: excludeUserId } });
+  return !!user;
+};
 
 /**
  * @typedef User

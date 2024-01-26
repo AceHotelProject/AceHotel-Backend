@@ -9,6 +9,8 @@ const allRoles = {
     'manageUsers',
     'manageVisitors',
     'getVisitors',
+    'getBookings',
+    'manageBookings',
     'manageTags',
     'getInventory',
     'manageInventory'
@@ -42,16 +44,6 @@ const allRoles = {
     'manageVisitors',
     'getVisitors',
   ],
-  branch_manager: [
-    'getRooms',
-    'manageRooms',
-    'getFranchise',
-    'manageFranchise',
-    'getUsers',
-    'manageVisitors',
-    'getVisitors',
-  ],
-  receptionist: ['getRooms', 'getFranchise', 'getUsers', 'manageVisitors', 'getVisitors'],
   admin: [
     'getRooms',
     'manageRooms',
@@ -61,17 +53,10 @@ const allRoles = {
     'manageUsers',
     'manageVisitors',
     'getVisitors',
+    'getBookings',
+    'manageBookings',
   ],
-  admin: [
-    'getRooms',
-    'manageRooms',
-    'getFranchise',
-    'manageFranchise',
-    'getUsers',
-    'manageUsers',
-    'manageVisitors',
-    'getVisitors',
-  ],
+
 };
 
 const roles = Object.keys(allRoles);

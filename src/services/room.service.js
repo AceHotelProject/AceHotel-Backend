@@ -125,12 +125,21 @@ const deleteRoomByHotelId = async (hotelId) => {
   return rooms;
 };
 
-const getAvailableRoomsByType = async (type, hotelId, count) => {
-  return Room.find({
-    type: type.toLowerCase(),
+const getAvailableRoomsByType = async (type, hotelId, count, checkin_date) => {
+  const room = await Room.find({
     hotel_id: hotelId,
-    is_booked: false,
-  }).limit(count);
+    type: type.toLowerCase(),
+  });
+  const availableRooms = [];
+  for (const r of room) {
+    if (r.checkout <= checkin_date || r.checkout === undefined) {
+      availableRooms.push(r._id);
+    }
+  }
+  // Cut the array to the count
+  availableRooms.splice(count);
+  console.log(availableRooms);
+  return availableRooms;
 };
 
 module.exports = {

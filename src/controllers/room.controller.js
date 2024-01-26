@@ -80,7 +80,15 @@ const updateRoomByHotelId = catchAsync(async (req, res) => {
 });
 
 const deleteRoomByHotelId = catchAsync(async (req, res) => {
+  const hotel = await hotelService.getHotelById(req.params.hotelId);
+  if (!hotel) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Hotel not found');
+  }
   await roomService.deleteRoomByHotelId(req.params.hotelId);
+  hotel.room_id = [];
+  hotel.regular_room_count = 0;
+  hotel.exclusive_room_count = 0;
+  await hotel.save();
   res.status(httpStatus.NO_CONTENT).send();
 });
 
