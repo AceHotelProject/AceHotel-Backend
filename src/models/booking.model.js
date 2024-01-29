@@ -33,6 +33,13 @@ const bookingSchema = mongoose.Schema(
       type: Date,
       required: true,
     },
+    actual_checkin: {
+      type: Date,
+    },
+    checkin_staff_id: {
+      type: mongoose.SchemaTypes.ObjectId,
+      ref: 'User',
+    },
     duration: {
       type: Number,
       required: true,
@@ -41,14 +48,32 @@ const bookingSchema = mongoose.Schema(
       type: Date,
       required: true,
     },
+    actual_checkout: {
+      type: Date,
+    },
+    checkout_staff_id: {
+      type: mongoose.SchemaTypes.ObjectId,
+      ref: 'User',
+    },
     total_price: {
       type: Number,
       required: true,
+      default: 0,
     },
     add_on_id: [
       {
         type: mongoose.SchemaTypes.ObjectId,
         ref: 'AddOn',
+      },
+    ],
+    has_problem: {
+      type: Boolean,
+      default: false,
+    },
+    note_id: [
+      {
+        type: mongoose.SchemaTypes.ObjectId,
+        ref: 'Note',
       },
     ],
     is_proof_uploaded: {

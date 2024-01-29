@@ -19,6 +19,10 @@ router
   .patch(auth('manageRooms'), roomController.updateRoomByHotelId)
   .delete(auth('manageRooms'), roomController.deleteRoomByHotelId);
 
+router.route('/checkin/:roomId').post(auth('manageRooms'), roomController.checkinById);
+
+router.route('/checkout/:roomId').post(auth('manageRooms'), roomController.checkoutById);
+
 module.exports = router;
 
 /**

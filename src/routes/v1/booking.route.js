@@ -37,6 +37,7 @@ router
   .patch(auth('manageBookings'), bookingController.updateBookingByVisitorId)
   .delete(auth('manageBookings'), bookingController.deleteBookingByVisitorId);
 
+router.route('/room/:roomId').get(auth('getBookings'), bookingController.getBookingsByRoomId);
 module.exports = router;
 
 /**

@@ -24,6 +24,11 @@ const createBooking = async (bookingBody) => {
  */
 const queryBookings = async (filter, options) => {
   const bookings = await Booking.paginate(filter, options);
+
+  // Manually populate the visitor_id field for each result
+  for (const booking of bookings.results) {
+    await booking.populate('visitor_id', 'name').execPopulate();
+  }
   return bookings;
 };
 
@@ -85,6 +90,12 @@ const deleteBookingsByVisitorId = async (visitorId, hotelId) => {
   return bookings;
 };
 
+const getBookingsByRoomId = async (roomId) => {
+  const bookings = await Booking.find({
+    room_id: roomId,
+  });
+  return bookings;
+};
 module.exports = {
   createBooking,
   queryBookings,
@@ -92,4 +103,5 @@ module.exports = {
   deleteBookingById,
   getBookingsByVisitorId,
   deleteBookingsByVisitorId,
+  getBookingsByRoomId,
 };

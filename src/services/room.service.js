@@ -1,7 +1,7 @@
 /* eslint-disable no-restricted-syntax, camelcase, no-plusplus, no-await-in-loop */
 
 const httpStatus = require('http-status');
-const { Room } = require('../models');
+const { Room, Booking } = require('../models');
 const ApiError = require('../utils/ApiError');
 
 /**
@@ -125,21 +125,96 @@ const deleteRoomByHotelId = async (hotelId) => {
   return rooms;
 };
 
-const getAvailableRoomsByType = async (type, hotelId, count, checkin_date) => {
+const bookingRoomById = async (roomId, updateBody) => {
+  const room = await getRoomById(roomId);
+  if (!room) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Room not found');
+  }
+  room.is_booked = updateBody.is_booked;
+  room.bookings.push(updateBody.bookings);
+  await room.save();
+  return room;
+};
+
+const getAvailableRoomsByType = async (type, hotelId, count, checkin_date, checkout_date) => {
   const room = await Room.find({
     hotel_id: hotelId,
     type: type.toLowerCase(),
   });
   const availableRooms = [];
   for (const r of room) {
-    if (r.checkout <= checkin_date || r.checkout === undefined) {
-      availableRooms.push(r._id);
+    let bookings = r.bookings.sort((a, b) => a.checkin_date - b.checkin_date);
+    // checkin date : 20 Januari 2024
+    // checkout date : 23 Januari 2024
+    // avaliable ketika checkin baru < checkin date dan checkout baru < checkin date
+    // available ketika checkin baru > checkout date dan checkout baru < checkin date booking selanjutnya
+    if (r.bookings.length === 0 || r.bookings === undefined) {
+      availableRooms.push(r);
+    } else {
+      for (let i = 0; i < r.bookings.length; i++) {
+        bookings = r.bookings.sort((a, b) => a.checkin_date - b.checkin_date);
+        if (
+          (checkin_date < bookings[0].checkin_date && checkout_date < bookings[0].checkin_date) ||
+          (checkin_date > bookings[i].checkout_date &&
+            (r.bookings[i + 1] === undefined ? true : checkout_date < r.bookings[i + 1].checkin_date))
+        ) {
+          availableRooms.push(r);
+        }
+      }
     }
   }
   // Cut the array to the count
   availableRooms.splice(count);
-  console.log(availableRooms);
   return availableRooms;
+};
+
+const checkinById = async (roomId, checkinBody, user_id) => {
+  const room = await getRoomById(roomId);
+  if (!room) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Room not found');
+  }
+  if (!room.is_booked) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Room is not booked');
+  }
+  for (const book of room.bookings) {
+    if (
+      book.visitor_id.toString() === checkinBody.visitor_id.toString() &&
+      book.booking_id.toString() === checkinBody.booking_id.toString()
+    ) {
+      const booking = await Booking.findById(book.booking_id);
+      if (!booking) {
+        throw new ApiError(httpStatus.NOT_FOUND, 'Booking not found');
+      }
+      if (checkinBody.checkin_date < booking.checkin) {
+        throw new ApiError(httpStatus.BAD_REQUEST, 'You cannot checkin before checkin date');
+      }
+      booking.actual_checkin = checkinBody.checkin_date;
+      booking.checkin_staff_id = user_id;
+      await booking.save();
+      return room;
+    }
+  }
+};
+
+const checkoutById = async (roomId, checkoutBody, bookingId) => {
+  const room = await getRoomById(roomId);
+  if (!room) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Room not found');
+  }
+  if (!room.is_booked) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Room is not booked');
+  }
+  for (const book of room.bookings) {
+    if (book.booking_id.toString() === bookingId.toString()) {
+      room.bookings = room.bookings.filter((booking) => booking.booking_id.toString() !== bookingId.toString());
+      console.log(room.bookings);
+      break;
+    }
+  }
+  room.is_booked = false;
+  Object.assign(room, checkoutBody);
+  await room.save();
+  return room;
 };
 
 module.exports = {
@@ -152,5 +227,8 @@ module.exports = {
   getRoomsByHotelId,
   updateRoomByHotelId,
   deleteRoomByHotelId,
+  bookingRoomById,
   getAvailableRoomsByType,
+  checkinById,
+  checkoutById,
 };

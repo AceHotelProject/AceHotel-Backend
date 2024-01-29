@@ -2,9 +2,10 @@ const httpStatus = require('http-status');
 const pick = require('../utils/pick');
 const ApiError = require('../utils/ApiError');
 const catchAsync = require('../utils/catchAsync');
-const { roomService, hotelService } = require('../services');
+const { roomService, hotelService, noteService, bookingService } = require('../services');
 
 const createRoom = catchAsync(async (req, res) => {
+  // eslint-disable-next-line camelcase
   const { hotel_id, type } = req.body;
   const hotel = await hotelService.getHotelById(hotel_id);
   if (!hotel) {
@@ -14,7 +15,7 @@ const createRoom = catchAsync(async (req, res) => {
   const room = await roomService.createRoom(req.body);
   hotel[updateField] += 1;
   hotel.room_id.push(room._id);
-  const updatedHotel = await hotel.save();
+  await hotel.save();
   res.status(httpStatus.CREATED).send(room);
 });
 
@@ -100,6 +101,63 @@ const getAvailableRoomsByType = catchAsync(async (req, res) => {
   res.send(result);
 });
 
+const checkinById = catchAsync(async (req, res) => {
+  const room = await roomService.checkinById(req.params.roomId, req.body, req.user._id);
+  if (!room) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Checkin Error');
+  }
+  res.send(room);
+});
+
+const checkoutById = catchAsync(async (req, res) => {
+  const room = await roomService.getRoomById(req.params.roomId);
+  if (!room) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Room not found');
+  }
+  let bookingId;
+  // eslint-disable-next-line no-restricted-syntax
+  for (const book of room.bookings) {
+    if (
+      book.visitor_id.toString() === req.body.visitor_id.toString() &&
+      book.booking_id.toString() === req.body.booking_id.toString()
+    ) {
+      // eslint-disable-next-line no-await-in-loop
+      const booking = await bookingService.getBookingById(req.body.booking_id);
+      if (!booking) {
+        throw new ApiError(httpStatus.NOT_FOUND, 'Booking not found');
+      }
+      if (req.body.note) {
+        // eslint-disable-next-line no-await-in-loop
+        const note = await noteService.createNote({
+          detail: req.body.note,
+          booking_id: booking._id,
+        });
+        booking.has_problem = true;
+        booking.note_id = [note._id];
+      }
+      if (
+        req.body.checkout_date < booking.checkin_date ||
+        req.body.checkout_date < booking.checkout_date ||
+        req.body.checkout_date > booking.checkout_date
+      ) {
+        throw new ApiError(httpStatus.BAD_REQUEST, 'Checkout date must be between checkin date and checkout date');
+      }
+      booking.actual_checkout = req.body.checkout_date;
+      booking.checkout_staff_id = req.user._id;
+      // eslint-disable-next-line no-await-in-loop
+      await booking.save();
+      bookingId = booking._id;
+    }
+  }
+  await roomService.checkoutById(req.params.roomId, req.body, bookingId);
+  if (!room) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Room not found');
+  }
+  res.send(room);
+});
+
+// const getDataForCheckin = catchAsync(async (req, res) => {
+// })
 module.exports = {
   createRoom,
   getRooms,
@@ -111,4 +169,6 @@ module.exports = {
   updateRoomByHotelId,
   deleteRoomByHotelId,
   getAvailableRoomsByType,
+  checkinById,
+  checkoutById,
 };

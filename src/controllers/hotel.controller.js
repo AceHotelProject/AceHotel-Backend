@@ -10,10 +10,14 @@ const createHotel = catchAsync(async (req, res) => {
 
   req.body.regular_room_image_path = [];
   req.body.exclusive_room_image_path = [];
+  // eslint-disable-next-line no-restricted-syntax
   for (const image of req.files.regular_room_image) {
+    // eslint-disable-next-line no-await-in-loop
     req.body.regular_room_image_path.push(await gcs.upload(image));
   }
+  // eslint-disable-next-line no-restricted-syntax
   for (const image of req.files.exclusive_room_image) {
+    // eslint-disable-next-line no-await-in-loop
     req.body.exclusive_room_image_path.push(await gcs.upload(image));
   }
 
@@ -75,7 +79,9 @@ const updateHotel = catchAsync(async (req, res) => {
 
 const deleteHotel = catchAsync(async (req, res) => {
   const hotel = await hotelService.getHotelById(req.params.hotelId);
+  // eslint-disable-next-line no-restricted-syntax
   for (const room of hotel.room_id) {
+    // eslint-disable-next-line no-await-in-loop
     await roomService.deleteRoomById(room);
   }
   await hotelService.deleteHotelById(req.params.hotelId);

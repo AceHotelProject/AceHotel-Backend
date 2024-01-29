@@ -4,6 +4,7 @@ module.exports.Visitor = require('./visitor.model');
 module.exports.Hotel = require('./hotel.model');
 module.exports.Room = require('./room.model');
 module.exports.Inventory = require('./inventory.model');
+module.exports.Addon = require('./addon.model');
 module.exports.Note = require('./note.model');
 module.exports.Booking = require('./booking.model');
 module.exports.Tag = require('./tag.model');
