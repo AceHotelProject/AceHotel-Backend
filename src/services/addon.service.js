@@ -8,7 +8,8 @@ const ApiError = require('../utils/ApiError');
  * @returns {Promise<Addon>}
  */
 const createAddon = async (addonBody) => {
-  return Addon.create(addonBody);
+  const addon = await Addon.create(addonBody);
+  return addon;
 };
 
 /**

@@ -65,6 +65,7 @@ visitorSchema.statics.isEmailTaken = async function (email, excludeUserId) {
   return !!user;
 };
 
+// eslint-disable-next-line camelcase
 visitorSchema.statics.isNIKTaken = async function (identity_num, excludeUserId) {
   const user = await this.findOne({ identity_num, _id: { $ne: excludeUserId } });
   return !!user;
