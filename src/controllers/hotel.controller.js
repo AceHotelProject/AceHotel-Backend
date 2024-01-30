@@ -3,17 +3,33 @@ const pick = require('../utils/pick');
 const gcs = require('../utils/cloudStorage');
 const ApiError = require('../utils/ApiError');
 const catchAsync = require('../utils/catchAsync');
-const { hotelService, roomService } = require('../services');
+const { hotelService, roomService, userService } = require('../services');
 
 const createHotel = catchAsync(async (req, res) => {
   req.body.owner_id = req.user._id;
-  const regularRoomImage = req.files.regular_room_image[0];
-  req.body.regular_room_image_path = await gcs.upload(regularRoomImage);
-  const exclusiveRoomImage = req.files.exclusive_room_image[0];
-  req.body.exclusive_room_image_path = await gcs.upload(exclusiveRoomImage);
+
+  req.body.regular_room_image_path = [];
+  req.body.exclusive_room_image_path = [];
+  // eslint-disable-next-line no-restricted-syntax
+  for (const image of req.files.regular_room_image) {
+    // eslint-disable-next-line no-await-in-loop
+    req.body.regular_room_image_path.push(await gcs.upload(image));
+  }
+  // eslint-disable-next-line no-restricted-syntax
+  for (const image of req.files.exclusive_room_image) {
+    // eslint-disable-next-line no-await-in-loop
+    req.body.exclusive_room_image_path.push(await gcs.upload(image));
+  }
+
+
+//   const regularRoomImage = req.files.regular_room_image[0];
+//   req.body.regular_room_image_path = await gcs.upload(regularRoomImage);
+//   const exclusiveRoomImage = req.files.exclusive_room_image[0];
+//   req.body.exclusive_room_image_path = await gcs.upload(exclusiveRoomImage);
+
   const hotel = await hotelService.createHotel(req.body);
-  // console.log(hotel);
   // Populate Some Rooms
+  userService.addHotelId(req.user._id, hotel._id);
   const regularRoomId = await roomService.populateRooms(hotel._id, {
     type: 'Regular',
     price: req.body.regular_room_price,
@@ -33,9 +49,15 @@ const createHotel = catchAsync(async (req, res) => {
 });
 
 const getHotels = catchAsync(async (req, res) => {
+  const hotel_id = req.user.hotel_id; // Return only hotel that user can access
   const filter = pick(req.query, ['name', 'owner_id']);
+  const combinedFilter = {
+    ...filter,
+    _id: { $in: hotel_id },
+  };
+
   const options = pick(req.query, ['sortBy', 'limit', 'page']);
-  const result = await hotelService.queryHotels(filter, options);
+  const result = await hotelService.queryHotels(combinedFilter, options);
   if (result.totalResults === 0) {
     throw new ApiError(httpStatus.NOT_FOUND, 'No hotels found');
   }
@@ -56,6 +78,12 @@ const updateHotel = catchAsync(async (req, res) => {
 });
 
 const deleteHotel = catchAsync(async (req, res) => {
+  const hotel = await hotelService.getHotelById(req.params.hotelId);
+  // eslint-disable-next-line no-restricted-syntax
+  for (const room of hotel.room_id) {
+    // eslint-disable-next-line no-await-in-loop
+    await roomService.deleteRoomById(room);
+  }
   await hotelService.deleteHotelById(req.params.hotelId);
   res.status(httpStatus.NO_CONTENT).send();
 });

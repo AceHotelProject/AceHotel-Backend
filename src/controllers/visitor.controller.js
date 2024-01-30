@@ -13,9 +13,14 @@ const createVisitor = catchAsync(async (req, res) => {
 });
 
 const getVisitors = catchAsync(async (req, res) => {
-  const filter = pick(req.query, ['name', 'role']);
+  const filter = pick(req.query, ['email', 'identity_num']); // Exclude 'name' from direct filtering
+  // eslint-disable-next-line security/detect-non-literal-regexp
+  const nameFilter = req.query.name ? { name: { $regex: new RegExp(req.query.name, 'i') } } : {};
   const options = pick(req.query, ['sortBy', 'limit', 'page']);
-  const result = await visitorService.queryVisitors(filter, options);
+  const result = await visitorService.queryVisitors({ ...filter, ...nameFilter }, options);
+  if (result.totalResults === 0) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'No visitors found');
+  }
   res.send(result);
 });
 

@@ -1,7 +1,8 @@
 const httpStatus = require('http-status');
+const { exec } = require('child_process');
 const catchAsync = require('../utils/catchAsync');
 const config = require('../config/config');
-var exec = require('child_process').exec;
+
 const update = catchAsync(async (req, res) => {
   // Optional: Validate the secret
   if (config.env === 'production') {
@@ -9,7 +10,7 @@ const update = catchAsync(async (req, res) => {
   }
 
   // Perform git fetch and restart the Node app
-  exec('cd ~/backend && git fetch  && git reset --hard origin/main   && pm2 restart index', (err, stdout, stderr) => {
+  exec('cd ~/AceHotel-Backend && git fetch && git reset --hard origin/main   && yarn start', (err, stdout, stderr) => {
     if (err) {
       console.error(err);
       return res.status(500).send('Internal Server Error');

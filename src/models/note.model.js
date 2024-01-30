@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-const validator = require('validator');
 const { toJSON, paginate } = require('./plugins');
 
 const noteSchema = mongoose.Schema(
@@ -8,10 +7,10 @@ const noteSchema = mongoose.Schema(
       type: String,
       required: true,
     },
-    room_id: [
+    booking_id: [
       {
         type: mongoose.SchemaTypes.ObjectId,
-        ref: 'Room',
+        ref: 'Booking',
       },
     ],
   },

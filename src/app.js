@@ -15,12 +15,31 @@ const { errorConverter, errorHandler } = require('./middlewares/error');
 const ApiError = require('./utils/ApiError');
 
 const app = express();
-// Handle MQTT
+// See commit head
 
-app.get('/', (req, res) => {
-  res.json({
-    message: '🦄🌈✨👋🌎🌍🌏✨🌈🦄its change, right now',
+const { exec } = require('child_process');
+
+const getCurrentGitCommit = () => {
+  return new Promise((resolve, reject) => {
+    exec('git rev-parse HEAD', (error, stdout) => {
+      if (error) {
+        reject(error);
+        return;
+      }
+      resolve(stdout.trim());
+    });
   });
+};
+
+app.get('/', async (req, res) => {
+  try {
+    const commitHash = await getCurrentGitCommit();
+    res.json({
+      message: `🦄🌈✨👋🌎🌍🌏  Current Git HEAD: ${commitHash}`,
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to get Git HEAD commit' });
+  }
 });
 
 if (config.env !== 'test') {
@@ -30,16 +49,18 @@ if (config.env !== 'test') {
 const mqtt = require('mqtt');
 const host = '35.202.12.122';
 const port = '1883';
-const clientId = `backend1`;
+
+const clientId = `backend3`;
+
 const topic = '/nodejs/mqtt/rx';
-
+const timeOutValue = 3000;
 const connectUrl = `mqtt://${host}:${port}`;
-
+//mosquitto_pub -d -q 1 -h 35.202.12.122 -p 1883 -t tbmq/demo/topic -i 'backend3' -u 'backend3' -P 'an1m3w1bu' -c -m 'Hello World'
 const mqttClient = mqtt.connect(connectUrl, {
   clientId,
   clean: true,
   connectTimeout: 4000,
-  username: 'backend2',
+  username: 'backend3',
   password: 'an1m3w1bu',
   reconnectPeriod: 1000,
 });
@@ -51,17 +72,38 @@ mqttClient.on('connect', function () {
 app.use(function (req, res, next) {
   // Publish messages
   req.mqttPublish = function (topic, message) {
-    mqttClient.publish(topic, message);
+    mqttClient.publish(topic, message, {
+      qos: 0,
+      retain: false,
+    });
   };
 
   // Subscribe to topic
-  req.mqttSubscribe = function (topic, callback) {
-    mqttClient.subscribe(topic);
-    mqttClient.on('message', function (t, m) {
-      if (t === topic) {
-        callback(m.toString());
-      }
+  req.mqttSubscribe = function (topic, timeout = 3000) {
+    return new Promise((resolve, reject) => {
+      let timeoutHandle;
+
+      const onMessage = (t, m) => {
+        if (t === topic) {
+          clearTimeout(timeoutHandle);
+          mqttClient.removeListener('message', onMessage);
+          resolve(m.toString());
+        }
+      };
+
+      mqttClient.subscribe(topic);
+      mqttClient.on('message', onMessage);
+
+      timeoutHandle = setTimeout(() => {
+        mqttClient.removeListener('message', onMessage);
+        next(new ApiError(httpStatus.REQUEST_TIMEOUT, 'MQTT message timeout'));
+      }, timeout);
     });
+  };
+
+  // Subscribe to topic
+  req.mqttUnsubscribe = function (topic, callback) {
+    mqttClient.unsubscribe(topic);
   };
   next();
 });

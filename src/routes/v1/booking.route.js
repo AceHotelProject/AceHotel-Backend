@@ -2,10 +2,7 @@ const express = require('express');
 const multer = require('multer');
 const auth = require('../../middlewares/auth');
 // const validate = require('../../middlewares/validate');
-// const hotelValidation = require('../../validations/hotel.validation');
-const hotelController = require('../../controllers/hotel.controller');
-
-const router = express.Router();
+const bookingController = require('../../controllers/bookings.controller');
 
 const multerConfig = multer({
   storage: multer.memoryStorage(),
@@ -14,24 +11,33 @@ const multerConfig = multer({
   },
 });
 
+const router = express.Router();
+
 router
   .route('/')
-  .post(
-    auth('manageFranchise'),
-    multerConfig.fields([
-      { name: 'regular_room_image', maxCount: 3 },
-      { name: 'exclusive_room_image', maxCount: 3 },
-    ]),
-    hotelController.createHotel
-  )
-  .get(auth('getFranchise'), hotelController.getHotels);
+  .get(auth('getBookings'), bookingController.getBookings)
+  .post(auth('manageBookings'), bookingController.createBooking);
+
+router.post(
+  '/pay/:bookingId',
+  auth('manageBookings'),
+  multerConfig.single('transaction_proof_image'),
+  bookingController.payBooking
+);
 
 router
-  .route('/:hotelId')
-  .get(auth('getFranchise'), hotelController.getHotel)
-  .patch(auth('manageFranchise'), hotelController.updateHotel)
-  .delete(auth('manageFranchise'), hotelController.deleteHotel);
+  .route('/:bookingId')
+  .get(auth('getBookings'), bookingController.getBookingById)
+  .patch(auth('manageBookings'), bookingController.updateBookingById)
+  .delete(auth('manageBookings'), bookingController.deleteBookingById);
 
+router
+  .route('/visitor/:visitorId')
+  .get(auth('getBookings'), bookingController.getBookingsByVisitorId)
+  .patch(auth('manageBookings'), bookingController.updateBookingByVisitorId)
+  .delete(auth('manageBookings'), bookingController.deleteBookingByVisitorId);
+
+router.route('/room/:roomId').get(auth('getBookings'), bookingController.getBookingsByRoomId);
 module.exports = router;
 
 /**

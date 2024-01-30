@@ -1,53 +1,38 @@
 const express = require('express');
-const multer = require('multer');
 const auth = require('../../middlewares/auth');
-// const validate = require('../../middlewares/validate');
-// const hotelValidation = require('../../validations/hotel.validation');
-const hotelController = require('../../controllers/hotel.controller');
+const validate = require('../../middlewares/validate');
+// const financeValidation = require('../../validations/finance.validation');
+const financeController = require('../../controllers/finance.controller');
 
 const router = express.Router();
 
-const multerConfig = multer({
-  storage: multer.memoryStorage(),
-  limits: {
-    fileSize: 5 * 1024 * 1024, // 5MB limit (adjust as needed)
-  },
-});
-
 router
   .route('/')
-  .post(
-    auth('manageFranchise'),
-    multerConfig.fields([
-      { name: 'regular_room_image', maxCount: 3 },
-      { name: 'exclusive_room_image', maxCount: 3 },
-    ]),
-    hotelController.createHotel
-  )
-  .get(auth('getFranchise'), hotelController.getHotels);
+  .post(auth('manageFinances'), financeController.createFinance)
+  .get(auth('manageFinances'), financeController.getFinanceData);
 
-router
-  .route('/:hotelId')
-  .get(auth('getFranchise'), hotelController.getHotel)
-  .patch(auth('manageFranchise'), hotelController.updateHotel)
-  .delete(auth('manageFranchise'), hotelController.deleteHotel);
+// router
+//   .route('/:financeId')
+//   .get(auth('getFinances'), financeController.getFinance)
+//   .patch(auth('manageFinances'), financeController.updateFinance)
+//   .delete(auth('manageFinances'), financeController.deleteFinance);
 
 module.exports = router;
 
 /**
  * @swagger
  * tags:
- *   name: Users
- *   description: User management and retrieval
+ *   name: Finances
+ *   description: Finance management and retrieval
  */
 
 /**
  * @swagger
- * /users:
+ * /finances:
  *   post:
- *     summary: Create a user
- *     description: Only admins can create other users.
- *     tags: [Users]
+ *     summary: Create a finance
+ *     description: Only admins can create other finances.
+ *     tags: [Finances]
  *     security:
  *       - bearerAuth: []
  *     requestBody:
@@ -75,19 +60,19 @@ module.exports = router;
  *                 description: At least one number and one letter
  *               role:
  *                  type: string
- *                  enum: [user, admin]
+ *                  enum: [finance, admin]
  *             example:
  *               name: fake name
  *               email: fake@example.com
  *               password: password1
- *               role: user
+ *               role: finance
  *     responses:
  *       "201":
  *         description: Created
  *         content:
  *           application/json:
  *             schema:
- *                $ref: '#/components/schemas/User'
+ *                $ref: '#/components/schemas/Finance'
  *       "400":
  *         $ref: '#/components/responses/DuplicateEmail'
  *       "401":
@@ -96,9 +81,9 @@ module.exports = router;
  *         $ref: '#/components/responses/Forbidden'
  *
  *   get:
- *     summary: Get all users
- *     description: Only admins can retrieve all users.
- *     tags: [Users]
+ *     summary: Get all finances
+ *     description: Only admins can retrieve all finances.
+ *     tags: [Finances]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -106,12 +91,12 @@ module.exports = router;
  *         name: name
  *         schema:
  *           type: string
- *         description: User name
+ *         description: Finance name
  *       - in: query
  *         name: role
  *         schema:
  *           type: string
- *         description: User role
+ *         description: Finance role
  *       - in: query
  *         name: sortBy
  *         schema:
@@ -123,7 +108,7 @@ module.exports = router;
  *           type: integer
  *           minimum: 1
  *         default: 10
- *         description: Maximum number of users
+ *         description: Maximum number of finances
  *       - in: query
  *         name: page
  *         schema:
@@ -142,7 +127,7 @@ module.exports = router;
  *                 results:
  *                   type: array
  *                   items:
- *                     $ref: '#/components/schemas/User'
+ *                     $ref: '#/components/schemas/Finance'
  *                 page:
  *                   type: integer
  *                   example: 1
@@ -163,11 +148,11 @@ module.exports = router;
 
 /**
  * @swagger
- * /users/{id}:
+ * /finances/{id}:
  *   get:
- *     summary: Get a user
- *     description: Logged in users can fetch only their own user information. Only admins can fetch other users.
- *     tags: [Users]
+ *     summary: Get a finance
+ *     description: Logged in finances can fetch only their own finance information. Only admins can fetch other finances.
+ *     tags: [Finances]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -176,14 +161,14 @@ module.exports = router;
  *         required: true
  *         schema:
  *           type: string
- *         description: User id
+ *         description: Finance id
  *     responses:
  *       "200":
  *         description: OK
  *         content:
  *           application/json:
  *             schema:
- *                $ref: '#/components/schemas/User'
+ *                $ref: '#/components/schemas/Finance'
  *       "401":
  *         $ref: '#/components/responses/Unauthorized'
  *       "403":
@@ -192,9 +177,9 @@ module.exports = router;
  *         $ref: '#/components/responses/NotFound'
  *
  *   patch:
- *     summary: Update a user
- *     description: Logged in users can only update their own information. Only admins can update other users.
- *     tags: [Users]
+ *     summary: Update a finance
+ *     description: Logged in finances can only update their own information. Only admins can update other finances.
+ *     tags: [Finances]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -203,7 +188,7 @@ module.exports = router;
  *         required: true
  *         schema:
  *           type: string
- *         description: User id
+ *         description: Finance id
  *     requestBody:
  *       required: true
  *       content:
@@ -232,7 +217,7 @@ module.exports = router;
  *         content:
  *           application/json:
  *             schema:
- *                $ref: '#/components/schemas/User'
+ *                $ref: '#/components/schemas/Finance'
  *       "400":
  *         $ref: '#/components/responses/DuplicateEmail'
  *       "401":
@@ -243,9 +228,9 @@ module.exports = router;
  *         $ref: '#/components/responses/NotFound'
  *
  *   delete:
- *     summary: Delete a user
- *     description: Logged in users can delete only themselves. Only admins can delete other users.
- *     tags: [Users]
+ *     summary: Delete a finance
+ *     description: Logged in finances can delete only themselves. Only admins can delete other finances.
+ *     tags: [Finances]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -254,7 +239,7 @@ module.exports = router;
  *         required: true
  *         schema:
  *           type: string
- *         description: User id
+ *         description: Finance id
  *     responses:
  *       "200":
  *         description: No content

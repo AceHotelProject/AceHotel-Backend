@@ -24,16 +24,28 @@ const hotelSchema = mongoose.Schema(
       type: Number,
       required: true,
     },
-    regular_room_image_path: {
-      type: String,
+    regular_room_image_path: [
+      {
+        type: String,
+        required: true,
+      },
+    ],
+    regular_room_price: {
+      type: Number,
       required: true,
     },
     exclusive_room_count: {
       type: Number,
       required: true,
     },
-    exclusive_room_image_path: {
-      type: String,
+    exclusive_room_image_path: [
+      {
+        type: String,
+        required: true,
+      },
+    ],
+    exclusive_room_price: {
+      type: Number,
       required: true,
     },
     room_id: [
@@ -48,6 +60,9 @@ const hotelSchema = mongoose.Schema(
         ref: 'Inventory',
       },
     ],
+    extra_bed_price: {
+      type: Number,
+    },
     revenue: {
       type: Number,
     },
