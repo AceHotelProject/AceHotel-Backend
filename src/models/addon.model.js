@@ -21,7 +21,7 @@ const addonSchema = mongoose.Schema(
     inventory_id: {
       type: mongoose.SchemaTypes.ObjectId,
       ref: 'Inventory',
-
+    },
     booking_id: {
       type: mongoose.SchemaTypes.ObjectId,
       ref: 'Bookings',
