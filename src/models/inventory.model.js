@@ -49,6 +49,12 @@ const inventorySchema = mongoose.Schema(
     inventory_update_history: {
       type: [inventoryUpdateRecordSchema], // Array of update records
     },
+    tag_id: [
+      {
+        type: mongoose.SchemaTypes.ObjectId,
+        ref: 'Tag',
+      },
+    ],
   },
   {
     timestamps: true,

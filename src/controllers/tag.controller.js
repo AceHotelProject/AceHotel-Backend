@@ -2,10 +2,11 @@ const httpStatus = require('http-status');
 const pick = require('../utils/pick');
 const ApiError = require('../utils/ApiError');
 const catchAsync = require('../utils/catchAsync');
-const { tagService } = require('../services');
+const { tagService, inventoryService } = require('../services');
 
 const createTag = catchAsync(async (req, res) => {
   const tag = await tagService.createTag(req.body);
+  inventoryService.addTagId(req.body.inventory_id, tag._id);
   res.status(httpStatus.CREATED).send(tag);
 });
 const getTagId = catchAsync(async (req, res) => {
