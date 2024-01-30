@@ -8,6 +8,12 @@ const ApiError = require('../utils/ApiError');
  * @returns {Promise<Visitor>}
  */
 const createVisitor = async (visitorBody) => {
+  if (await Visitor.isEmailTaken(visitorBody.email)) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Email already taken');
+  }
+  if (await Visitor.isNIKTaken(visitorBody.identity_num)) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'NIK already taken');
+  }
   return Visitor.create(visitorBody);
 };
 
@@ -44,6 +50,12 @@ const updateVisitorById = async (visitorId, updateBody) => {
   const visitor = await getVisitorById(visitorId);
   if (!visitor) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Visitor not found');
+  }
+  if (updateBody.email && (await Visitor.isEmailTaken(updateBody.email))) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Email already taken');
+  }
+  if (updateBody.identity_num && (await Visitor.isNIKTaken(updateBody.identity_num))) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'NIK already taken');
   }
   Object.assign(visitor, updateBody);
   await visitor.save();

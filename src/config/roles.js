@@ -9,6 +9,8 @@ const allRoles = {
     'manageUsers',
     'manageVisitors',
     'getVisitors',
+    'getBookings',
+    'manageBookings',
     'manageTags',
     'getInventory',
     'manageInventory'
@@ -36,6 +38,7 @@ const allRoles = {
     'getNotes',
     'manageNotes',
     'getFranchise',
+    'manageFranchise',
     'getUsers',
     'manageUsers',
     'manageVisitors',
@@ -50,7 +53,10 @@ const allRoles = {
     'manageUsers',
     'manageVisitors',
     'getVisitors',
+    'getBookings',
+    'manageBookings',
   ],
+
 };
 
 const roles = Object.keys(allRoles);

@@ -5,7 +5,7 @@ const roomController = require('../../controllers/room.controller');
 
 const router = express.Router();
 
-router.route('/').get(auth('getRooms'), roomController.getRooms);
+router.route('/').get(auth('getRooms'), roomController.getRooms).post(auth('manageRooms'), roomController.createRoom);
 
 router
   .route('/:roomId')
@@ -15,10 +15,13 @@ router
 
 router
   .route('/hotel/:hotelId')
-  .post(auth('manageRooms'), roomController.populateRooms)
   .get(auth('getRooms'), roomController.getRoomsByHotelId)
   .patch(auth('manageRooms'), roomController.updateRoomByHotelId)
   .delete(auth('manageRooms'), roomController.deleteRoomByHotelId);
+
+router.route('/checkin/:roomId').post(auth('manageRooms'), roomController.checkinById);
+
+router.route('/checkout/:roomId').post(auth('manageRooms'), roomController.checkoutById);
 
 module.exports = router;
 

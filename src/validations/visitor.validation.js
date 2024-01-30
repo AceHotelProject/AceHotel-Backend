@@ -6,7 +6,6 @@ const createVisitor = {
     name: Joi.string().required(),
     address: Joi.string().required(),
     identity_num: Joi.string().required(),
-    path_identity_image: Joi.string().required(),
     phone: Joi.string().required(),
     email: Joi.string().required().email(),
   }),

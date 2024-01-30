@@ -67,8 +67,10 @@ const updateInventoryById = async (inventoryId, updateBody, user) => {
     inventory.inventory_update_history.push({
       title: updateBody.title,
       description: updateBody.description,
+
       personInCharge: user.username,
       stockChange: stockChange,
+
       date: new Date(), // This will set the date to the current date and time
     });
   }

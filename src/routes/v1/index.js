@@ -8,6 +8,7 @@ const roomRoute = require('./room.route');
 const webhookRoute = require('./webhook.route');
 const inventoryRoute = require('./inventory.route');
 const noteRoute = require('./note.route');
+const bookingRoute = require('./booking.route');
 const tagRoute = require('./tag.route');
 const financeRoute = require('./finance.route');
 const config = require('../../config/config');
@@ -54,6 +55,10 @@ const defaultRoutes = [
   {
     path: '/webhook',
     route: webhookRoute,
+  },
+  {
+    path: '/bookings',
+    route: bookingRoute,
   },
 ];
 
