@@ -3,10 +3,9 @@ const pick = require('../utils/pick');
 const gcs = require('../utils/cloudStorage');
 const ApiError = require('../utils/ApiError');
 const catchAsync = require('../utils/catchAsync');
-const { hotelService, roomService } = require('../services');
+const { hotelService, roomService, userService } = require('../services');
 
 const createHotel = catchAsync(async (req, res) => {
-  req.body.owner_id = req.user._id;
   req.body.regular_room_image_path = [];
   req.body.exclusive_room_image_path = [];
   // eslint-disable-next-line no-restricted-syntax
@@ -35,6 +34,34 @@ const createHotel = catchAsync(async (req, res) => {
   });
   // Assign Room to Hotel
   hotel.room_id = [...regularRoomId, ...exclusiveRoomId];
+  const owner = await userService.createUser({
+    username: req.body.owner_name,
+    email: req.body.owner_email,
+    password: req.body.owner_password,
+    role: 'branch_manager',
+  });
+  hotel.owner_id = owner._id;
+  const receptionist = await userService.createUser({
+    username: req.body.receptionist_name,
+    email: req.body.receptionist_email,
+    password: req.body.receptionist_password,
+    role: 'receptionist',
+  });
+  hotel.receptionist_id = receptionist._id;
+  const cleaningStaff = await userService.createUser({
+    username: req.body.cleaning_staff_name,
+    email: req.body.cleaning_staff_email,
+    password: req.body.cleaning_staff_password,
+    role: 'cleaning_staff',
+  });
+  hotel.cleaning_staff_id = cleaningStaff._id;
+  const inventoryStaff = await userService.createUser({
+    username: req.body.inventory_staff_name,
+    email: req.body.inventory_staff_email,
+    password: req.body.inventory_staff_password,
+    role: 'inventory_staff',
+  });
+  hotel.inventory_staff_id = inventoryStaff._id;
   await hotel.save();
   res.status(httpStatus.CREATED).send(hotel);
 });
