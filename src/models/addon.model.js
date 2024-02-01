@@ -5,7 +5,6 @@ const addonSchema = mongoose.Schema(
   {
     name: {
       type: String,
-      enum: types,
       required: true,
     },
     price: {
