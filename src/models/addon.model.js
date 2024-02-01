@@ -1,16 +1,25 @@
 const mongoose = require('mongoose');
 const { toJSON, paginate } = require('./plugins');
-const { types } = require('../config/inventory.types');
 
 const addonSchema = mongoose.Schema(
   {
-    type: {
+    name: {
       type: String,
-      enum: types,
       required: true,
     },
     price: {
       type: Number,
+    },
+
+    room_id: [
+      {
+        type: mongoose.SchemaTypes.ObjectId,
+        ref: 'Room',
+      },
+    ],
+    inventory_id: {
+      type: mongoose.SchemaTypes.ObjectId,
+      ref: 'Inventory',
     },
     booking_id: {
       type: mongoose.SchemaTypes.ObjectId,

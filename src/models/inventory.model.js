@@ -17,6 +17,12 @@ const inventoryUpdateRecordSchema = mongoose.Schema({
     type: Date,
     default: Date.now, // Automatically set to current date
   },
+  personInCharge: {
+    // Name of user in charge of update
+    type: String,
+    required: true,
+    trim: true,
+  },
   stockChange: {
     // jumlah perubahan
     type: Number,
@@ -40,7 +46,15 @@ const inventorySchema = mongoose.Schema(
       type: Number,
       required: true,
     },
-    inventory_update_history: [inventoryUpdateRecordSchema], // Array of update records
+    inventory_update_history: {
+      type: [inventoryUpdateRecordSchema], // Array of update records
+    },
+    tag_id: [
+      {
+        type: mongoose.SchemaTypes.ObjectId,
+        ref: 'Tag',
+      },
+    ],
   },
   {
     timestamps: true,
