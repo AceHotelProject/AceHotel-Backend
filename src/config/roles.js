@@ -10,6 +10,7 @@ const allRoles = {
     'getVisitors',
     'getBookings',
     'manageBookings',
+    'uploadFiles',
   ],
   branch_manager: [
     'getRooms',
@@ -21,8 +22,18 @@ const allRoles = {
     'getVisitors',
     'getBookings',
     'manageBookings',
+    'uploadFiles',
   ],
-  receptionist: ['getRooms', 'getFranchise', 'getUsers', 'manageVisitors', 'getVisitors', 'getBookings', 'manageBookings'],
+  receptionist: [
+    'getRooms',
+    'getFranchise',
+    'getUsers',
+    'manageVisitors',
+    'getVisitors',
+    'getBookings',
+    'manageBookings',
+    'uploadFiles',
+  ],
   admin: [
     'getRooms',
     'manageRooms',
@@ -34,6 +45,7 @@ const allRoles = {
     'getVisitors',
     'getBookings',
     'manageBookings',
+    'uploadFiles',
   ],
   inventory_staff: [
     'getRooms',
@@ -46,6 +58,7 @@ const allRoles = {
     'getVisitors',
     'getBookings',
     'manageBookings',
+    'uploadFiles',
   ],
   cleaning_staff: [
     'getRooms',
@@ -58,6 +71,7 @@ const allRoles = {
     'getVisitors',
     'getBookings',
     'manageBookings',
+    'uploadFiles',
   ],
 };
 
