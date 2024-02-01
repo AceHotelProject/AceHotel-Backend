@@ -50,6 +50,7 @@ const createHotel = catchAsync(async (req, res) => {
     email: req.body.owner_email,
     password: req.body.owner_password,
     role: 'branch_manager',
+    hotel_id: hotel._id,
   });
   hotel.owner_id = owner._id;
   const receptionist = await userService.createUser({
@@ -57,6 +58,7 @@ const createHotel = catchAsync(async (req, res) => {
     email: req.body.receptionist_email,
     password: req.body.receptionist_password,
     role: 'receptionist',
+    hotel_id: hotel._id,
   });
   hotel.receptionist_id = receptionist._id;
   const cleaningStaff = await userService.createUser({
@@ -64,6 +66,7 @@ const createHotel = catchAsync(async (req, res) => {
     email: req.body.cleaning_staff_email,
     password: req.body.cleaning_staff_password,
     role: 'cleaning_staff',
+    hotel_id: hotel._id,
   });
   hotel.cleaning_staff_id = cleaningStaff._id;
   const inventoryStaff = await userService.createUser({
@@ -71,6 +74,7 @@ const createHotel = catchAsync(async (req, res) => {
     email: req.body.inventory_staff_email,
     password: req.body.inventory_staff_password,
     role: 'inventory_staff',
+    hotel_id: hotel._id,
   });
   hotel.inventory_staff_id = inventoryStaff._id;
   await hotel.save();
