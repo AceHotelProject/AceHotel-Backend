@@ -26,18 +26,21 @@ router.post(
 );
 
 router
-  .route('/:bookingId')
-  .get(auth('getBookings'), bookingController.getBookingById)
-  .patch(auth('manageBookings'), bookingController.updateBookingById)
-  .delete(auth('manageBookings'), bookingController.deleteBookingById);
-
-router
   .route('/visitor/:visitorId')
   .get(auth('getBookings'), bookingController.getBookingsByVisitorId)
   .patch(auth('manageBookings'), bookingController.updateBookingByVisitorId)
   .delete(auth('manageBookings'), bookingController.deleteBookingByVisitorId);
 
 router.route('/room/:roomId').get(auth('getBookings'), bookingController.getBookingsByRoomId);
+
+router.route('/discount/:bookingId').post(auth('manageBookings'), bookingController.applyDiscount);
+
+router
+  .route('/:bookingId')
+  .get(auth('getBookings'), bookingController.getBookingById)
+  .patch(auth('manageBookings'), bookingController.updateBookingById)
+  .delete(auth('manageBookings'), bookingController.deleteBookingById);
+
 module.exports = router;
 
 /**

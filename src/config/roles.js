@@ -57,6 +57,31 @@ const allRoles = {
     'manageBookings',
   ],
 
+  inventory_staff: [
+    'getRooms',
+    'manageRooms',
+    'getFranchise',
+    'manageFranchise',
+    'getUsers',
+    'manageUsers',
+    'manageVisitors',
+    'getVisitors',
+    'getBookings',
+    'manageBookings',
+  ],
+  cleaning_staff: [
+    'getRooms',
+    'manageRooms',
+    'getFranchise',
+    'manageFranchise',
+    'getUsers',
+    'manageUsers',
+    'manageVisitors',
+    'getVisitors',
+    'getBookings',
+    'manageBookings',
+  ],
+
 };
 
 const roles = Object.keys(allRoles);

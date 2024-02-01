@@ -141,7 +141,7 @@ const getAvailableRoomsByType = async (type, hotelId, count, checkin_date, check
     hotel_id: hotelId,
     type: type.toLowerCase(),
   });
-  const availableRooms = [];
+  let availableRooms = [];
   for (const r of room) {
     let bookings = r.bookings.sort((a, b) => a.checkin_date - b.checkin_date);
     // checkin date : 20 Januari 2024
@@ -158,13 +158,18 @@ const getAvailableRoomsByType = async (type, hotelId, count, checkin_date, check
           (checkin_date > bookings[i].checkout_date &&
             (r.bookings[i + 1] === undefined ? true : checkout_date < r.bookings[i + 1].checkin_date))
         ) {
-          availableRooms.push(r);
+          if (availableRooms[availableRooms.length - 1] !== r) {
+            availableRooms.push(r);
+          }
         }
       }
     }
   }
   // Cut the array to the count
-  availableRooms.splice(count);
+  if (availableRooms.length < count) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'No available rooms found');
+  }
+  availableRooms = availableRooms.slice(0, count);
   return availableRooms;
 };
 
@@ -207,7 +212,6 @@ const checkoutById = async (roomId, checkoutBody, bookingId) => {
   for (const book of room.bookings) {
     if (book.booking_id.toString() === bookingId.toString()) {
       room.bookings = room.bookings.filter((booking) => booking.booking_id.toString() !== bookingId.toString());
-      console.log(room.bookings);
       break;
     }
   }

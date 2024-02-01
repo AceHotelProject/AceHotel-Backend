@@ -3,6 +3,7 @@
 const httpStatus = require('http-status');
 const { Booking } = require('../models');
 const ApiError = require('../utils/ApiError');
+const { hotelService } = require('.');
 
 /**
  * Create a room
@@ -96,6 +97,23 @@ const getBookingsByRoomId = async (roomId) => {
   });
   return bookings;
 };
+
+const applyDiscount = async (bookingId, discountBody) => {
+  const booking = await getBookingById(bookingId);
+  if (!booking) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Booking not found');
+  }
+  const hotel = await hotelService.getHotelById(booking.hotel_id);
+  if (!hotel) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Hotel not found');
+  }
+  if (discountBody.discount_code !== hotel.discount_code) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Discount code not found');
+  }
+  booking.total_price -= hotel.discount_amount;
+  await booking.save();
+  return booking;
+};
 module.exports = {
   createBooking,
   queryBookings,
@@ -104,4 +122,5 @@ module.exports = {
   getBookingsByVisitorId,
   deleteBookingsByVisitorId,
   getBookingsByRoomId,
+  applyDiscount,
 };

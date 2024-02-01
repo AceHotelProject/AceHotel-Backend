@@ -197,6 +197,11 @@ const getBookingsByRoomId = catchAsync(async (req, res) => {
   res.send(result);
 });
 
+const applyDiscount = catchAsync(async (req, res) => {
+  const booking = await bookingService.applyDiscount(req.params.bookingId, req.body);
+  res.send(booking);
+});
+
 module.exports = {
   createBooking,
   payBooking,
@@ -208,4 +213,5 @@ module.exports = {
   updateBookingByVisitorId,
   deleteBookingByVisitorId,
   getBookingsByRoomId,
+  applyDiscount,
 };
