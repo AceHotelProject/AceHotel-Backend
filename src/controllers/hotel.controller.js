@@ -1,33 +1,10 @@
 const httpStatus = require('http-status');
 const pick = require('../utils/pick');
-const gcs = require('../utils/cloudStorage');
 const ApiError = require('../utils/ApiError');
 const catchAsync = require('../utils/catchAsync');
 const { hotelService, roomService, userService } = require('../services');
 
 const createHotel = catchAsync(async (req, res) => {
-
-  req.body.owner_id = req.user._id;
-
-  req.body.regular_room_image_path = [];
-  req.body.exclusive_room_image_path = [];
-  // eslint-disable-next-line no-restricted-syntax
-  for (const image of req.files.regular_room_image) {
-    // eslint-disable-next-line no-await-in-loop
-    req.body.regular_room_image_path.push(await gcs.upload(image));
-  }
-  // eslint-disable-next-line no-restricted-syntax
-  for (const image of req.files.exclusive_room_image) {
-    // eslint-disable-next-line no-await-in-loop
-    req.body.exclusive_room_image_path.push(await gcs.upload(image));
-  }
-
-
-//   const regularRoomImage = req.files.regular_room_image[0];
-//   req.body.regular_room_image_path = await gcs.upload(regularRoomImage);
-//   const exclusiveRoomImage = req.files.exclusive_room_image[0];
-//   req.body.exclusive_room_image_path = await gcs.upload(exclusiveRoomImage);
-
   const hotel = await hotelService.createHotel(req.body);
   // Populate Some Rooms
   userService.addHotelId(req.user._id, hotel._id);

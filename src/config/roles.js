@@ -13,7 +13,8 @@ const allRoles = {
     'manageBookings',
     'manageTags',
     'getInventory',
-    'manageInventory'
+    'manageInventory',
+    'uploadFiles',
   ],
   branch_manager: [
     'manageFinances',
@@ -43,6 +44,9 @@ const allRoles = {
     'manageUsers',
     'manageVisitors',
     'getVisitors',
+    'getBookings',
+    'manageBookings',
+    'uploadFiles',
   ],
   admin: [
     'getRooms',
@@ -55,6 +59,7 @@ const allRoles = {
     'getVisitors',
     'getBookings',
     'manageBookings',
+    'uploadFiles',
   ],
 
   inventory_staff: [
@@ -68,6 +73,7 @@ const allRoles = {
     'getVisitors',
     'getBookings',
     'manageBookings',
+    'uploadFiles',
   ],
   cleaning_staff: [
     'getRooms',
@@ -80,8 +86,8 @@ const allRoles = {
     'getVisitors',
     'getBookings',
     'manageBookings',
+    'uploadFiles',
   ],
-
 };
 
 const roles = Object.keys(allRoles);
