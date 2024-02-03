@@ -110,7 +110,7 @@ const applyDiscount = async (bookingId, discountBody) => {
   if (discountBody.discount_code !== hotel.discount_code) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Discount code not found');
   }
-  booking.total_price -= hotel.discount_amount;
+  booking.total_price -= hotel.discount_amount * booking.room_count;
   await booking.save();
   return booking;
 };
