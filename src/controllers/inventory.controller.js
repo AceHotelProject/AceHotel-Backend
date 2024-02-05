@@ -6,12 +6,12 @@ const { inventoryService, hotelService } = require('../services');
 
 const createInventory = catchAsync(async (req, res) => {
   const inventory = await inventoryService.createInventory(req.body, req.user);
-  hotelService.addInventoryId(req.body.hotel_id, inventory._id);
+  hotelService.addInventoryId(req.query.hotel_id, inventory._id);
   res.status(httpStatus.CREATED).send(inventory);
 });
 
 const getInventories = catchAsync(async (req, res) => {
-  const hotel = await hotelService.getHotelById(req.body.hotel_id);
+  const hotel = await hotelService.getHotelById(req.query.hotel_id);
   const inventory_id = hotel.inventory_id;
   const filter = pick(req.query, ['name', 'type']);
   const combinedFilter = {

@@ -12,7 +12,7 @@ router
   .get(auth('manageReaders'), validate(readerValidation.getReaders), readerController.getReaders);
 
 router
-  .route('/:readerId')
+  .route('/:readerName')
   .get(auth('manageReaders'), validate(readerValidation.getReader), readerController.getReader)
   .patch(auth('manageReaders'), validate(readerValidation.updateReader), readerController.updateReader)
   .delete(auth('manageReaders'), validate(readerValidation.deleteReader), readerController.deleteReader);

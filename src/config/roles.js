@@ -14,6 +14,7 @@ const allRoles = {
     'manageTags',
     'getInventory',
     'manageInventory',
+    'manageReaders',
     'uploadFiles',
   ],
   branch_manager: [
@@ -26,6 +27,7 @@ const allRoles = {
     'manageUsers',
     'manageVisitors',
     'getVisitors',
+    'manageReaders',
   ],
   receptionist: [
     'manageFinances',
@@ -44,6 +46,7 @@ const allRoles = {
     'manageUsers',
     'manageVisitors',
     'getVisitors',
+    'manageReaders',
     'getBookings',
     'manageBookings',
     'uploadFiles',
@@ -59,6 +62,7 @@ const allRoles = {
     'getVisitors',
     'getBookings',
     'manageBookings',
+    'manageReaders',
     'uploadFiles',
   ],
 
