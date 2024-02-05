@@ -50,7 +50,7 @@ const mqtt = require('mqtt');
 const host = '35.202.12.122';
 const port = '1883';
 
-const clientId = `backend3`;
+const clientId = `backend1`;
 
 const topic = '/nodejs/mqtt/rx';
 const timeOutValue = 3000;
