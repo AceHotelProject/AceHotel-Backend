@@ -1,15 +1,7 @@
 const express = require('express');
-const multer = require('multer');
 const auth = require('../../middlewares/auth');
 // const validate = require('../../middlewares/validate');
 const bookingController = require('../../controllers/bookings.controller');
-
-const multerConfig = multer({
-  storage: multer.memoryStorage(),
-  limits: {
-    fileSize: 5 * 1024 * 1024, // 5MB limit (adjust as needed)
-  },
-});
 
 const router = express.Router();
 
@@ -18,18 +10,7 @@ router
   .get(auth('getBookings'), bookingController.getBookings)
   .post(auth('manageBookings'), bookingController.createBooking);
 
-router.post(
-  '/pay/:bookingId',
-  auth('manageBookings'),
-  multerConfig.single('transaction_proof_image'),
-  bookingController.payBooking
-);
-
-router
-  .route('/:bookingId')
-  .get(auth('getBookings'), bookingController.getBookingById)
-  .patch(auth('manageBookings'), bookingController.updateBookingById)
-  .delete(auth('manageBookings'), bookingController.deleteBookingById);
+router.post('/pay/:bookingId', auth('manageBookings'), bookingController.payBooking);
 
 router
   .route('/visitor/:visitorId')
@@ -38,6 +19,15 @@ router
   .delete(auth('manageBookings'), bookingController.deleteBookingByVisitorId);
 
 router.route('/room/:roomId').get(auth('getBookings'), bookingController.getBookingsByRoomId);
+
+router.route('/discount/:bookingId').post(auth('manageBookings'), bookingController.applyDiscount);
+
+router
+  .route('/:bookingId')
+  .get(auth('getBookings'), bookingController.getBookingById)
+  .patch(auth('manageBookings'), bookingController.updateBookingById)
+  .delete(auth('manageBookings'), bookingController.deleteBookingById);
+
 module.exports = router;
 
 /**

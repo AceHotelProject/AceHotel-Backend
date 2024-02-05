@@ -31,7 +31,7 @@ const queryHotels = async (filter, options) => {
  * @returns {Promise<Hotel>}
  */
 const getHotelById = async (id) => {
-  return Hotel.findById(id);
+  return Hotel.findById(id).populate('room_id');
 };
 
 /**
@@ -46,6 +46,26 @@ const updateHotelById = async (hotelId, updateBody) => {
     throw new ApiError(httpStatus.NOT_FOUND, 'Hotel not found');
   }
   Object.assign(hotel, updateBody);
+  if (updateBody.regular_room_price) {
+    // eslint-disable-next-line no-restricted-syntax
+    for (const room of hotel.room_id) {
+      if (room.type === 'regular') {
+        room.price = updateBody.regular_room_price;
+        // eslint-disable-next-line no-await-in-loop
+        await room.save();
+      }
+    }
+  }
+  if (updateBody.exclusive_room_price) {
+    // eslint-disable-next-line no-restricted-syntax
+    for (const room of hotel.room_id) {
+      if (room.type === 'exclusive') {
+        room.price = updateBody.exclusive_room_price;
+        // eslint-disable-next-line no-await-in-loop
+        await room.save();
+      }
+    }
+  }
   await hotel.save();
   return hotel;
 };

@@ -1,5 +1,4 @@
 const express = require('express');
-const multer = require('multer');
 const auth = require('../../middlewares/auth');
 // const validate = require('../../middlewares/validate');
 // const hotelValidation = require('../../validations/hotel.validation');
@@ -7,23 +6,9 @@ const hotelController = require('../../controllers/hotel.controller');
 
 const router = express.Router();
 
-const multerConfig = multer({
-  storage: multer.memoryStorage(),
-  limits: {
-    fileSize: 5 * 1024 * 1024, // 5MB limit (adjust as needed)
-  },
-});
-
 router
   .route('/')
-  .post(
-    auth('manageFranchise'),
-    multerConfig.fields([
-      { name: 'regular_room_image', maxCount: 3 },
-      { name: 'exclusive_room_image', maxCount: 3 },
-    ]),
-    hotelController.createHotel
-  )
+  .post(auth('manageFranchise'), hotelController.createHotel)
   .get(auth('getFranchise'), hotelController.getHotels);
 
 router
