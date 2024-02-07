@@ -76,6 +76,7 @@ const hotelSchema = mongoose.Schema(
     },
     revenue: {
       type: Number,
+      default: 0,
     },
     discount_code: {
       type: String,

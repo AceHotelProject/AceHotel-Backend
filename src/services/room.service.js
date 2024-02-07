@@ -1,7 +1,7 @@
 /* eslint-disable no-restricted-syntax, camelcase, no-plusplus, no-await-in-loop */
 
 const httpStatus = require('http-status');
-const { Room, Booking } = require('../models');
+const { Room, Booking, Hotel } = require('../models');
 const ApiError = require('../utils/ApiError');
 
 /**
@@ -175,6 +175,10 @@ const getAvailableRoomsByType = async (type, hotelId, count, checkin_date, check
 
 const checkinById = async (roomId, checkinBody, user_id) => {
   const room = await getRoomById(roomId);
+  const hotel = await Hotel.findById(room.hotel_id);
+  if (!hotel) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Hotel not found');
+  }
   if (!room) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Room not found');
   }
@@ -193,8 +197,12 @@ const checkinById = async (roomId, checkinBody, user_id) => {
       if (checkinBody.checkin_date < booking.checkin) {
         throw new ApiError(httpStatus.BAD_REQUEST, 'You cannot checkin before checkin date');
       }
+      if (!booking.actual_checkin || booking.actual_checkin === undefined) {
+        hotel.revenue += booking.total_price;
+      }
       booking.actual_checkin = checkinBody.checkin_date;
       booking.checkin_staff_id = user_id;
+      await hotel.save();
       await booking.save();
       return room;
     }

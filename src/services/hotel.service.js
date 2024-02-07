@@ -21,8 +21,12 @@ const createHotel = async (hotelBody) => {
  * @returns {Promise<QueryResult>}
  */
 const queryHotels = async (filter, options) => {
-  const hotels = await Hotel.paginate(filter, options);
-  return hotels;
+  return Hotel.find(filter)
+    .populate('owner_id receptionist_id cleaning_staff_id inventory_staff_id')
+    .sort(options.sortBy)
+    .limit(options.limit)
+    .skip(options.page * options.limit)
+    .exec();
 };
 
 /**

@@ -98,6 +98,13 @@ const getBookingsByRoomId = async (roomId) => {
   return bookings;
 };
 
+const getBookingsByHotelId = async (hotelId) => {
+  const bookings = await Booking.find({
+    hotel_id: hotelId,
+  });
+  return bookings;
+};
+
 const applyDiscount = async (bookingId, discountBody) => {
   const booking = await getBookingById(bookingId);
   if (!booking) {
@@ -123,4 +130,5 @@ module.exports = {
   deleteBookingsByVisitorId,
   getBookingsByRoomId,
   applyDiscount,
+  getBookingsByHotelId,
 };

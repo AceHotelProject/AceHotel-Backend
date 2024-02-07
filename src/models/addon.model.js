@@ -10,7 +10,6 @@ const addonSchema = mongoose.Schema(
     price: {
       type: Number,
     },
-
     room_id: [
       {
         type: mongoose.SchemaTypes.ObjectId,
