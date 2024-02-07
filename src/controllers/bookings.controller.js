@@ -60,6 +60,7 @@ const createBooking = catchAsync(async (req, res) => {
     for (let i = 0; i < req.body.extra_bed; i += 1) {
       // eslint-disable-next-line no-await-in-loop
       const addon = await addonService.createAddon({
+        name: 'Extra Bed',
         booking_id: booking._id,
         type: 'kasur',
         price: hotel.extra_bed_price,
