@@ -12,6 +12,8 @@ const bookingRoute = require('./booking.route');
 const tagRoute = require('./tag.route');
 const financeRoute = require('./finance.route');
 const readerRoute = require('./reader.route');
+const uploadRoute = require('./upload.route');
+const recapRoute = require('./recap.route');
 const config = require('../../config/config');
 
 const router = express.Router();
@@ -64,6 +66,14 @@ const defaultRoutes = [
   {
     path: '/reader',
     route: readerRoute,
+  },
+  {
+    path: '/uploads',
+    route: uploadRoute,
+  },
+  {
+    path: '/recap',
+    route: recapRoute,
   },
 ];
 

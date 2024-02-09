@@ -11,6 +11,7 @@ const createAddon = catchAsync(async (req, res) => {
 
 const getAddons = catchAsync(async (req, res) => {
   const options = pick(req.query, ['sortBy', 'limit', 'page']);
+  const filter = pick(req.query, ['booking_id', 'type']);
   const result = await addonService.queryAddons(filter, options);
   res.send(result);
 });

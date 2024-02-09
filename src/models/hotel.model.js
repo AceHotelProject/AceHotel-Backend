@@ -17,7 +17,18 @@ const hotelSchema = mongoose.Schema(
     },
     owner_id: {
       type: mongoose.SchemaTypes.ObjectId,
-      required: true,
+      ref: 'User',
+    },
+    receptionist_id: {
+      type: mongoose.SchemaTypes.ObjectId,
+      ref: 'User',
+    },
+    cleaning_staff_id: {
+      type: mongoose.SchemaTypes.ObjectId,
+      ref: 'User',
+    },
+    inventory_staff_id: {
+      type: mongoose.SchemaTypes.ObjectId,
       ref: 'User',
     },
     regular_room_count: {
@@ -64,6 +75,13 @@ const hotelSchema = mongoose.Schema(
       type: Number,
     },
     revenue: {
+      type: Number,
+      default: 0,
+    },
+    discount_code: {
+      type: String,
+    },
+    discount_amount: {
       type: Number,
     },
   },

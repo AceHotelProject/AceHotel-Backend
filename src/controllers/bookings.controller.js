@@ -3,7 +3,6 @@ const pick = require('../utils/pick');
 const ApiError = require('../utils/ApiError');
 const catchAsync = require('../utils/catchAsync');
 const { bookingService, roomService, hotelService, visitorService, addonService } = require('../services');
-const gcs = require('../utils/cloudStorage');
 
 const createBooking = catchAsync(async (req, res) => {
   // Cek Hotel ID
@@ -61,6 +60,7 @@ const createBooking = catchAsync(async (req, res) => {
     for (let i = 0; i < req.body.extra_bed; i += 1) {
       // eslint-disable-next-line no-await-in-loop
       const addon = await addonService.createAddon({
+        name: 'Extra Bed',
         booking_id: booking._id,
         type: 'kasur',
         price: hotel.extra_bed_price,
@@ -83,9 +83,7 @@ const payBooking = catchAsync(async (req, res) => {
   if (!booking) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Booking not found');
   }
-  // Upload Bukti Pembayaran
-  const { file } = req;
-  booking.path_transaction_proof = await gcs.upload(file);
+  booking.path_transaction_proof = req.body.path_transaction_proof;
   // Update is_proof_uploaded
   booking.is_proof_uploaded = true;
   // Save
@@ -197,6 +195,11 @@ const getBookingsByRoomId = catchAsync(async (req, res) => {
   res.send(result);
 });
 
+const applyDiscount = catchAsync(async (req, res) => {
+  const booking = await bookingService.applyDiscount(req.params.bookingId, req.body);
+  res.send(booking);
+});
+
 module.exports = {
   createBooking,
   payBooking,
@@ -208,4 +211,5 @@ module.exports = {
   updateBookingByVisitorId,
   deleteBookingByVisitorId,
   getBookingsByRoomId,
+  applyDiscount,
 };

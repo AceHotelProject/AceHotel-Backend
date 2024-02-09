@@ -50,6 +50,10 @@ const visitorSchema = mongoose.Schema(
         }
       },
     },
+    hotel_id: {
+      type: mongoose.SchemaTypes.ObjectId,
+      ref: 'Hotel',
+    },
   },
   {
     timestamps: true,
