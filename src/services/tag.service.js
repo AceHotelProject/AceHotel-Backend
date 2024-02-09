@@ -2,9 +2,9 @@ const httpStatus = require('http-status');
 const { Tag } = require('../models');
 const ApiError = require('../utils/ApiError');
 
-const topicRx = '/nodejs/mqtt/rx';
-const topicAdd = '/nodejs/mqtt/add';
-const timeOutValue = 3000;
+const topicRx = 'mqtt-integration/Inventory/SN-001/rx';
+const topicAdd = 'mqtt-integration/Inventory/SN-001/add';
+const timeOutValue = 5000;
 /**
  * Create a tag
  * @param {Object} tagBody
@@ -23,6 +23,7 @@ const setQuery = async (req) => {
     method: 'setQuery',
     params: req.query.state,
   };
+  console.log(resultJson);
   const result = JSON.stringify(resultJson);
   req.mqttPublish(topicRx, result);
   return resultJson;
@@ -75,9 +76,8 @@ const getTagId = async (req) => {
   const command = JSON.stringify(commandJson);
 
   req.mqttPublish(topicRx, command);
-  const dummy = JSON.stringify(dummyResponseJson);
-  req.mqttPublish(topicAdd, dummy);
-
+  // const dummy = JSON.stringify(dummyResponseJson);
+  // req.mqttPublish(topicAdd, dummy);
 
   const messageString = await req.mqttSubscribe(topicAdd, timeOutValue); // 3 seconds timeout
   req.mqttUnsubscribe(topicAdd);
@@ -89,6 +89,10 @@ const getTagId = async (req) => {
   if (messageObj.status == 1) {
     result = {
       tagId: messageObj.tid,
+      status: messageObj.status,
+    };
+  } else {
+    result = {
       status: messageObj.status,
     };
   }

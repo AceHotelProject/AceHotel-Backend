@@ -60,7 +60,7 @@ const mqttClient = mqtt.connect(connectUrl, {
   clientId,
   clean: true,
   connectTimeout: 4000,
-  username: 'backend3',
+  username: 'backend1',
   password: 'an1m3w1bu',
   reconnectPeriod: 1000,
 });
