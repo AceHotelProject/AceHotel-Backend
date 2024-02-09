@@ -87,7 +87,6 @@ const addInventoryId = async (hotelId, inventoryId) => {
   }
   hotel.inventory_id.push(inventoryId);
   await hotel.save();
-  return;
 };
 
 /**

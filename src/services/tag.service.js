@@ -66,7 +66,7 @@ const getTagId = async (req) => {
     status: '1',
   };
 
-  let queryCommandJson = {
+  const queryCommandJson = {
     method: 'setQuery',
     params: 'false',
   };
@@ -77,7 +77,6 @@ const getTagId = async (req) => {
   req.mqttPublish(topicRx, command);
   const dummy = JSON.stringify(dummyResponseJson);
   req.mqttPublish(topicAdd, dummy);
-
 
   const messageString = await req.mqttSubscribe(topicAdd, timeOutValue); // 3 seconds timeout
   req.mqttUnsubscribe(topicAdd);

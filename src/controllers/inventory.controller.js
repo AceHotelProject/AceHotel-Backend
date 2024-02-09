@@ -12,7 +12,7 @@ const createInventory = catchAsync(async (req, res) => {
 
 const getInventories = catchAsync(async (req, res) => {
   const hotel = await hotelService.getHotelById(req.body.hotel_id);
-  const inventory_id = hotel.inventory_id;
+  const { inventory_id } = hotel;
   const filter = pick(req.query, ['name', 'type']);
   const combinedFilter = {
     ...filter,

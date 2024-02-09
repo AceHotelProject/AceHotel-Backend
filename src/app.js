@@ -6,6 +6,8 @@ const compression = require('compression');
 const cors = require('cors');
 const passport = require('passport');
 const httpStatus = require('http-status');
+const { exec } = require('child_process');
+const mqtt = require('mqtt');
 const config = require('./config/config');
 const morgan = require('./config/morgan');
 const { jwtStrategy } = require('./config/passport');
@@ -16,8 +18,6 @@ const ApiError = require('./utils/ApiError');
 
 const app = express();
 // See commit head
-
-const { exec } = require('child_process');
 
 const getCurrentGitCommit = () => {
   return new Promise((resolve, reject) => {
@@ -46,7 +46,7 @@ if (config.env !== 'test') {
   app.use(morgan.successHandler);
   app.use(morgan.errorHandler);
 }
-const mqtt = require('mqtt');
+
 const host = '35.202.12.122';
 const port = '1883';
 
@@ -55,7 +55,7 @@ const clientId = `backend3`;
 const topic = '/nodejs/mqtt/rx';
 const timeOutValue = 3000;
 const connectUrl = `mqtt://${host}:${port}`;
-//mosquitto_pub -d -q 1 -h 35.202.12.122 -p 1883 -t tbmq/demo/topic -i 'backend3' -u 'backend3' -P 'an1m3w1bu' -c -m 'Hello World'
+// mosquitto_pub -d -q 1 -h 35.202.12.122 -p 1883 -t tbmq/demo/topic -i 'backend3' -u 'backend3' -P 'an1m3w1bu' -c -m 'Hello World'
 const mqttClient = mqtt.connect(connectUrl, {
   clientId,
   clean: true,

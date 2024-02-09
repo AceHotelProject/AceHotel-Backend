@@ -1,14 +1,14 @@
 const httpStatus = require('http-status');
 const catchAsync = require('../utils/catchAsync');
-const { bookingService } = require('../services');
+const { bookingService, hotelService } = require('../services');
 
 const getRecap = catchAsync(async (req, res) => {
-  const revenue = 0;
+  let revenue = 0;
   const branchCount = req.user.hotel_id.length;
-  const checkinCount = 0;
-  const totalBooking = 0;
-  for (const hotel of req.user.hotel_id) {
-    const hotel = await hotelService.hotelService.getHotelById(hotel);
+  let checkinCount = 0;
+  let totalBooking = 0;
+  for (const h of req.user.hotel_id) {
+    const hotel = await hotelService.getHotelById(h);
     if (!hotel) {
       throw new ApiError(httpStatus.NOT_FOUND, 'Hotel not found');
     }
@@ -21,7 +21,7 @@ const getRecap = catchAsync(async (req, res) => {
       }
     }
   }
-  res.httpStatus(httpStatus.OK).send({
+  res.status(httpStatus.OK).send({
     revenue,
     branch_count: branchCount,
     checkin_count: checkinCount,
