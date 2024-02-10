@@ -11,3 +11,4 @@ module.exports.addonService = require('./addon.service');
 module.exports.bookingService = require('./bookings.service');
 module.exports.tagService = require('./tag.service');
 module.exports.financeService = require('./finance.service');
+module.exports.readerService = require('./reader.service');

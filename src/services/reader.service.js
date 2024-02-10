@@ -48,12 +48,12 @@ const getReaderByName = async (name) => {
 
 /**
  * Update reader by id
- * @param {ObjectId} readerId
+ * @param {ObjectId} readerName
  * @param {Object} updateBody
  * @returns {Promise<Reader>}
  */
-const updateReaderById = async (readerId, updateBody) => {
-  const reader = await getReaderById(readerId);
+const updateReaderByName = async (readerName, updateBody) => {
+  const reader = await getReaderByName(readerName);
   if (!reader) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Reader not found');
   }
@@ -64,11 +64,11 @@ const updateReaderById = async (readerId, updateBody) => {
 
 /**
  * Delete reader by id
- * @param {ObjectId} readerId
+ * @param {ObjectId} readerName
  * @returns {Promise<Reader>}
  */
-const deleteReaderById = async (readerId) => {
-  const reader = await getReaderById(readerId);
+const deleteReaderByName = async (readerName) => {
+  const reader = await getReaderById(readerName);
   if (!reader) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Reader not found');
   }
@@ -79,8 +79,7 @@ const deleteReaderById = async (readerId) => {
 module.exports = {
   createReader,
   queryReaders,
-  getReaderById,
-  getReaderByEmail,
-  updateReaderById,
-  deleteReaderById,
+  getReaderByName,
+  updateReaderByName,
+  deleteReaderByName,
 };
