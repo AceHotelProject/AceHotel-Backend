@@ -22,7 +22,8 @@ const createFinance = async (financeBody) => {
  */
 const queryFinances = async (options) => {
   const now = new Date();
-  let startDate, endDate;
+  let startDate;
+  let endDate;
 
   if (options.filter === 'thisDay') {
     startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());

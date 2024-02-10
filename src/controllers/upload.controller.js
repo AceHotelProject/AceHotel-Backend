@@ -9,7 +9,7 @@ const uploadFiles = catchAsync(async (req, res) => {
     // eslint-disable-next-line no-await-in-loop
     path.push(await uploadImage(file));
   }
-  res.status(httpStatus.OK).send(path);
+  res.status(httpStatus.OK).send({ path });
 });
 
 module.exports = {

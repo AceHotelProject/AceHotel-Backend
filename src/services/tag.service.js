@@ -67,7 +67,7 @@ const getTagId = async (req) => {
     status: '1',
   };
 
-  let queryCommandJson = {
+  const queryCommandJson = {
     method: 'setQuery',
     params: 'false',
   };

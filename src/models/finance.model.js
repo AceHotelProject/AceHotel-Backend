@@ -9,7 +9,7 @@ const financeSchema = mongoose.Schema(
       required: true,
     },
     booking: {
-      //total booking in a day
+      // total booking in a day
       type: Number,
       required: true,
     },

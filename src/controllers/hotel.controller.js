@@ -59,7 +59,7 @@ const createHotel = catchAsync(async (req, res) => {
 });
 
 const getHotels = catchAsync(async (req, res) => {
-  const hotel_id = req.user.hotel_id; // Return only hotel that user can access
+  const { hotel_id } = req.user; // Return only hotel that user can access
   const filter = pick(req.query, ['name', 'owner_id']);
   const combinedFilter = {
     ...filter,
@@ -71,7 +71,9 @@ const getHotels = catchAsync(async (req, res) => {
   if (result.totalResults === 0) {
     throw new ApiError(httpStatus.NOT_FOUND, 'No hotels found');
   }
-  res.send(result);
+  res.send({
+    result,
+  });
 });
 
 const getHotel = catchAsync(async (req, res) => {

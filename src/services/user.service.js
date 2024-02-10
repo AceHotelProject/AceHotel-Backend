@@ -78,7 +78,6 @@ const addHotelId = async (userId, hotelId) => {
   }
   user.hotel_id.push(hotelId);
   await user.save();
-  return;
 };
 
 /**

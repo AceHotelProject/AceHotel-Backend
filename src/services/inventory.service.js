@@ -69,7 +69,7 @@ const updateInventoryById = async (inventoryId, updateBody, user) => {
       description: updateBody.description,
 
       personInCharge: user.username,
-      stockChange: stockChange,
+      stockChange,
 
       date: new Date(), // This will set the date to the current date and time
     });
@@ -96,7 +96,6 @@ const addTagId = async (inventoryId, tagId) => {
   }
   inventory.tag_id.push(tagId);
   await inventory.save();
-  return;
 };
 
 /**
