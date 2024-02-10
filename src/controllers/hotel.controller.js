@@ -71,7 +71,9 @@ const getHotels = catchAsync(async (req, res) => {
   if (result.totalResults === 0) {
     throw new ApiError(httpStatus.NOT_FOUND, 'No hotels found');
   }
-  res.send(result);
+  res.send({
+    result,
+  });
 });
 
 const getHotel = catchAsync(async (req, res) => {

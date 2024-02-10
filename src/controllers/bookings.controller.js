@@ -3,6 +3,7 @@ const pick = require('../utils/pick');
 const ApiError = require('../utils/ApiError');
 const catchAsync = require('../utils/catchAsync');
 const { bookingService, roomService, hotelService, visitorService, addonService } = require('../services');
+const { isDate } = require('validator');
 
 const createBooking = catchAsync(async (req, res) => {
   // Cek Hotel ID
@@ -91,9 +92,56 @@ const payBooking = catchAsync(async (req, res) => {
   res.status(httpStatus.OK).send(booking);
 });
 
+const setCheckinTime = (date) => {
+  if (!(date instanceof Date)) {
+    throw new Error('Invalid date provided');
+  }
+
+  // Set the time to 14:00:00
+  date.setHours(14, 0, 0, 0);
+  return date;
+};
+
 const getBookings = catchAsync(async (req, res) => {
   const filter = pick(req.query, ['checkin_date', 'visitor_id', 'hotel_id']);
   const options = pick(req.query, ['sortBy', 'limit', 'page']);
+  if (filter.checkin_date) {
+    // You may want to validate the date format or handle any parsing issues here
+    // For simplicity, assuming the date format is valid ISO 8601
+    const fullDate = new Date(filter.checkin_date);
+
+    // Check the length of the provided date string
+    if (filter.checkin_date.length === 4) {
+      // If only the year is provided, set the filter to cover the entire year
+      const startOfYear = new Date(fullDate.getFullYear(), 0, 1);
+      const endOfYear = new Date(fullDate.getFullYear() + 1, 0, 1);
+
+      // Set the time to 14:00:00
+      startOfYear.setHours(14, 0, 0, 0);
+      endOfYear.setHours(14, 0, 0, 0);
+
+      filter.checkin_date = {
+        $gte: startOfYear,
+        $lt: endOfYear,
+      };
+    } else if (filter.checkin_date.length === 7) {
+      // If year and month are provided, set the filter to cover the entire month
+      const startOfMonth = new Date(fullDate.getFullYear(), fullDate.getMonth(), 1);
+      const endOfMonth = new Date(fullDate.getFullYear(), fullDate.getMonth() + 1, 1);
+
+      // Set the time to 14:00:00
+      startOfMonth.setHours(14, 0, 0, 0);
+      endOfMonth.setHours(14, 0, 0, 0);
+
+      filter.checkin_date = {
+        $gte: startOfMonth,
+        $lt: endOfMonth,
+      };
+    } else {
+      // If the full date is provided, set the time to 14:00:00
+      filter.checkin_date = setCheckinTime(fullDate);
+    }
+  }
   const result = await bookingService.queryBookings(filter, options);
   if (result.totalResults === 0) {
     throw new ApiError(httpStatus.NOT_FOUND, 'No booking found');
