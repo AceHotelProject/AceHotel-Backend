@@ -9,13 +9,13 @@ const router = express.Router();
 router
   .route('/')
   .post(auth('manageInventory'), validate(inventoryValidation.createInventory), inventoryController.createInventory)
-  .get(auth('getInventory'), validate(inventoryValidation.getInventories), inventoryController.getInventories);
+  .get(auth('getInventory'), validate(inventoryValidation.getInventories), inventoryController.getInventories)
+  .delete(auth('manageInventory'), validate(inventoryValidation.deleteInventory), inventoryController.deleteInventory);
 
 router
   .route('/:inventoryId')
   .get(auth('getInventory'), validate(inventoryValidation.getInventory), inventoryController.getInventory)
-  .patch(auth('manageInventory'), validate(inventoryValidation.updateInventory), inventoryController.updateInventory)
-  .delete(auth('manageInventory'), validate(inventoryValidation.deleteInventory), inventoryController.deleteInventory);
+  .patch(auth('manageInventory'), validate(inventoryValidation.updateInventory), inventoryController.updateInventory);
 
 module.exports = router;
 
