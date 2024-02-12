@@ -13,7 +13,7 @@ const { authLimiter } = require('./middlewares/rateLimiter');
 const routes = require('./routes/v1');
 const { errorConverter, errorHandler } = require('./middlewares/error');
 const ApiError = require('./utils/ApiError');
-
+const logger = require('./config/logger');
 const app = express();
 // See commit head
 
@@ -50,7 +50,7 @@ const mqtt = require('mqtt');
 const host = '35.202.12.122';
 const port = '1883';
 
-const clientId = `backend2`;
+const clientId = `backend1`;
 
 const timeOutValue = 3000;
 const connectUrl = `mqtt://${host}:${port}`;
@@ -62,13 +62,13 @@ const mqttClient = mqtt.connect(connectUrl, {
   clientId,
   clean: true,
   connectTimeout: 4000,
-  username: 'backend2',
+  username: 'backend1',
   password: 'an1m3w1bu',
   reconnectPeriod: 1000,
 });
 // Connect to the MQTT broker
 mqttClient.on('connect', function () {
-  console.log('Connected to MQTT broker');
+  logger.info('Connected to MQTT broker');
   mqttClient.subscribe(topicPrefix + '#');
 });
 mqttClient.on('message', async (topic, message) => {

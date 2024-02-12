@@ -47,10 +47,8 @@ const updateInventory = {
 
 const deleteInventory = {
   query: Joi.object().keys({
-    hotel_id: Joi.string().required(),
-  }),
-  params: Joi.object().keys({
-    inventoryId: Joi.string().custom(objectId),
+    hotel_id: Joi.string().custom(objectId),
+    inventory_id: Joi.string().custom(objectId),
   }),
 };
 
