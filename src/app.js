@@ -6,8 +6,6 @@ const compression = require('compression');
 const cors = require('cors');
 const passport = require('passport');
 const httpStatus = require('http-status');
-const { exec } = require('child_process');
-const mqtt = require('mqtt');
 const config = require('./config/config');
 const morgan = require('./config/morgan');
 const { jwtStrategy } = require('./config/passport');
@@ -18,6 +16,8 @@ const ApiError = require('./utils/ApiError');
 
 const app = express();
 // See commit head
+
+const { exec } = require('child_process');
 
 const getCurrentGitCommit = () => {
   return new Promise((resolve, reject) => {
@@ -46,27 +46,118 @@ if (config.env !== 'test') {
   app.use(morgan.successHandler);
   app.use(morgan.errorHandler);
 }
-
+const mqtt = require('mqtt');
 const host = '35.202.12.122';
 const port = '1883';
 
-const clientId = `backend1`;
+const clientId = `backend2`;
 
-const topic = '/nodejs/mqtt/rx';
 const timeOutValue = 3000;
 const connectUrl = `mqtt://${host}:${port}`;
-// mosquitto_pub -d -q 1 -h 35.202.12.122 -p 1883 -t tbmq/demo/topic -i 'backend3' -u 'backend3' -P 'an1m3w1bu' -c -m 'Hello World'
+const topicPrefix = '/mqtt-integration/Reader/';
+const { readerService } = require('./services');
+const { rejects } = require('assert');
+//mosquitto_pub -d -q 1 -h 35.202.12.122 -p 1883 -t tbmq/demo/topic -i 'backend3' -u 'backend3' -P 'an1m3w1bu' -c -m 'Hello World'
 const mqttClient = mqtt.connect(connectUrl, {
   clientId,
   clean: true,
   connectTimeout: 4000,
-  username: 'backend1',
+  username: 'backend2',
   password: 'an1m3w1bu',
   reconnectPeriod: 1000,
 });
 // Connect to the MQTT broker
 mqttClient.on('connect', function () {
   console.log('Connected to MQTT broker');
+  mqttClient.subscribe(topicPrefix + '#');
+});
+mqttClient.on('message', async (topic, message) => {
+  let readerName;
+  try {
+    // message is a Buffer
+    // let strTopic = topic.toString();
+    const strMessage = message
+      .toString()
+      .replace(/\r?\n|\r/, '')
+      .trim();
+    // console.log('msg: ', strMessage);
+    // let objMessage = JSON.parse(strMessage);
+    // Check if the topic starts with the prefix and then extract the specific part
+
+    if (topic.startsWith(topicPrefix)) {
+      readerName = topic.slice(topicPrefix.length);
+    }
+    const reader = await readerService.getReaderByName(readerName);
+    //console.log(reader);
+    if (!reader) {
+      rejects('Reader Not Found');
+    }
+    //console.log(readerName, strMessage);
+    const messageObj = JSON.parse(strMessage);
+    if (!messageObj) {
+      rejects('Error Processing Reader, Check Synthax');
+    }
+    console.log(topic, strMessage);
+    if (!messageObj.method) {
+      // console.log('not a method', messageObj);
+    }
+    if (messageObj.method && messageObj.method == 'getData') {
+      const message = {
+        name: readerName,
+        data: {
+          power_gain: reader.power_gain,
+          read_interval: reader.read_interval,
+        },
+        status: 1,
+      };
+      // console.log('success message: ', message);
+
+      mqttClient.publish(topicPrefix + readerName, JSON.stringify(message), {
+        qos: 0,
+        retain: false,
+      });
+    } else if (messageObj.method && messageObj.params && messageObj.method == 'updateData') {
+      // console.log(messageObj.params);
+      const data = messageObj.params;
+      // Convert string values to numbers
+      Object.keys(data).forEach((key) => {
+        if (!isNaN(data[key])) {
+          data[key] = Number(data[key]);
+        }
+      });
+
+      // console.log(data);
+      Object.assign(reader, data);
+      await reader.save();
+      const message = {
+        name: readerName,
+        data: {
+          power_gain: reader.power_gain,
+          read_interval: reader.read_interval,
+        },
+        status: 1,
+      };
+      // console.log('success message: ', message);
+
+      mqttClient.publish(topicPrefix + readerName, JSON.stringify(message), {
+        qos: 0,
+        retain: false,
+      });
+    }
+  } catch (error) {
+    if (error.message) {
+      const message = {
+        name: readerName,
+        data: error.message,
+        status: 0,
+      };
+      // console.log('error message: ', message);
+      mqttClient.publish(topicPrefix + readerName, JSON.stringify(message), {
+        qos: 0,
+        retain: false,
+      });
+    }
+  }
 });
 // MQTT middleware for publishing and subscribing
 app.use(function (req, res, next) {
