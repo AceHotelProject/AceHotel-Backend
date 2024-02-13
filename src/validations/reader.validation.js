@@ -3,13 +3,13 @@ const { objectId } = require('./custom.validation');
 
 const createReader = {
   body: Joi.object().keys({
-    name: Joi.string().required(),
+    reader_name: Joi.string().required(),
   }),
 };
 
 const getReaders = {
   query: Joi.object().keys({
-    name: Joi.string(),
+    readerName: Joi.string(),
     sortBy: Joi.string(),
     limit: Joi.number().integer(),
     page: Joi.number().integer(),

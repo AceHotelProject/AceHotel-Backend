@@ -50,7 +50,7 @@ const mqtt = require('mqtt');
 const host = '35.202.12.122';
 const port = '1883';
 
-const clientId = `backend1`;
+const clientId = `backend3`;
 
 const timeOutValue = 3000;
 const connectUrl = `mqtt://${host}:${port}`;
@@ -62,7 +62,7 @@ const mqttClient = mqtt.connect(connectUrl, {
   clientId,
   clean: true,
   connectTimeout: 4000,
-  username: 'backend1',
+  username: 'backend3',
   password: 'an1m3w1bu',
   reconnectPeriod: 1000,
 });
