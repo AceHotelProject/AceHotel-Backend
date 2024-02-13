@@ -3,7 +3,7 @@ const pick = require('../utils/pick');
 const ApiError = require('../utils/ApiError');
 const catchAsync = require('../utils/catchAsync');
 const { bookingService, roomService, hotelService, visitorService, addonService } = require('../services');
-const { isDate } = require('validator');
+const { deleteFile } = require('../utils/cloudStorage');
 
 const createBooking = catchAsync(async (req, res) => {
   // Cek Hotel ID
@@ -166,6 +166,9 @@ const deleteBookingById = catchAsync(async (req, res) => {
   const booking = await bookingService.getBookingById(req.params.bookingId);
   if (!booking) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Booking not found');
+  }
+  if (booking.path_transaction_proof) {
+    await deleteFile(booking.path_transaction_proof);
   }
   // Update Room Yang Dipilih Menjadi Available
   // eslint-disable-next-line no-restricted-syntax, camelcase

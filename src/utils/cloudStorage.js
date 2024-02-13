@@ -30,6 +30,22 @@ const upload = async (file) => {
   });
 };
 
+const deleteFile = async (fileUrl) => {
+  return new Promise((resolve, reject) => {
+    try {
+      const bucketName = 'ace-hotel';
+      const bucket = storage.bucket(bucketName);
+      const fileName = fileUrl.split('/').pop();
+      const gcsFile = bucket.file(fileName);
+      gcsFile.delete();
+      resolve();
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
 module.exports = {
   upload,
+  deleteFile,
 };

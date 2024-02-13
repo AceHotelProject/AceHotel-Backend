@@ -21,12 +21,12 @@ const createHotel = async (hotelBody) => {
  * @returns {Promise<QueryResult>}
  */
 const queryHotels = async (filter, options) => {
-  return Hotel.find(filter)
-    .populate('owner_id receptionist_id cleaning_staff_id inventory_staff_id')
-    .sort(options.sortBy)
-    .limit(options.limit)
-    .skip(options.page * options.limit)
-    .exec();
+  const hotels = await Hotel.paginate(filter, options);
+  // eslint-disable-next-line no-restricted-syntax
+  for (const hotel of hotels.results) {
+    await hotel.populate('owner_id receptionist_id cleaning_staff_id inventory_staff_id').execPopulate();
+  }
+  return hotels;
 };
 
 /**
@@ -116,7 +116,6 @@ const removeInventoryId = async (hotelId, inventoryId) => {
 
   // Find the index of the inventoryId in the inventory_id array
   const index = hotel.inventory_id.indexOf(inventoryId);
-  console.log(inventoryId, ' ', index);
   // If the inventoryId exists in the array, remove it
   if (index > -1) {
     hotel.inventory_id.splice(index, 1);
