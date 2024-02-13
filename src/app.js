@@ -50,7 +50,7 @@ if (config.env !== 'test') {
 const host = '35.202.12.122';
 const port = '1883';
 
-const clientId = `backend3`;
+const clientId = `backend1`;
 
 const topic = '/nodejs/mqtt/rx';
 const timeOutValue = 3000;
@@ -60,7 +60,7 @@ const mqttClient = mqtt.connect(connectUrl, {
   clientId,
   clean: true,
   connectTimeout: 4000,
-  username: 'backend3',
+  username: 'backend1',
   password: 'an1m3w1bu',
   reconnectPeriod: 1000,
 });
