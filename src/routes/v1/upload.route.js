@@ -6,7 +6,7 @@ const uploadController = require('../../controllers/upload.controller');
 const multerConfig = multer({
   storage: multer.memoryStorage(),
   limits: {
-    fileSize: 1 * 1024 * 1024, // 5MB limit (adjust as needed)
+    fileSize: 1 * 1024 * 1024,
   },
 });
 

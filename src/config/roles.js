@@ -1,6 +1,7 @@
 const allRoles = {
   owner: [
     'manageFinances',
+    'getAllRooms',
     'getRooms',
     'manageRooms',
     'getFranchise',

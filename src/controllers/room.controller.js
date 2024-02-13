@@ -20,7 +20,7 @@ const createRoom = catchAsync(async (req, res) => {
 });
 
 const getRooms = catchAsync(async (req, res) => {
-  const filter = pick(req.query, ['name', 'type', 'hotel_id']);
+  const filter = pick(req.query, ['type', 'hotel_id']);
   const options = pick(req.query, ['sortBy', 'limit', 'page']);
   const result = await roomService.queryRooms(filter, options);
   if (result.totalResults === 0) {
@@ -33,6 +33,16 @@ const getRoom = catchAsync(async (req, res) => {
   const room = await roomService.getRoomById(req.params.roomId);
   if (!room) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Room not found');
+  }
+  if (
+    req.user.role === 'branch_manager' ||
+    req.user.role === 'receptionist' ||
+    req.user.role === 'cleaning_staff' ||
+    req.user.role === 'inventory_staff'
+  ) {
+    if (!req.user.hotel_id.includes(room.hotel_id.toString())) {
+      throw new ApiError(httpStatus.FORBIDDEN, 'Forbidden');
+    }
   }
   res.send(room);
 });
@@ -47,13 +57,23 @@ const deleteRoom = catchAsync(async (req, res) => {
   if (!room) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Room not found');
   }
+  if (
+    req.user.role === 'branch_manager' ||
+    req.user.role === 'receptionist' ||
+    req.user.role === 'cleaning_staff' ||
+    req.user.role === 'inventory_staff'
+  ) {
+    if (!req.user.hotel_id.includes(room.hotel_id.toString())) {
+      throw new ApiError(httpStatus.FORBIDDEN, 'Forbidden');
+    }
+  }
   const hotel = await hotelService.getHotelById(room.hotel_id);
   if (!hotel) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Hotel not found');
   }
   const updateField = room.type === 'regular' ? 'regular_room_count' : 'exclusive_room_count';
   hotel[updateField] -= 1;
-  hotel.room_id = hotel.room_id.filter((id) => id.toString() !== room._id.toString());
+  hotel.room_id = hotel.room_id.filter((h) => h._id.toString() !== room._id.toString());
   await hotel.save();
   await roomService.deleteRoomById(req.params.roomId);
   res.status(httpStatus.NO_CONTENT).send();
@@ -65,7 +85,20 @@ const populateRooms = catchAsync(async (req, res) => {
 });
 
 const getRoomsByHotelId = catchAsync(async (req, res) => {
-  const result = await roomService.getRoomsByHotelId(req.params.hotelId);
+  if (
+    req.user.role === 'branch_manager' ||
+    req.user.role === 'receptionist' ||
+    req.user.role === 'cleaning_staff' ||
+    req.user.role === 'inventory_staff'
+  ) {
+    if (!req.user.hotel_id.includes(req.params.hotelId)) {
+      throw new ApiError(httpStatus.FORBIDDEN, 'Forbidden');
+    }
+  }
+  let filter = pick(req.query, ['type']);
+  filter = { ...filter, hotel_id: req.params.hotelId };
+  const options = pick(req.query, ['sortBy', 'limit', 'page']);
+  const result = await roomService.queryRooms(filter, options);
   if (result.length === 0) {
     throw new ApiError(httpStatus.NOT_FOUND, 'No rooms found');
   }
@@ -84,6 +117,16 @@ const deleteRoomByHotelId = catchAsync(async (req, res) => {
   const hotel = await hotelService.getHotelById(req.params.hotelId);
   if (!hotel) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Hotel not found');
+  }
+  if (
+    req.user.role === 'branch_manager' ||
+    req.user.role === 'receptionist' ||
+    req.user.role === 'cleaning_staff' ||
+    req.user.role === 'inventory_staff'
+  ) {
+    if (!req.user.hotel_id.includes(req.params.hotelId)) {
+      throw new ApiError(httpStatus.FORBIDDEN, 'Forbidden');
+    }
   }
   await roomService.deleteRoomByHotelId(req.params.hotelId);
   hotel.room_id = [];

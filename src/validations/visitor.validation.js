@@ -8,6 +8,8 @@ const createVisitor = {
     identity_num: Joi.string().required(),
     phone: Joi.string().required(),
     email: Joi.string().required().email(),
+    path_identity_image: Joi.string().required(),
+    hotel_id: Joi.string().custom(objectId),
   }),
 };
 
@@ -18,6 +20,7 @@ const getVisitors = {
     sortBy: Joi.string(),
     limit: Joi.number().integer(),
     page: Joi.number().integer(),
+    hotel_id: Joi.string().custom(objectId),
   }),
 };
 

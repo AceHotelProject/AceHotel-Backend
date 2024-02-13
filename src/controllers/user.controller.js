@@ -10,9 +10,28 @@ const createUser = catchAsync(async (req, res) => {
 });
 
 const getUsers = catchAsync(async (req, res) => {
-  const filter = pick(req.query, ['username', 'role']);
+  let filter = pick(req.query, ['role']);
+  const usernameFilter = req.query.username ? { username: { $regex: new RegExp(req.query.username, 'i') } } : {};
   const options = pick(req.query, ['sortBy', 'limit', 'page']);
-  const result = await userService.queryUsers(filter, options);
+  if (
+    req.user.role === 'branch_manager' ||
+    req.user.role === 'receptionist' ||
+    req.user.role === 'cleaning_staff' ||
+    req.user.role === 'inventory_staff'
+  ) {
+    filter = {
+      ...filter,
+      hotel_id: req.query.hotel_id,
+    };
+  } else if (req.user.role === 'owner') {
+    if (req.query.hotel_id) {
+      filter = {
+        ...filter,
+        hotel_id: req.query.hotel_id,
+      };
+    }
+  }
+  const result = await userService.queryUsers({ ...filter, ...usernameFilter }, options);
   if (result.totalResults === 0) {
     throw new ApiError(httpStatus.NOT_FOUND, 'No users found');
   }
@@ -24,15 +43,53 @@ const getUser = catchAsync(async (req, res) => {
   if (!user) {
     throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
   }
+  if (
+    req.user.role === 'branch_manager' ||
+    req.user.role === 'receptionist' ||
+    req.user.role === 'cleaning_staff' ||
+    req.user.role === 'inventory_staff'
+  ) {
+    if (user.hotel_id != req.query.hotel_id) {
+      throw new ApiError(httpStatus.FORBIDDEN, 'Forbidden');
+    }
+  }
   res.send(user);
 });
 
 const updateUser = catchAsync(async (req, res) => {
-  const user = await userService.updateUserById(req.params.userId, req.body);
-  res.send(user);
+  const user = await userService.getUserById(req.params.userId);
+  if (!user) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
+  }
+  if (
+    req.user.role === 'branch_manager' ||
+    req.user.role === 'receptionist' ||
+    req.user.role === 'cleaning_staff' ||
+    req.user.role === 'inventory_staff'
+  ) {
+    if (user.hotel_id != req.query.hotel_id) {
+      throw new ApiError(httpStatus.FORBIDDEN, 'Forbidden');
+    }
+  }
+  const updatedUser = await userService.updateUserById(req.params.userId, req.body);
+  res.send(updatedUser);
 });
 
 const deleteUser = catchAsync(async (req, res) => {
+  const user = await userService.getUserById(req.params.userId);
+  if (!user) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
+  }
+  if (
+    req.user.role === 'branch_manager' ||
+    req.user.role === 'receptionist' ||
+    req.user.role === 'cleaning_staff' ||
+    req.user.role === 'inventory_staff'
+  ) {
+    if (user.hotel_id != req.query.hotel_id) {
+      throw new ApiError(httpStatus.FORBIDDEN, 'Forbidden');
+    }
+  }
   await userService.deleteUserById(req.params.userId);
   res.status(httpStatus.NO_CONTENT).send();
 });
