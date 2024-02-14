@@ -18,6 +18,9 @@ const getVisitors = catchAsync(async (req, res) => {
     req.user.role === 'cleaning_staff' ||
     req.user.role === 'inventory_staff'
   ) {
+    if (!req.user.hotel_id.includes(req.query.hotel_id.toString())) {
+      throw new ApiError(httpStatus.FORBIDDEN, 'Forbidden');
+    }
     filter = {
       ...filter,
       hotel_id: req.query.hotel_id,
