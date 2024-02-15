@@ -16,6 +16,8 @@ const createVisitor = {
 const getVisitors = {
   query: Joi.object().keys({
     name: Joi.string(),
+    email: Joi.string(),
+    identity_num: Joi.string(),
     role: Joi.string(),
     sortBy: Joi.string(),
     limit: Joi.number().integer(),
