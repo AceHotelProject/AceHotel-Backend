@@ -35,7 +35,7 @@ const queryHotels = async (filter, options) => {
  * @returns {Promise<Hotel>}
  */
 const getHotelById = async (id) => {
-  return Hotel.findById(id).populate('room_id');
+  return Hotel.findById(id).populate('room_id owner_id receptionist_id cleaning_staff_id inventory_staff_id');
 };
 
 /**
