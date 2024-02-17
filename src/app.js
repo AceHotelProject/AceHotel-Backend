@@ -54,7 +54,7 @@ const clientId = `backend3`;
 
 const timeOutValue = 3000;
 const connectUrl = `mqtt://${host}:${port}`;
-const topicPrefix = '/mqtt-integration/Reader/';
+const topicPrefix = 'mqtt-integration/Reader/';
 const { readerService } = require('./services');
 const { rejects } = require('assert');
 //mosquitto_pub -d -q 1 -h 35.202.12.122 -p 1883 -t tbmq/demo/topic -i 'backend3' -u 'backend3' -P 'an1m3w1bu' -c -m 'Hello World'
@@ -69,7 +69,7 @@ const mqttClient = mqtt.connect(connectUrl, {
 // Connect to the MQTT broker
 mqttClient.on('connect', function () {
   logger.info('Connected to MQTT broker');
-  mqttClient.subscribe(topicPrefix + '#');
+  mqttClient.subscribe(topicPrefix + '+');
 });
 mqttClient.on('message', async (topic, message) => {
   let readerName;
@@ -80,7 +80,7 @@ mqttClient.on('message', async (topic, message) => {
       .toString()
       .replace(/\r?\n|\r/, '')
       .trim();
-    // console.log('msg: ', strMessage);
+    console.log('msg: ', strMessage);
     // let objMessage = JSON.parse(strMessage);
     // Check if the topic starts with the prefix and then extract the specific part
 
@@ -88,14 +88,14 @@ mqttClient.on('message', async (topic, message) => {
       readerName = topic.slice(topicPrefix.length);
     }
     const reader = await readerService.getReaderByName(readerName);
-    //console.log(reader);
+    console.log(reader);
     if (!reader) {
-      rejects('Reader Not Found');
+      throw new Error('Reader Not Found');
     }
-    //console.log(readerName, strMessage);
+    console.log(topic, strMessage);
     const messageObj = JSON.parse(strMessage);
     if (!messageObj) {
-      rejects('Error Processing Reader, Check Synthax');
+      throw new Error('Error Processing Reader, Check Synthax');
     }
     console.log(topic, strMessage);
     if (!messageObj.method) {
@@ -103,16 +103,15 @@ mqttClient.on('message', async (topic, message) => {
     }
     if (messageObj.method && messageObj.method == 'getData') {
       const message = {
-        name: readerName,
         data: {
           power_gain: reader.power_gain,
           read_interval: reader.read_interval,
         },
         status: 1,
       };
-      // console.log('success message: ', message);
+      console.log(topicPrefix + readerName + '/rx', message);
 
-      mqttClient.publish(topicPrefix + readerName, JSON.stringify(message), {
+      mqttClient.publish(topicPrefix + readerName + '/rx', JSON.stringify(message), {
         qos: 0,
         retain: false,
       });
@@ -130,7 +129,6 @@ mqttClient.on('message', async (topic, message) => {
       Object.assign(reader, data);
       await reader.save();
       const message = {
-        name: readerName,
         data: {
           power_gain: reader.power_gain,
           read_interval: reader.read_interval,
@@ -139,7 +137,7 @@ mqttClient.on('message', async (topic, message) => {
       };
       // console.log('success message: ', message);
 
-      mqttClient.publish(topicPrefix + readerName, JSON.stringify(message), {
+      mqttClient.publish(topicPrefix + readerName + '/rx', JSON.stringify(message), {
         qos: 0,
         retain: false,
       });
@@ -147,12 +145,11 @@ mqttClient.on('message', async (topic, message) => {
   } catch (error) {
     if (error.message) {
       const message = {
-        name: readerName,
         data: error.message,
         status: 0,
       };
-      // console.log('error message: ', message);
-      mqttClient.publish(topicPrefix + readerName, JSON.stringify(message), {
+      console.log(topicPrefix + readerName + '/rx');
+      mqttClient.publish(topicPrefix + readerName + '/rx', JSON.stringify(message), {
         qos: 0,
         retain: false,
       });

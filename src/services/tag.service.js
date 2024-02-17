@@ -2,8 +2,8 @@ const httpStatus = require('http-status');
 const { Tag } = require('../models');
 const ApiError = require('../utils/ApiError');
 
-const topicRx = 'mqtt-integration/Inventory/SN-001/rx';
-const topicAdd = 'mqtt-integration/Inventory/SN-001/add';
+const topicRx = 'mqtt-integration/Inventory/ACE-001/rx';
+const topicAdd = 'mqtt-integration/Inventory/ACE-001/add';
 const timeOutValue = 5000;
 /**
  * Create a tag

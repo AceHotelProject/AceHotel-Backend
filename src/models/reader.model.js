@@ -14,6 +14,10 @@ const readerSchema = mongoose.Schema(
       type: Number,
       default: 30,
     },
+    query_mode: {
+      type: Boolean,
+      default: true,
+    },
     read_interval: {
       type: Number,
       default: 1000,
