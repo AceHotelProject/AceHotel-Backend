@@ -48,6 +48,32 @@ const getInventoryById = async (id) => {
 };
 
 /**
+ * Get inventory history by key
+ * @param {ObjectId} id
+ * @returns {Promise<Inventory>}
+ */
+const getInventoryHistories = async (id, keywords) => {
+  const inventory = await getInventoryById(id);
+  if (!inventory) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Inventory not found');
+  }
+  // Create a regular expression for case-insensitive matching
+  const regex = new RegExp(keywords, 'i');
+
+  // Filter the `inventory_update_history` array with the regex
+  const history = inventory.inventory_update_history.filter(
+    (historyItem) => regex.test(historyItem.title) || regex.test(historyItem.personInCharge)
+  );
+
+  if (history.length === 0) {
+    // Check if any history items matched the keywords
+    throw new ApiError(httpStatus.NOT_FOUND, 'History not found');
+  }
+
+  return history;
+};
+
+/**
  * Update inventory by id
  * @param {ObjectId} inventoryId
  * @param {Object} updateBody
@@ -118,5 +144,6 @@ module.exports = {
   getInventoryById,
   updateInventoryById,
   deleteInventoryById,
+  getInventoryHistories,
   addTagId,
 };

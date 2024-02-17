@@ -31,6 +31,11 @@ const getInventory = catchAsync(async (req, res) => {
   res.send(inventory);
 });
 
+const getInventoryHistory = catchAsync(async (req, res) => {
+  const inventory = await inventoryService.getInventoryHistories(req.params.inventoryId, req.params.historyKey);
+  res.send(inventory);
+});
+
 const updateInventory = catchAsync(async (req, res) => {
   const inventory = await inventoryService.updateInventoryById(req.params.inventoryId, req.body, req.user);
   res.send(inventory);
@@ -48,5 +53,6 @@ module.exports = {
   getInventories,
   getInventory,
   updateInventory,
+  getInventoryHistory,
   deleteInventory,
 };

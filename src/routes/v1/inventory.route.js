@@ -16,6 +16,7 @@ router
   .route('/:inventoryId')
   .get(auth('getInventory'), validate(inventoryValidation.getInventory), inventoryController.getInventory)
   .patch(auth('manageInventory'), validate(inventoryValidation.updateInventory), inventoryController.updateInventory);
+router.route('/:inventoryId/history/:historyKey').get(auth('getInventory'), inventoryController.getInventoryHistory);
 
 module.exports = router;
 
