@@ -65,6 +65,11 @@ const inventorySchema = mongoose.Schema(
 inventorySchema.plugin(toJSON);
 inventorySchema.plugin(paginate);
 
+// inventorySchema.statics.searchHistory = async function (keywords) {
+//   const inventoryHistory =
+//   return !!inventoryHistory;
+// };
+
 /**
  * @typedef Inventory
  */
