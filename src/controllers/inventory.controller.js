@@ -32,7 +32,7 @@ const getInventory = catchAsync(async (req, res) => {
 });
 
 const getInventoryHistory = catchAsync(async (req, res) => {
-  const inventory = await inventoryService.getInventoryHistories(req.params.inventoryId, req.params.historyKey);
+  const inventory = await inventoryService.getInventoryHistories(req.params.inventoryId, req.query.key);
   res.send(inventory);
 });
 
