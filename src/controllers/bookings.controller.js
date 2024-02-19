@@ -178,8 +178,25 @@ const getBookingById = catchAsync(async (req, res) => {
 });
 
 const updateBookingById = catchAsync(async (req, res) => {
-  const booking = await bookingService.updateBookingById(req.params.bookingId, req.body);
-  res.send(booking);
+  const booking = await bookingService.getBookingById(req.params.bookingId);
+  if (!booking) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Booking not found');
+  }
+  if (
+    req.user.role === 'branch_manager' ||
+    req.user.role === 'receptionist' ||
+    req.user.role === 'cleaning_staff' ||
+    req.user.role === 'inventory_staff'
+  ) {
+    if (!req.user.hotel_id.includes(booking.hotel_id.toString())) {
+      throw new ApiError(httpStatus.FORBIDDEN, 'Forbidden');
+    }
+  }
+  if (req.body.path_transaction_proof) {
+    await deleteFile(booking.path_transaction_proof);
+  }
+  const updatedBooking = await bookingService.updateBookingById(req.params.bookingId, req.body);
+  res.send(updatedBooking);
 });
 
 const deleteBookingById = catchAsync(async (req, res) => {

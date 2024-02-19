@@ -76,6 +76,9 @@ const updateVisitor = catchAsync(async (req, res) => {
       throw new ApiError(httpStatus.FORBIDDEN, 'Forbidden');
     }
   }
+  if (req.body.path_identity_image) {
+    await deleteFile(visitor.path_identity_image);
+  }
   const updatedVisitor = await visitorService.updateVisitorById(req.params.visitorId, req.body);
   res.send(updatedVisitor);
 });

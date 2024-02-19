@@ -73,6 +73,8 @@ const deleteRoomById = async (roomId) => {
  * @returns {Promise<Hotel>}
  */
 const populateRooms = async (hotelId, ...roomDataArray) => {
+  const hotel = await Hotel.findById(hotelId);
+  const total_room = hotel.room_id.length();
   const roomIds = [];
 
   for (const roomData of roomDataArray) {
@@ -81,6 +83,7 @@ const populateRooms = async (hotelId, ...roomDataArray) => {
     // Create rooms based on the room_count
     for (let i = 0; i < room_count; i++) {
       const room = new Room({
+        name: `Kamar ${total_room + 1}`,
         hotel_id: hotelId,
         type: type.toLowerCase(), // Assuming your enum values are lowercase
         is_booked: false,

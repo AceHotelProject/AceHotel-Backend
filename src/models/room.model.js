@@ -14,6 +14,10 @@ const roomSchema = mongoose.Schema(
       default: 'regular',
       required: true,
     },
+    name: {
+      type: String,
+      required: true,
+    },
     is_booked: {
       type: Boolean,
       default: false,
