@@ -24,6 +24,7 @@ const queryHotels = async (filter, options) => {
   const hotels = await Hotel.paginate(filter, options);
   // eslint-disable-next-line no-restricted-syntax
   for (const hotel of hotels.results) {
+    // eslint-disable-next-line no-await-in-loop
     await hotel.populate('owner_id receptionist_id cleaning_staff_id inventory_staff_id').execPopulate();
   }
   return hotels;

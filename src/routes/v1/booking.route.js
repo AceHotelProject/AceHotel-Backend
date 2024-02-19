@@ -7,7 +7,7 @@ const router = express.Router();
 
 router
   .route('/')
-  .get(auth('getBookings'), bookingController.getBookings)
+  .get(auth('getAllBookings'), bookingController.getBookings)
   .post(auth('manageBookings'), bookingController.createBooking);
 
 router.post('/pay/:bookingId', auth('manageBookings'), bookingController.payBooking);
@@ -19,6 +19,8 @@ router
   .delete(auth('manageBookings'), bookingController.deleteBookingByVisitorId);
 
 router.route('/room/:roomId').get(auth('getBookings'), bookingController.getBookingsByRoomId);
+
+router.route('/hotel/:hotelId').get(auth('getBookings'), bookingController.getBookingsByHotelId);
 
 router.route('/discount/:bookingId').post(auth('manageBookings'), bookingController.applyDiscount);
 
