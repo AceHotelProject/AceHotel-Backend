@@ -32,10 +32,9 @@ const sendEmail = async (to, subject, text) => {
 const sendResetPasswordEmail = async (to, token) => {
   const subject = 'Reset password';
   // replace this url with the link to the reset password page of your front-end app
-  const resetPasswordUrl = `http://link-to-app/reset-password?token=${token}`;
-  const text = `Dear user,
-To reset your password, click on this link: ${resetPasswordUrl}
-If you did not request any password resets, then ignore this email.`;
+  const resetPasswordUrl = `http://ace-hotel-reset-password-web.vercel.app/v1/auth/reset-password?token=${token}`;
+  const text = `Untuk merubah password, gunakan link berikut: ${resetPasswordUrl}
+  Jika anda tidak meminta perubahan password, abaikan link ini.`;
   await sendEmail(to, subject, text);
 };
 
