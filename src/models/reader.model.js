@@ -4,7 +4,7 @@ const { toJSON, paginate } = require('./plugins');
 
 const readerSchema = mongoose.Schema(
   {
-    name: {
+    reader_name: {
       type: String,
       required: true,
       trim: true,
