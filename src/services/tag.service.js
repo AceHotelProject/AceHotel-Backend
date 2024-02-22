@@ -2,8 +2,8 @@ const httpStatus = require('http-status');
 const { Tag } = require('../models');
 const ApiError = require('../utils/ApiError');
 
-const topicRx = 'mqtt-integration/Inventory/SN-001/rx';
-const topicAdd = 'mqtt-integration/Inventory/SN-001/add';
+const topic = 'mqtt-integration/Inventory/';
+
 const timeOutValue = 5000;
 /**
  * Create a tag
@@ -25,7 +25,7 @@ const setQuery = async (req) => {
   };
   console.log(resultJson);
   const result = JSON.stringify(resultJson);
-  req.mqttPublish(topicRx, result);
+  req.mqttPublish(topic + req.params.readerId + '/rx', result);
   return resultJson;
 };
 
@@ -72,15 +72,15 @@ const getTagId = async (req) => {
     params: 'false',
   };
   let query = JSON.stringify(queryCommandJson);
-  req.mqttPublish(topicRx, query);
+  req.mqttPublish(topic + req.params.readerId + '/rx', query);
   const command = JSON.stringify(commandJson);
 
-  req.mqttPublish(topicRx, command);
+  req.mqttPublish(topic + req.params.readerId + '/rx', command);
   // const dummy = JSON.stringify(dummyResponseJson);
   // req.mqttPublish(topicAdd, dummy);
 
-  const messageString = await req.mqttSubscribe(topicAdd, timeOutValue); // 3 seconds timeout
-  req.mqttUnsubscribe(topicAdd);
+  const messageString = await req.mqttSubscribe(topic + req.params.readerId + '/add', timeOutValue); // 3 seconds timeout
+  req.mqttUnsubscribe(topic + req.params.readerId + '/add');
   const messageObj = JSON.parse(messageString);
   if (!messageObj) {
     throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, 'Failed to parse JSON data');
@@ -98,7 +98,7 @@ const getTagId = async (req) => {
   }
   queryCommandJson.params = 'true';
   query = JSON.stringify(queryCommandJson);
-  req.mqttPublish(topicRx, query);
+  req.mqttPublish(topic + req.params.readerId + '/rx', query);
 
   return result;
 };
