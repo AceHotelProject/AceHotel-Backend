@@ -3,13 +3,13 @@ const { objectId } = require('./custom.validation');
 
 const createReader = {
   body: Joi.object().keys({
-    name: Joi.string().required(),
+    reader_name: Joi.string().required(),
   }),
 };
 
 const getReaders = {
   query: Joi.object().keys({
-    name: Joi.string(),
+    reader_name: Joi.string(),
     sortBy: Joi.string(),
     limit: Joi.number().integer(),
     page: Joi.number().integer(),
@@ -18,17 +18,16 @@ const getReaders = {
 
 const getReader = {
   params: Joi.object().keys({
-    readerName: Joi.string().required(),
+    reader_name: Joi.string().required(),
   }),
 };
 
 const updateReader = {
   params: Joi.object().keys({
-    readerName: Joi.string().required(),
+    reader_name: Joi.string().required(),
   }),
   body: Joi.object()
     .keys({
-      name: Joi.string(),
       power_gain: Joi.number(),
       read_interval: Joi.number(),
     })
@@ -37,7 +36,7 @@ const updateReader = {
 
 const deleteReader = {
   params: Joi.object().keys({
-    readerName: Joi.string().required(),
+    reader_name: Joi.string().required(),
   }),
 };
 
