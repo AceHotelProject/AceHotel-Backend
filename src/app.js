@@ -54,7 +54,7 @@ const clientId = `backend3`;
 
 const timeOutValue = 3000;
 const connectUrl = `mqtt://${host}:${port}`;
-const topicPrefix = '/mqtt-integration/Reader/';
+const topicPrefix = 'mqtt-integration/Reader/';
 const { readerService } = require('./services');
 const { rejects } = require('assert');
 //mosquitto_pub -d -q 1 -h 35.202.12.122 -p 1883 -t tbmq/demo/topic -i 'backend3' -u 'backend3' -P 'an1m3w1bu' -c -m 'Hello World'
