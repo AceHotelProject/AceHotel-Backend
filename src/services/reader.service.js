@@ -42,8 +42,8 @@ const getReaderById = async (id) => {
  * @param {string} name
  * @returns {Promise<Reader>}
  */
-const getReaderByName = async (name) => {
-  return Reader.findOne({ name });
+const getReaderByName = async (reader_name) => {
+  return Reader.findOne({ reader_name });
 };
 
 /**
