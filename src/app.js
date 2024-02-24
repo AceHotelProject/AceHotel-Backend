@@ -50,7 +50,7 @@ const mqtt = require('mqtt');
 const host = '35.202.12.122';
 const port = '1883';
 
-const clientId = `backend3`;
+const clientId = `backend1`;
 
 const timeOutValue = 3000;
 const connectUrl = `mqtt://${host}:${port}`;
@@ -62,7 +62,7 @@ const mqttClient = mqtt.connect(connectUrl, {
   clientId,
   clean: true,
   connectTimeout: 4000,
-  username: 'backend3',
+  username: 'backend1',
   password: 'an1m3w1bu',
   reconnectPeriod: 1000,
 });
@@ -90,12 +90,12 @@ mqttClient.on('message', async (topic, message) => {
     const reader = await readerService.getReaderByName(readerName);
     //console.log(reader);
     if (!reader) {
-      rejects('Reader Not Found');
+      throw new Error('Reader Not Found');
     }
     //console.log(readerName, strMessage);
     const messageObj = JSON.parse(strMessage);
     if (!messageObj) {
-      rejects('Error Processing Reader, Check Synthax');
+      throw new Error('Error Processing Reader, Check Synthax');
     }
     console.log(topic, strMessage);
     if (!messageObj.method) {
@@ -112,7 +112,7 @@ mqttClient.on('message', async (topic, message) => {
       };
       // console.log('success message: ', message);
 
-      mqttClient.publish(topicPrefix + readerName, JSON.stringify(message), {
+      mqttClient.publish(topicPrefix + readerName + '/rx', JSON.stringify(message), {
         qos: 0,
         retain: false,
       });
@@ -139,7 +139,7 @@ mqttClient.on('message', async (topic, message) => {
       };
       // console.log('success message: ', message);
 
-      mqttClient.publish(topicPrefix + readerName, JSON.stringify(message), {
+      mqttClient.publish(topicPrefix + readerName + '/rx', JSON.stringify(message), {
         qos: 0,
         retain: false,
       });
@@ -152,7 +152,7 @@ mqttClient.on('message', async (topic, message) => {
         status: 0,
       };
       // console.log('error message: ', message);
-      mqttClient.publish(topicPrefix + readerName, JSON.stringify(message), {
+      mqttClient.publish(topicPrefix + readerName + '/rx', JSON.stringify(message), {
         qos: 0,
         retain: false,
       });
