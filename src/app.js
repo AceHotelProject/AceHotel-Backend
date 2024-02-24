@@ -69,7 +69,7 @@ const mqttClient = mqtt.connect(connectUrl, {
 // Connect to the MQTT broker
 mqttClient.on('connect', function () {
   logger.info('Connected to MQTT broker');
-  mqttClient.subscribe(topicPrefix + '#');
+  mqttClient.subscribe(topicPrefix + '+');
 });
 mqttClient.on('message', async (topic, message) => {
   let readerName;
