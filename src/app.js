@@ -47,7 +47,7 @@ if (config.env !== 'test') {
   app.use(morgan.errorHandler);
 }
 const mqtt = require('mqtt');
-const host = '35.202.12.122';
+const host = '34.66.84.55';
 const port = '1883';
 
 const clientId = `backend1`;
