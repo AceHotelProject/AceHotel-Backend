@@ -17,6 +17,7 @@ const setCheckinTime = (date) => {
 const getRecap = catchAsync(async (req, res) => {
   const filter = pick(req.query, ['checkin_date']);
   const options = pick(req.query, ['sortBy', 'limit', 'page']);
+  options.limit = 9999999999;
   if (filter.checkin_date) {
     // You may want to validate the date format or handle any parsing issues here
     // For simplicity, assuming the date format is valid ISO 8601
@@ -60,16 +61,20 @@ const getRecap = catchAsync(async (req, res) => {
   let totalBooking = 0;
   // eslint-disable-next-line no-restricted-syntax
   for (const h of req.user.hotel_id) {
+    console.log(h);
     // eslint-disable-next-line no-await-in-loop
-    const hotel = await hotelService.getHotelById(h);
+    const hotel = await hotelService.getHotelById(h.toString());
     if (!hotel) {
       throw new ApiError(httpStatus.NOT_FOUND, 'Hotel not found');
     }
     // eslint-disable-next-line no-await-in-loop
     const bookings = await bookingService.queryBookings(filter, options);
-    totalBooking += bookings.length;
+    if (!bookings) {
+      throw new ApiError(httpStatus.NOT_FOUND, 'Booking not found');
+    }
+    totalBooking += bookings.totalResults;
     // eslint-disable-next-line no-restricted-syntax
-    for (const booking of bookings) {
+    for (const booking of bookings.results) {
       revenue += booking.total_price;
       if (booking.actual_checkin) {
         checkinCount += 1;

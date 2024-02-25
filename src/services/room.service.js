@@ -74,8 +74,16 @@ const deleteRoomById = async (roomId) => {
  */
 const populateRooms = async (hotelId, ...roomDataArray) => {
   const hotel = await Hotel.findById(hotelId);
-  const total_room = hotel.room_id.length();
+  if (!hotel) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Hotel not found');
+  }
+
   const roomIds = [];
+
+  let total_room = 0;
+  if (hotel.room_id.length > 0) {
+    total_room = hotel.room_id.length;
+  }
 
   for (const roomData of roomDataArray) {
     const { type, price, room_count } = roomData;
@@ -90,7 +98,7 @@ const populateRooms = async (hotelId, ...roomDataArray) => {
         is_clean: true,
         price,
       });
-
+      total_room += 1;
       // Save the room to the database
       await room.save();
 
@@ -178,6 +186,9 @@ const getAvailableRoomsByType = async (type, hotelId, count, checkin_date, check
 
 const checkinById = async (roomId, checkinBody, user_id) => {
   const room = await getRoomById(roomId);
+  if (!room) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Room not found');
+  }
   const hotel = await Hotel.findById(room.hotel_id);
   if (!hotel) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Hotel not found');

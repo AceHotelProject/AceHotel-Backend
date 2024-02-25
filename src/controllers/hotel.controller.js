@@ -39,14 +39,15 @@ const createHotel = catchAsync(async (req, res) => {
     image_path: req.body.regular_room_image_path,
     room_count: req.body.regular_room_count,
   });
+  hotel.room_id.push(...regularRoomId);
+  await hotel.save();
   const exclusiveRoomId = await roomService.populateRooms(hotel._id, {
     type: 'Exclusive',
     price: req.body.exclusive_room_price,
     image_path: req.body.exclusive_room_image_path,
     room_count: req.body.exclusive_room_count,
   });
-  // Assign Room to Hotel
-  hotel.room_id = [...regularRoomId, ...exclusiveRoomId];
+  hotel.room_id.push(...exclusiveRoomId);
   hotel.owner_id = owner._id;
   hotel.receptionist_id = receptionist._id;
   hotel.cleaning_staff_id = cleaningStaff._id;
