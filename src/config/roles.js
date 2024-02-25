@@ -1,5 +1,6 @@
 const allRoles = {
   owner: [
+    'getAllBookings',
     'manageFinances',
     'getAllRooms',
     'getRooms',
@@ -29,8 +30,14 @@ const allRoles = {
     'manageUsers',
     'manageVisitors',
     'getVisitors',
-    'recap',
+    'getBookings',
+    'manageBookings',
+    'manageTags',
+    'getInventory',
+    'manageInventory',
     'manageReaders',
+    'uploadFiles',
+    'recap',
   ],
   receptionist: [
     'manageFinances',

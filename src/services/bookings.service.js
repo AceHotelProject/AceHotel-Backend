@@ -39,7 +39,11 @@ const queryBookings = async (filter, options) => {
  * @returns {Promise<Booking>}
  */
 const getBookingById = async (id) => {
-  const booking = await Booking.findById(id);
+  let booking = await Booking.findById(id);
+  if (!booking) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Booking not found');
+  }
+  booking = booking.populate('visitor_id', 'name').execPopulate();
   return booking;
 };
 
@@ -59,31 +63,15 @@ const deleteBookingById = async (bookingId) => {
 };
 
 /**
- * Get bookings by visitor id
- * @param {ObjectId} visitorId
- * @param {ObjectId} hotelId
- * @returns {Promise<Booking>}
- */
-
-const getBookingsByVisitorId = async (visitorId, hotelId) => {
-  const bookings = await Booking.find({
-    visitor_id: visitorId,
-    hotel_id: hotelId,
-  });
-  return bookings;
-};
-
-/**
  * Delete bookings by visitor id
  * @param {ObjectId} visitorId
  * @param {ObjectId} hotelId
  * @returns {Promise<Booking>}
  */
 
-const deleteBookingsByVisitorId = async (visitorId, hotelId) => {
+const deleteBookingsByVisitorId = async (visitorId) => {
   const bookings = await Booking.find({
     visitor_id: visitorId,
-    hotel_id: hotelId,
   });
   for (const b of bookings) {
     await b.remove();
@@ -91,22 +79,8 @@ const deleteBookingsByVisitorId = async (visitorId, hotelId) => {
   return bookings;
 };
 
-const getBookingsByRoomId = async (roomId) => {
-  const bookings = await Booking.find({
-    room_id: roomId,
-  });
-  return bookings;
-};
-
-const getBookingsByHotelId = async (hotelId) => {
-  const bookings = await Booking.find({
-    hotel_id: hotelId,
-  });
-  return bookings;
-};
-
 const applyDiscount = async (bookingId, discountBody) => {
-  const booking = await getBookingById(bookingId);
+  let booking = await getBookingById(bookingId);
   if (!booking) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Booking not found');
   }
@@ -119,6 +93,7 @@ const applyDiscount = async (bookingId, discountBody) => {
   }
   booking.total_price -= hotel.discount_amount * booking.room_count;
   await booking.save();
+  booking = await booking.populate('visitor_id', 'name').execPopulate();
   return booking;
 };
 module.exports = {
@@ -126,9 +101,6 @@ module.exports = {
   queryBookings,
   getBookingById,
   deleteBookingById,
-  getBookingsByVisitorId,
   deleteBookingsByVisitorId,
-  getBookingsByRoomId,
   applyDiscount,
-  getBookingsByHotelId,
 };

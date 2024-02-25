@@ -114,6 +114,20 @@ const updateHotel = catchAsync(async (req, res) => {
       throw new ApiError(httpStatus.FORBIDDEN, 'Forbidden');
     }
   }
+  if (req.body.exclusive_room_image_path) {
+    // eslint-disable-next-line no-restricted-syntax
+    for (const file of hotel.exclusive_room_image_path) {
+      // eslint-disable-next-line no-await-in-loop
+      await deleteFile(file);
+    }
+  }
+  if (req.body.regular_room_image_path) {
+    // eslint-disable-next-line no-restricted-syntax
+    for (const file of hotel.regular_room_image_path) {
+      // eslint-disable-next-line no-await-in-loop
+      await deleteFile(file);
+    }
+  }
   const updatedHotel = await hotelService.updateHotelById(req.params.hotelId, req.body);
   res.send(updatedHotel);
 });
