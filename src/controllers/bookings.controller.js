@@ -76,6 +76,8 @@ const createBooking = catchAsync(async (req, res) => {
     }
     // eslint-disable-next-line camelcase
     booking.add_on_id = add_on_id;
+  } else {
+    req.body.extra_bed = 0;
   }
   // Hitung Total Harga
   booking.total_price = req.body.room_count * room.price * req.body.duration + req.body.extra_bed * hotel.extra_bed_price;
