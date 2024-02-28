@@ -43,6 +43,7 @@ const updateVisitor = {
       name: Joi.string(),
       phone: Joi.string(),
       identity_num: Joi.string(),
+      path_identity_image: Joi.string(),
     })
     .min(1),
 };
