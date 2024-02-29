@@ -129,6 +129,87 @@ const updateHotel = catchAsync(async (req, res) => {
       await deleteFile(file);
     }
   }
+  // Kurangi Room Regular
+  if (req.body.regular_room_count && req.body.regular_room_count < hotel.regular_room_count) {
+    const yangDihapus = hotel.regular_room_count - req.body.regular_room_count;
+    let sudahTerhapus = 0;
+    // eslint-disable-next-line no-plusplus
+    for (let i = 0; i < yangDihapus; i++) {
+      // eslint-disable-next-line no-restricted-syntax
+      for (const room of hotel.room_id) {
+        // eslint-disable-next-line no-await-in-loop
+        const roomObject = await roomService.getRoomById(room);
+        if (!roomObject.is_booked) {
+          // eslint-disable-next-line camelcase, no-await-in-loop
+          hotel.room_id = await hotel.room_id.filter((room_id) => room_id !== room);
+          // eslint-disable-next-line no-await-in-loop
+          await hotel.save();
+          // eslint-disable-next-line no-await-in-loop
+          await roomService.deleteRoomById(room);
+          sudahTerhapus += 1;
+          break;
+        }
+      }
+    }
+    if (sudahTerhapus === 0) {
+      throw new ApiError(httpStatus.NOT_FOUND, 'No Rooms Can Be Deleted');
+    }
+  }
+
+  // Tambahin Room Regular
+  else if (req.body.regular_room_count && req.body.regular_room_count > hotel.regular_room_count) {
+    const yangDitambah = req.body.regular_room_count - hotel.regular_room_count;
+    const regularRoomId = await roomService.populateRooms(hotel._id, {
+      type: 'Regular',
+      price: hotel.regular_room_price,
+      image_path: hotel.regular_room_image_path,
+      room_count: yangDitambah,
+    });
+    hotel.room_id = [...hotel.room_id, ...regularRoomId];
+    // eslint-disable-next-line no-await-in-loop
+    await hotel.save();
+  }
+
+  // Kurangi Room Exclusive
+  if (req.body.exclusive_room_count && req.body.exclusive_room_count < hotel.exclusive_room_count) {
+    const yangDihapus = hotel.exclusive_room_count - req.body.exclusive_room_count;
+    let sudahTerhapus = 0;
+    // eslint-disable-next-line no-plusplus
+    for (let i = 0; i < yangDihapus; i++) {
+      // eslint-disable-next-line no-restricted-syntax
+      for (const room of hotel.room_id) {
+        // eslint-disable-next-line no-await-in-loop
+        const roomObject = await roomService.getRoomById(room);
+        if (!roomObject.is_booked) {
+          // eslint-disable-next-line camelcase, no-await-in-loop
+          hotel.room_id = await hotel.room_id.filter((room_id) => room_id !== room);
+          // eslint-disable-next-line no-await-in-loop
+          await hotel.save();
+          // eslint-disable-next-line no-await-in-loop
+          await roomService.deleteRoomById(room);
+          sudahTerhapus += 1;
+          break;
+        }
+      }
+    }
+    if (sudahTerhapus === 0) {
+      throw new ApiError(httpStatus.NOT_FOUND, 'No Rooms Can Be Deleted');
+    }
+  }
+
+  // Tambahin Room Exclusive
+  else if (req.body.exclusive_room_count && req.body.exclusive_room_count > hotel.exclusive_room_count) {
+    const yangDitambah = req.body.exclusive_room_count - hotel.exclusive_room_count;
+    const exclusiveRoomId = await roomService.populateRooms(hotel._id, {
+      type: 'Exclusive',
+      price: hotel.exclusive_room_price,
+      image_path: hotel.exclusive_room_image_path,
+      room_count: yangDitambah,
+    });
+    hotel.room_id = [...hotel.room_id, ...exclusiveRoomId];
+    // eslint-disable-next-line no-await-in-loop
+    await hotel.save();
+  }
   const updatedHotel = await hotelService.updateHotelById(req.params.hotelId, req.body);
   res.send(updatedHotel);
 });
