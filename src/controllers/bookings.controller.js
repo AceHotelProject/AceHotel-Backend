@@ -22,6 +22,7 @@ const createBooking = catchAsync(async (req, res) => {
   if (visitor.hotel_id.toString() !== hotel._id.toString()) {
     throw new ApiError(httpStatus.FORBIDDEN, 'Forbidden');
   }
+
   // Checkin Date Harus Jam 14:00
   const checkinDate = new Date(req.body.checkin_date);
   checkinDate.setHours(14, 0, 0, 0); // Set checkin time to 14:00
