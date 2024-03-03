@@ -1,4 +1,4 @@
-const types = ['linen', 'kasur','fnb'];
+const types = ['linen', 'kasur','makanan','minuman];
 
 module.exports = {
   types,
