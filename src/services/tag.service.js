@@ -75,12 +75,12 @@ const getTagId = async (req) => {
   req.mqttPublish(topic + req.params.readerId + '/rx', query);
   const command = JSON.stringify(commandJson);
 
-  req.mqttPublish(topic + req.params.readerId + '/rx', command);
   // const dummy = JSON.stringify(dummyResponseJson);
   // req.mqttPublish(topicAdd, dummy);
 
-  const messageString = await req.mqttSubscribe(topic + req.params.readerId + '/add', timeOutValue); // 3 seconds timeout
-  req.mqttUnsubscribe(topic + req.params.readerId + '/add');
+  const messageString = await req.mqttWaitMessage(topic + req.params.readerId + '/add', timeOutValue); // 3 seconds timeout
+  req.mqttPublish(topic + req.params.readerId + '/rx', command);
+  // req.mqttUnsubscribe(topic + req.params.readerId + '/add');
   const messageObj = JSON.parse(messageString);
   if (!messageObj) {
     throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, 'Failed to parse JSON data');

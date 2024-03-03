@@ -50,26 +50,28 @@ const mqtt = require('mqtt');
 const host = '34.66.84.55';
 const port = '1883';
 
-const clientId = `backend1`;
+const clientId = `backend3`;
 
 const timeOutValue = 3000;
 const connectUrl = `mqtt://${host}:${port}`;
-const topicPrefix = 'mqtt-integration/Reader/';
+const topicReader = 'mqtt-integration/Reader/';
+const topicInventory = 'mqtt-integration/Inventory/+/add';
 const { readerService } = require('./services');
 const { rejects } = require('assert');
-//mosquitto_pub -d -q 1 -h 35.202.12.122 -p 1883 -t tbmq/demo/topic -i 'backend3' -u 'backend3' -P 'an1m3w1bu' -c -m 'Hello World'
+//mosquitto_pub -d -q 1 -h 34.66.84.55 -p 1883 -t mqtt-integration/Reader/ACE-001/rx -i 'backend3' -u 'backend3' -P 'an1m3w1bu' -c -m 'Hello World'
 const mqttClient = mqtt.connect(connectUrl, {
   clientId,
   clean: true,
   connectTimeout: 4000,
-  username: 'backend1',
+  username: 'backend3',
   password: 'an1m3w1bu',
   reconnectPeriod: 1000,
 });
 // Connect to the MQTT broker
 mqttClient.on('connect', function () {
   logger.info('Connected to MQTT broker');
-  mqttClient.subscribe(topicPrefix + '+');
+  mqttClient.subscribe(topicReader + '+');
+  mqttClient.subscribe(topicInventory);
 });
 mqttClient.on('message', async (topic, message) => {
   let readerName;
@@ -84,65 +86,65 @@ mqttClient.on('message', async (topic, message) => {
     // let objMessage = JSON.parse(strMessage);
     // Check if the topic starts with the prefix and then extract the specific part
 
-    if (topic.startsWith(topicPrefix)) {
-      readerName = topic.slice(topicPrefix.length);
-    }
-    const reader = await readerService.getReaderByName(readerName);
-    //console.log(reader);
-    if (!reader) {
-      throw new Error('Reader Not Found');
-    }
-    //console.log(readerName, strMessage);
-    const messageObj = JSON.parse(strMessage);
-    if (!messageObj) {
-      throw new Error('Error Processing Reader, Check Synthax');
-    }
-    console.log(topic, strMessage);
-    if (!messageObj.method) {
-      // console.log('not a method', messageObj);
-    }
-    if (messageObj.method && messageObj.method == 'getData') {
-      const message = {
-        name: readerName,
-        data: {
-          power_gain: reader.power_gain,
-          read_interval: reader.read_interval,
-        },
-        status: 1,
-      };
-      // console.log('success message: ', message);
+    if (topic.startsWith(topicReader)) {
+      readerName = topic.slice(topicReader.length);
+      const reader = await readerService.getReaderByName(readerName);
+      //console.log(reader);
+      if (!reader) {
+        throw new Error('Reader Not Found');
+      }
+      //console.log(readerName, strMessage);
+      const messageObj = JSON.parse(strMessage);
+      if (!messageObj) {
+        throw new Error('Error Processing Reader, Check Synthax');
+      }
+      console.log(topic, strMessage);
+      if (!messageObj.method) {
+        // console.log('not a method', messageObj);
+      }
+      if (messageObj.method && messageObj.method == 'getData') {
+        const message = {
+          name: readerName,
+          data: {
+            power_gain: reader.power_gain,
+            read_interval: reader.read_interval,
+          },
+          status: 1,
+        };
+        // console.log('success message: ', message);
 
-      mqttClient.publish(topicPrefix + readerName + '/rx', JSON.stringify(message), {
-        qos: 0,
-        retain: false,
-      });
-    } else if (messageObj.method && messageObj.params && messageObj.method == 'updateData') {
-      // console.log(messageObj.params);
-      const data = messageObj.params;
-      // Convert string values to numbers
-      Object.keys(data).forEach((key) => {
-        if (!isNaN(data[key])) {
-          data[key] = Number(data[key]);
-        }
-      });
+        mqttClient.publish(topicReader + readerName + '/rx', JSON.stringify(message), {
+          qos: 0,
+          retain: false,
+        });
+      } else if (messageObj.method && messageObj.params && messageObj.method == 'updateData') {
+        // console.log(messageObj.params);
+        const data = messageObj.params;
+        // Convert string values to numbers
+        Object.keys(data).forEach((key) => {
+          if (!isNaN(data[key])) {
+            data[key] = Number(data[key]);
+          }
+        });
 
-      // console.log(data);
-      Object.assign(reader, data);
-      await reader.save();
-      const message = {
-        name: readerName,
-        data: {
-          power_gain: reader.power_gain,
-          read_interval: reader.read_interval,
-        },
-        status: 1,
-      };
-      // console.log('success message: ', message);
+        // console.log(data);
+        Object.assign(reader, data);
+        await reader.save();
+        const message = {
+          name: readerName,
+          data: {
+            power_gain: reader.power_gain,
+            read_interval: reader.read_interval,
+          },
+          status: 1,
+        };
+        // console.log('success message: ', message);
 
-      mqttClient.publish(topicPrefix + readerName + '/rx', JSON.stringify(message), {
-        qos: 0,
-        retain: false,
-      });
+        mqttClient.publish(topicReader + readerName + '/rx', JSON.stringify(message), {
+          qos: 0,
+          retain: false,
+        });
+      }
     }
   } catch (error) {
     if (error.message) {
@@ -152,7 +154,7 @@ mqttClient.on('message', async (topic, message) => {
         status: 0,
       };
       // console.log('error message: ', message);
-      mqttClient.publish(topicPrefix + readerName + '/rx', JSON.stringify(message), {
+      mqttClient.publish(topicReader + readerName + '/rx', JSON.stringify(message), {
         qos: 0,
         retain: false,
       });
@@ -170,7 +172,7 @@ app.use(function (req, res, next) {
   };
 
   // Subscribe to topic
-  req.mqttSubscribe = function (topic, timeout = 3000) {
+  req.mqttWaitMessage = function (topic, timeout = 6000) {
     return new Promise((resolve, reject) => {
       let timeoutHandle;
 
@@ -182,7 +184,7 @@ app.use(function (req, res, next) {
         }
       };
 
-      mqttClient.subscribe(topic);
+      // mqttClient.subscribe(topic);
       mqttClient.on('message', onMessage);
 
       timeoutHandle = setTimeout(() => {
