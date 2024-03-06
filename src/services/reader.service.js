@@ -8,7 +8,7 @@ const ApiError = require('../utils/ApiError');
  * @returns {Promise<Reader>}
  */
 const createReader = async (readerBody) => {
-  if (await Reader.isNameTaken(readerBody.name)) {
+  if (await Reader.isNameTaken(readerBody.reader_name)) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Name already taken');
   }
   return Reader.create(readerBody);
