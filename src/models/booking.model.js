@@ -17,11 +17,34 @@ const bookingSchema = mongoose.Schema(
       type: Number,
       required: true,
     },
-    room_id: [
+    room: [
       {
-        type: mongoose.SchemaTypes.ObjectId,
-        required: true,
-        ref: 'Room',
+        id: {
+          type: mongoose.SchemaTypes.ObjectId,
+          ref: 'Room',
+        },
+        actual_checkin: {
+          type: Date,
+        },
+        actual_checkout: {
+          type: Date,
+        },
+        checkin_staff_id: {
+          type: mongoose.SchemaTypes.ObjectId,
+          ref: 'User',
+        },
+        checkout_staff_id: {
+          type: mongoose.SchemaTypes.ObjectId,
+          ref: 'User',
+        },
+        has_problem: {
+          type: Boolean,
+          default: false,
+        },
+        note_id: {
+          type: mongoose.SchemaTypes.ObjectId,
+          ref: 'Note',
+        },
       },
     ],
     visitor_id: {
@@ -33,13 +56,12 @@ const bookingSchema = mongoose.Schema(
       type: Date,
       required: true,
     },
-    actual_checkin: {
-      type: Date,
-    },
-    checkin_staff_id: {
-      type: mongoose.SchemaTypes.ObjectId,
-      ref: 'User',
-    },
+    add_on_id: [
+      {
+        type: mongoose.SchemaTypes.ObjectId,
+        ref: 'AddOn',
+      },
+    ],
     duration: {
       type: Number,
       required: true,
@@ -48,34 +70,11 @@ const bookingSchema = mongoose.Schema(
       type: Date,
       required: true,
     },
-    actual_checkout: {
-      type: Date,
-    },
-    checkout_staff_id: {
-      type: mongoose.SchemaTypes.ObjectId,
-      ref: 'User',
-    },
     total_price: {
       type: Number,
       required: true,
       default: 0,
     },
-    add_on_id: [
-      {
-        type: mongoose.SchemaTypes.ObjectId,
-        ref: 'AddOn',
-      },
-    ],
-    has_problem: {
-      type: Boolean,
-      default: false,
-    },
-    note_id: [
-      {
-        type: mongoose.SchemaTypes.ObjectId,
-        ref: 'Note',
-      },
-    ],
     is_proof_uploaded: {
       type: Boolean,
       required: true,

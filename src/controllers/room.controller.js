@@ -153,7 +153,7 @@ const checkinById = catchAsync(async (req, res) => {
 });
 
 const checkoutById = catchAsync(async (req, res) => {
-  const room = await roomService.getRoomById(req.params.roomId);
+  let room = await roomService.getRoomById(req.params.roomId);
   if (!room) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Room not found');
   }
@@ -175,24 +175,32 @@ const checkoutById = catchAsync(async (req, res) => {
           detail: req.body.note,
           booking_id: booking._id,
         });
-        booking.has_problem = true;
-        booking.note_id = [note._id];
+        // eslint-disable-next-line no-restricted-syntax
+        for (const r of booking.room) {
+          if (r.id.toString() === req.params.roomId.toString()) {
+            r.note_id = note._id;
+            r.has_problem = true;
+          }
+        }
       }
-      if (
-        req.body.checkout_date < booking.checkin_date ||
-        req.body.checkout_date < booking.checkout_date ||
-        req.body.checkout_date > booking.checkout_date
-      ) {
-        throw new ApiError(httpStatus.BAD_REQUEST, 'Checkout date must be between checkin date and checkout date');
+      req.body.checkout_date = new Date(req.body.checkout_date);
+      req.body.checkout_date.setHours(12, 0, 0, 0);
+      // eslint-disable-next-line no-restricted-syntax
+      for (const r of booking.room) {
+        if (r.id.toString() === req.params.roomId.toString()) {
+          if (req.body.checkout_date < booking.checkin_date || req.body.checkout_date > booking.checkout_date) {
+            throw new ApiError(httpStatus.BAD_REQUEST, 'Checkout date must be between checkin date and checkout date');
+          }
+          r.actual_checkout = req.body.checkout_date;
+          r.checkout_staff_id = req.user._id;
+        }
       }
-      booking.actual_checkout = req.body.checkout_date;
-      booking.checkout_staff_id = req.user._id;
       // eslint-disable-next-line no-await-in-loop
       await booking.save();
       bookingId = booking._id;
     }
   }
-  await roomService.checkoutById(req.params.roomId, req.body, bookingId);
+  room = await roomService.checkoutById(req.params.roomId, req.body, bookingId);
   if (!room) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Room not found');
   }
