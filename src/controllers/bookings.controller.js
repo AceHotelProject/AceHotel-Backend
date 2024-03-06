@@ -33,23 +33,23 @@ const createBooking = catchAsync(async (req, res) => {
   checkoutDate.setHours(12, 0, 0, 0); // Set checkout time to 12:00
   req.body.checkout_date = checkoutDate;
   // Pilih Room Yang Tersedia (Berdasarkan Tipe Kamar dan Tanggal Checkin dan Checkout)
-  req.body.room_id = await roomService.getAvailableRoomsByType(
+  req.body.room = await roomService.getAvailableRoomsByType(
     req.body.type,
     req.body.hotel_id,
     req.body.room_count,
     req.body.checkin_date,
     req.body.checkout_date
   );
-  if (req.body.room_id.length === 0) {
+  if (req.body.room.length === 0) {
     throw new ApiError(httpStatus.NOT_FOUND, 'No available room');
   }
   // Buat Booking
   const booking = await bookingService.createBooking(req.body);
   // Update Room Yang Dipilih Menjadi Booked
   // eslint-disable-next-line camelcase, no-restricted-syntax
-  for (const room_id of req.body.room_id) {
+  for (const room of req.body.room) {
     // eslint-disable-next-line no-await-in-loop
-    await roomService.bookingRoomById(room_id, {
+    await roomService.bookingRoomById(room.id, {
       is_booked: true,
       bookings: {
         booking_id: booking._id,
@@ -60,7 +60,7 @@ const createBooking = catchAsync(async (req, res) => {
     });
   }
   // Ambil Harga Room
-  const room = await roomService.getRoomById(req.body.room_id[0]);
+  const room = await roomService.getRoomById(req.body.room[0].id);
   // Jika Ada Add On, Buat Add On
   if (req.body.extra_bed) {
     // eslint-disable-next-line camelcase

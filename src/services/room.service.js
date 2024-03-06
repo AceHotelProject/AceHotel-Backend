@@ -160,7 +160,9 @@ const getAvailableRoomsByType = async (type, hotelId, count, checkin_date, check
     // avaliable ketika checkin baru < checkin date dan checkout baru < checkin date
     // available ketika checkin baru > checkout date dan checkout baru < checkin date booking selanjutnya
     if (r.bookings.length === 0 || r.bookings === undefined) {
-      availableRooms.push(r);
+      availableRooms.push({
+        id: r._id,
+      });
     } else {
       for (let i = 0; i < r.bookings.length; i++) {
         bookings = r.bookings.sort((a, b) => a.checkin_date - b.checkin_date);
@@ -170,7 +172,9 @@ const getAvailableRoomsByType = async (type, hotelId, count, checkin_date, check
             (r.bookings[i + 1] === undefined ? true : checkout_date < r.bookings[i + 1].checkin_date))
         ) {
           if (availableRooms[availableRooms.length - 1] !== r) {
-            availableRooms.push(r);
+            availableRooms.push({
+              id: r._id,
+            });
           }
         }
       }
@@ -208,14 +212,21 @@ const checkinById = async (roomId, checkinBody, user_id) => {
       if (!booking) {
         throw new ApiError(httpStatus.NOT_FOUND, 'Booking not found');
       }
-      if (checkinBody.checkin_date < booking.checkin) {
-        throw new ApiError(httpStatus.BAD_REQUEST, 'You cannot checkin before checkin date');
+      // eslint-disable-next-line no-param-reassign
+      checkinBody.checkin_date = new Date(checkinBody.checkin_date);
+      checkinBody.checkin_date.setHours(14, 0, 0, 0);
+      if (checkinBody.checkin_date < booking.checkin_date || checkinBody.checkin_date > booking.checkout_date) {
+        throw new ApiError(httpStatus.BAD_REQUEST, 'You must checkin between checkin date and checkout date');
       }
-      if (!booking.actual_checkin || booking.actual_checkin === undefined) {
-        hotel.revenue += booking.total_price;
+      for (const r of booking.room) {
+        if (r.id.toString() === roomId.toString()) {
+          if (!r.actual_checkin || booking.actual_checkin === undefined) {
+            hotel.revenue += booking.total_price;
+            r.actual_checkin = checkinBody.checkin_date;
+            r.checkin_staff_id = user_id;
+          }
+        }
       }
-      booking.actual_checkin = checkinBody.checkin_date;
-      booking.checkin_staff_id = user_id;
       await hotel.save();
       await booking.save();
       return room;
@@ -237,7 +248,9 @@ const checkoutById = async (roomId, checkoutBody, bookingId) => {
       break;
     }
   }
-  room.is_booked = false;
+  if (room.bookings.length === 0) {
+    room.is_booked = false;
+  }
   Object.assign(room, checkoutBody);
   await room.save();
   return room;
