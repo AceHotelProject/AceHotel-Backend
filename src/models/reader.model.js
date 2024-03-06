@@ -8,7 +8,6 @@ const readerSchema = mongoose.Schema(
       type: String,
       required: true,
       trim: true,
-      unique: true,
     },
     power_gain: {
       type: Number,
@@ -36,6 +35,7 @@ readerSchema.plugin(paginate);
  */
 readerSchema.statics.isNameTaken = async function (reader_name, excludeReaderId) {
   const reader = await this.findOne({ reader_name, _id: { $ne: excludeReaderId } });
+
   return !!reader;
 };
 
