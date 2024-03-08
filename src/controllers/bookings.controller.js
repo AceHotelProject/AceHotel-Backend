@@ -22,7 +22,7 @@ const createBooking = catchAsync(async (req, res) => {
   if (visitor.hotel_id.toString() !== hotel._id.toString()) {
     throw new ApiError(httpStatus.FORBIDDEN, 'Forbidden');
   }
-
+  req.body.visitor_name = visitor.name;
   // Checkin Date Harus Jam 14:00
   const checkinDate = new Date(req.body.checkin_date);
   checkinDate.setHours(14, 0, 0, 0); // Set checkin time to 14:00
@@ -117,6 +117,8 @@ const setCheckinTime = (date) => {
 
 const getBookings = catchAsync(async (req, res) => {
   const filter = pick(req.query, ['checkin_date', 'visitor_id', 'hotel_id']);
+  // eslint-disable-next-line security/detect-non-literal-regexp
+  const nameFilter = req.query.visitor_name ? { visitor_name: { $regex: new RegExp(req.query.visitor_name, 'i') } } : {};
   const options = pick(req.query, ['sortBy', 'limit', 'page']);
   if (filter.checkin_date) {
     // You may want to validate the date format or handle any parsing issues here
@@ -155,20 +157,7 @@ const getBookings = catchAsync(async (req, res) => {
       filter.checkin_date = setCheckinTime(fullDate);
     }
   }
-  const result = await bookingService.queryBookings(filter, options);
-  // Populate manually
-  for (let i = 0; i < result.results.length; i += 1) {
-    // eslint-disable-next-line no-await-in-loop
-    result.results[i] = await result.results[i].populate('visitor_id', 'name').execPopulate();
-  }
-  if (req.query.visitor_name) {
-    result.results = result.results.filter((booking) =>
-      booking.visitor_id.name.toLowerCase().includes(req.query.visitor_name.toLowerCase())
-    );
-    result.totalResults = result.results.length;
-    result.totalPages = Math.ceil(result.totalResults / (options.limit ? options.limit : 10));
-    result.limit = options.limit;
-  }
+  const result = await bookingService.queryBookings({ ...filter, ...nameFilter }, options);
   if (result.totalResults === 0) {
     throw new ApiError(httpStatus.NOT_FOUND, 'No booking found');
   }
@@ -255,6 +244,8 @@ const deleteBookingById = catchAsync(async (req, res) => {
 
 const getBookingsByVisitorId = catchAsync(async (req, res) => {
   let filter = pick(req.query, ['checkin_date', 'visitor_id', 'hotel_id']);
+  // eslint-disable-next-line security/detect-non-literal-regexp
+  const nameFilter = req.query.visitor_name ? { visitor_name: { $regex: new RegExp(req.query.visitor_name, 'i') } } : {};
   const options = pick(req.query, ['sortBy', 'limit', 'page']);
   if (filter.checkin_date) {
     // You may want to validate the date format or handle any parsing issues here
@@ -308,7 +299,7 @@ const getBookingsByVisitorId = catchAsync(async (req, res) => {
       throw new ApiError(httpStatus.FORBIDDEN, 'Forbidden');
     }
   }
-  filter = { ...filter, visitor_id: req.params.visitorId };
+  filter = { ...filter, ...nameFilter, visitor_id: req.params.visitorId };
   const result = await bookingService.queryBookings(filter, options);
   if (result.totalResults === 0) {
     throw new ApiError(httpStatus.NOT_FOUND, 'No booking found');
@@ -357,6 +348,8 @@ const deleteBookingByVisitorId = catchAsync(async (req, res) => {
 
 const getBookingsByRoomId = catchAsync(async (req, res) => {
   let filter = pick(req.query, ['checkin_date', 'visitor_id', 'hotel_id']);
+  // eslint-disable-next-line security/detect-non-literal-regexp
+  const nameFilter = req.query.visitor_name ? { visitor_name: { $regex: new RegExp(req.query.visitor_name, 'i') } } : {};
   const options = pick(req.query, ['sortBy', 'limit', 'page']);
   if (filter.checkin_date) {
     // You may want to validate the date format or handle any parsing issues here
@@ -411,6 +404,7 @@ const getBookingsByRoomId = catchAsync(async (req, res) => {
   }
   filter = {
     ...filter,
+    ...nameFilter,
     room: { $in: { id: room._id } },
   };
   const result = await bookingService.queryBookings(filter, options);
@@ -422,6 +416,8 @@ const getBookingsByRoomId = catchAsync(async (req, res) => {
 
 const getBookingsByHotelId = catchAsync(async (req, res) => {
   let filter = pick(req.query, ['checkin_date', 'visitor_id', 'hotel_id']);
+  // eslint-disable-next-line security/detect-non-literal-regexp
+  const nameFilter = req.query.visitor_name ? { visitor_name: { $regex: new RegExp(req.query.visitor_name, 'i') } } : {};
   const options = pick(req.query, ['sortBy', 'limit', 'page']);
   if (filter.checkin_date) {
     // You may want to validate the date format or handle any parsing issues here
@@ -474,7 +470,7 @@ const getBookingsByHotelId = catchAsync(async (req, res) => {
       throw new ApiError(httpStatus.FORBIDDEN, 'Forbidden');
     }
   }
-  filter = { ...filter, hotel_id: req.params.hotelId };
+  filter = { ...filter, ...nameFilter, hotel_id: req.params.hotelId };
   const result = await bookingService.queryBookings(filter, options);
   if (result.totalResults === 0) {
     throw new ApiError(httpStatus.NOT_FOUND, 'No booking found');
