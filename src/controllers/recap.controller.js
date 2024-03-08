@@ -61,7 +61,6 @@ const getRecap = catchAsync(async (req, res) => {
   let totalBooking = 0;
   // eslint-disable-next-line no-restricted-syntax
   for (const h of req.user.hotel_id) {
-    console.log(h);
     // eslint-disable-next-line no-await-in-loop
     const hotel = await hotelService.getHotelById(h.toString());
     if (!hotel) {
@@ -76,8 +75,11 @@ const getRecap = catchAsync(async (req, res) => {
     // eslint-disable-next-line no-restricted-syntax
     for (const booking of bookings.results) {
       revenue += booking.total_price;
-      if (booking.actual_checkin) {
-        checkinCount += 1;
+      // eslint-disable-next-line no-restricted-syntax
+      for (const r of booking.room) {
+        if (!r.actual_checkin) {
+          checkinCount += 1;
+        }
       }
     }
   }
