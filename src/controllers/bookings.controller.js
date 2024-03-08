@@ -156,6 +156,19 @@ const getBookings = catchAsync(async (req, res) => {
     }
   }
   const result = await bookingService.queryBookings(filter, options);
+  // Populate manually
+  for (let i = 0; i < result.results.length; i += 1) {
+    // eslint-disable-next-line no-await-in-loop
+    result.results[i] = await result.results[i].populate('visitor_id', 'name').execPopulate();
+  }
+  if (req.query.visitor_name) {
+    result.results = result.results.filter((booking) =>
+      booking.visitor_id.name.toLowerCase().includes(req.query.visitor_name.toLowerCase())
+    );
+    result.totalResults = result.results.length;
+    result.totalPages = Math.ceil(result.totalResults / (options.limit ? options.limit : 10));
+    result.limit = options.limit;
+  }
   if (result.totalResults === 0) {
     throw new ApiError(httpStatus.NOT_FOUND, 'No booking found');
   }
@@ -222,9 +235,9 @@ const deleteBookingById = catchAsync(async (req, res) => {
   }
   // Update Room Yang Dipilih Menjadi Available
   // eslint-disable-next-line no-restricted-syntax, camelcase
-  for (const room_id of booking.room_id) {
+  for (const r of booking.room) {
     // eslint-disable-next-line no-await-in-loop
-    const room = await roomService.getRoomById(room_id);
+    const room = await roomService.getRoomById(r.id);
     if (!room) {
       throw new ApiError(httpStatus.NOT_FOUND, 'Room not found');
     }
@@ -331,9 +344,9 @@ const deleteBookingByVisitorId = catchAsync(async (req, res) => {
   // eslint-disable-next-line no-restricted-syntax
   for (const b of booking) {
     // eslint-disable-next-line no-restricted-syntax
-    for (const r of b.room_id) {
+    for (const r of b.room) {
       // eslint-disable-next-line no-await-in-loop
-      await roomService.updateRoomById(r, {
+      await roomService.updateRoomById(r.id, {
         is_clean: true,
       });
     }
@@ -398,7 +411,7 @@ const getBookingsByRoomId = catchAsync(async (req, res) => {
   }
   filter = {
     ...filter,
-    room_id: { $in: room._id },
+    room: { $in: { id: room._id } },
   };
   const result = await bookingService.queryBookings(filter, options);
   if (result.totalResults === 0) {
