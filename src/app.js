@@ -51,7 +51,7 @@ if (config.env !== 'test') {
 const host = '35.209.47.216';
 const port = '1883';
 
-const clientId = `backend1`;
+const clientId = `backend3`;
 
 // const timeOutValue = 3000;
 const connectUrl = `mqtt://${host}:${port}`;
@@ -65,7 +65,7 @@ const mqttClient = mqtt.connect(connectUrl, {
 
   clean: true,
   connectTimeout: 4000,
-  username: 'backend1',
+  username: 'backend3',
   password: 'an1m3w1bu',
   reconnectPeriod: 1000,
 });
@@ -77,6 +77,7 @@ mqttClient.on('connect', function () {
 });
 mqttClient.on('message', async (topic, message) => {
   let readerName;
+
   try {
     // message is a Buffer
     // let strTopic = topic.toString();
@@ -90,6 +91,7 @@ mqttClient.on('message', async (topic, message) => {
 
     if (topic.startsWith(topicReader)) {
       readerName = topic.slice(topicReader.length);
+      console.log('match reader: ', readerName);
       const reader = await readerService.getReaderByName(readerName);
       // console.log(reader);
       if (!reader) {
@@ -147,6 +149,12 @@ mqttClient.on('message', async (topic, message) => {
           retain: false,
         });
       }
+    } else if (topic.startsWith('mqtt-integration/Inventory/') && topic.endsWith('/tag')) {
+      const topicRegex = /^mqtt-integration\/Inventory\/([^\/]+)\/tag$/;
+
+      const match = topic.match(topicRegex)[1];
+      readerName = match; // This is the captured READER_NAME
+      console.log(`Match inventory: ${readerName}`);
     }
   } catch (error) {
     if (error.message) {
