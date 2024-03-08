@@ -6,6 +6,8 @@ const compression = require('compression');
 const cors = require('cors');
 const passport = require('passport');
 const httpStatus = require('http-status');
+const mqtt = require('mqtt');
+const { exec } = require('child_process');
 const config = require('./config/config');
 const morgan = require('./config/morgan');
 const { jwtStrategy } = require('./config/passport');
@@ -14,10 +16,9 @@ const routes = require('./routes/v1');
 const { errorConverter, errorHandler } = require('./middlewares/error');
 const ApiError = require('./utils/ApiError');
 const logger = require('./config/logger');
+
 const app = express();
 // See commit head
-
-const { exec } = require('child_process');
 
 const getCurrentGitCommit = () => {
   return new Promise((resolve, reject) => {
@@ -46,31 +47,32 @@ if (config.env !== 'test') {
   app.use(morgan.successHandler);
   app.use(morgan.errorHandler);
 }
-const mqtt = require('mqtt');
+
 const host = '35.209.47.216';
 const port = '1883';
 
-const clientId = `backend3`;
+const clientId = `backend1`;
 
-const timeOutValue = 3000;
+// const timeOutValue = 3000;
 const connectUrl = `mqtt://${host}:${port}`;
 const topicReader = 'mqtt-integration/Reader/';
 const topicInventory = 'mqtt-integration/Inventory/+/add';
 const { readerService } = require('./services');
-const { rejects } = require('assert');
-//mosquitto_pub -d -q 1 -h 34.66.84.55 -p 1883 -t mqtt-integration/Reader/ACE-001/rx -i 'backend3' -u 'backend3' -P 'an1m3w1bu' -c -m 'Hello World'
+
+// mosquitto_pub -d -q 1 -h 34.66.84.55 -p 1883 -t mqtt-integration/Reader/ACE-001/rx -i 'backend3' -u 'backend3' -P 'an1m3w1bu' -c -m 'Hello World'
 const mqttClient = mqtt.connect(connectUrl, {
   clientId,
+
   clean: true,
   connectTimeout: 4000,
-  username: 'backend3',
+  username: 'backend1',
   password: 'an1m3w1bu',
   reconnectPeriod: 1000,
 });
 // Connect to the MQTT broker
 mqttClient.on('connect', function () {
   logger.info('Connected to MQTT broker');
-  mqttClient.subscribe(topicReader + '+');
+  mqttClient.subscribe(`${topicReader}+`);
   mqttClient.subscribe(topicInventory);
 });
 mqttClient.on('message', async (topic, message) => {
@@ -89,21 +91,21 @@ mqttClient.on('message', async (topic, message) => {
     if (topic.startsWith(topicReader)) {
       readerName = topic.slice(topicReader.length);
       const reader = await readerService.getReaderByName(readerName);
-      //console.log(reader);
+      // console.log(reader);
       if (!reader) {
         throw new Error('Reader Not Found');
       }
-      //console.log(readerName, strMessage);
+      // console.log(readerName, strMessage);
       const messageObj = JSON.parse(strMessage);
       if (!messageObj) {
         throw new Error('Error Processing Reader, Check Synthax');
       }
-      console.log(topic, strMessage);
+      // console.log(topic, strMessage);
       if (!messageObj.method) {
         // console.log('not a method', messageObj);
       }
-      if (messageObj.method && messageObj.method == 'getData') {
-        const message = {
+      if (messageObj.method && messageObj.method === 'getData') {
+        const pubMessage = {
           name: readerName,
           data: {
             power_gain: reader.power_gain,
@@ -113,16 +115,16 @@ mqttClient.on('message', async (topic, message) => {
         };
         // console.log('success message: ', message);
 
-        mqttClient.publish(topicReader + readerName + '/rx', JSON.stringify(message), {
+        mqttClient.publish(`${topicReader + readerName}/rx`, JSON.stringify(pubMessage), {
           qos: 0,
           retain: false,
         });
-      } else if (messageObj.method && messageObj.params && messageObj.method == 'updateData') {
+      } else if (messageObj.method && messageObj.params && messageObj.method === 'updateData') {
         // console.log(messageObj.params);
         const data = messageObj.params;
         // Convert string values to numbers
         Object.keys(data).forEach((key) => {
-          if (!isNaN(data[key])) {
+          if (!Number.isNaN(data[key])) {
             data[key] = Number(data[key]);
           }
         });
@@ -130,7 +132,7 @@ mqttClient.on('message', async (topic, message) => {
         // console.log(data);
         Object.assign(reader, data);
         await reader.save();
-        const message = {
+        const pubMessage = {
           name: readerName,
           data: {
             power_gain: reader.power_gain,
@@ -140,7 +142,7 @@ mqttClient.on('message', async (topic, message) => {
         };
         // console.log('success message: ', message);
 
-        mqttClient.publish(topicReader + readerName + '/rx', JSON.stringify(message), {
+        mqttClient.publish(`${topicReader + readerName}/rx`, JSON.stringify(pubMessage), {
           qos: 0,
           retain: false,
         });
@@ -148,13 +150,13 @@ mqttClient.on('message', async (topic, message) => {
     }
   } catch (error) {
     if (error.message) {
-      const message = {
+      const pubMessage = {
         name: readerName,
         data: error.message,
         status: 0,
       };
       // console.log('error message: ', message);
-      mqttClient.publish(topicReader + readerName + '/rx', JSON.stringify(message), {
+      mqttClient.publish(`${topicReader + readerName}/rx`, JSON.stringify(pubMessage), {
         qos: 0,
         retain: false,
       });
@@ -173,7 +175,7 @@ app.use(function (req, res, next) {
 
   // Subscribe to topic
   req.mqttWaitMessage = function (topic, timeout = 6000) {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       let timeoutHandle;
 
       const onMessage = (t, m) => {
@@ -195,7 +197,7 @@ app.use(function (req, res, next) {
   };
 
   // Subscribe to topic
-  req.mqttUnsubscribe = function (topic, callback) {
+  req.mqttUnsubscribe = function (topic) {
     mqttClient.unsubscribe(topic);
   };
   next();
