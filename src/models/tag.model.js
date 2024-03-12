@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const validator = require('validator');
+
 const { toJSON, paginate } = require('./plugins');
 
 const tagSchema = mongoose.Schema(
@@ -9,8 +9,9 @@ const tagSchema = mongoose.Schema(
       required: true,
     },
     status: {
-      type: Number,
-      default: 0,
+      type: String,
+      enum: ['IN', 'OUT'],
+      default: 'IN',
     },
     inventory_id: {
       type: mongoose.SchemaTypes.ObjectId,
