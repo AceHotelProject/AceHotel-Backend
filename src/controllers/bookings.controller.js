@@ -405,7 +405,7 @@ const getBookingsByRoomId = catchAsync(async (req, res) => {
   filter = {
     ...filter,
     ...nameFilter,
-    room: { $in: { id: room._id } },
+    room: { $elemMatch: { id: room._id } },
   };
   const result = await bookingService.queryBookings(filter, options);
   if (result.totalResults === 0) {
