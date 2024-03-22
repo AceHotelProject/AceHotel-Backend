@@ -48,32 +48,35 @@ if (config.env !== 'test') {
   app.use(morgan.errorHandler);
 }
 
-const host = '35.209.47.216';
+const host = config.mqtt.url;
 const port = '1883';
 
-const clientId = `backend3`;
+// eslint-disable-next-line prefer-destructuring
+const clientId = `${config.mqtt.clientId}`;
 
 // const timeOutValue = 3000;
 const connectUrl = `mqtt://${host}:${port}`;
 const topicReader = 'mqtt-integration/Reader/';
-const topicInventory = 'mqtt-integration/Inventory/+/add';
-const { readerService } = require('./services');
-
+const topicInventoryAdd = 'mqtt-integration/Inventory/+/add';
+const topicInventoryTag = 'mqtt-integration/Inventory/+/tag';
+const { readerService, inventoryService } = require('./services');
+const { tagService } = require('./services');
 // mosquitto_pub -d -q 1 -h 34.66.84.55 -p 1883 -t mqtt-integration/Reader/ACE-001/rx -i 'backend3' -u 'backend3' -P 'an1m3w1bu' -c -m 'Hello World'
 const mqttClient = mqtt.connect(connectUrl, {
   clientId,
 
   clean: true,
   connectTimeout: 4000,
-  username: 'backend3',
-  password: 'an1m3w1bu',
+  username: `${config.mqtt.userName}`,
+  password: `${config.mqtt.pass}`,
   reconnectPeriod: 1000,
 });
 // Connect to the MQTT broker
 mqttClient.on('connect', function () {
   logger.info('Connected to MQTT broker');
   mqttClient.subscribe(`${topicReader}+`);
-  mqttClient.subscribe(topicInventory);
+  mqttClient.subscribe(topicInventoryAdd);
+  mqttClient.subscribe(topicInventoryTag);
 });
 mqttClient.on('message', async (topic, message) => {
   let readerName;
@@ -81,6 +84,7 @@ mqttClient.on('message', async (topic, message) => {
   try {
     // message is a Buffer
     // let strTopic = topic.toString();
+
     const strMessage = message
       .toString()
       .replace(/\r?\n|\r/, '')
@@ -91,7 +95,7 @@ mqttClient.on('message', async (topic, message) => {
 
     if (topic.startsWith(topicReader)) {
       readerName = topic.slice(topicReader.length);
-      console.log('match reader: ', readerName);
+
       const reader = await readerService.getReaderByName(readerName);
       // console.log(reader);
       if (!reader) {
@@ -150,11 +154,40 @@ mqttClient.on('message', async (topic, message) => {
         });
       }
     } else if (topic.startsWith('mqtt-integration/Inventory/') && topic.endsWith('/tag')) {
-      const topicRegex = /^mqtt-integration\/Inventory\/([^\/]+)\/tag$/;
+      const topicRegex = /^mqtt-integration\/Inventory\/([^]+)\/tag$/;
 
       const match = topic.match(topicRegex)[1];
       readerName = match; // This is the captured READER_NAME
-      console.log(`Match inventory: ${readerName}`);
+      const messageObj = JSON.parse(strMessage);
+
+      if (!messageObj) {
+        throw new Error('Error Processing Reader, Check Synthax');
+      }
+      if (messageObj.status === '1') {
+        if (messageObj.tid) {
+          const listOfTid = messageObj.tid;
+          const togglePromises = listOfTid.map((tid) => tagService.toggleTagStatus(tid));
+          const results = await Promise.all(togglePromises);
+          const inventoryCount = {};
+
+          results.forEach((result) => {
+            if (result) {
+              const { inventoryId, increment } = result;
+              const inventoryIdStr = inventoryId.toString();
+
+              // Initialize the count if not present
+              if (!inventoryCount[inventoryIdStr]) {
+                inventoryCount[inventoryIdStr] = 0;
+              }
+
+              // Update the count based on the increment (-1 for OUT, 1 for IN)
+              inventoryCount[inventoryIdStr] += increment;
+            }
+          });
+          inventoryService.updateInventoryByReader(inventoryCount);
+          console.log(inventoryCount);
+        }
+      }
     }
   } catch (error) {
     if (error.message) {

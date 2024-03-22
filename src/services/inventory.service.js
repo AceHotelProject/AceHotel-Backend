@@ -108,7 +108,51 @@ const updateInventoryById = async (inventoryId, updateBody, user) => {
   await inventory.save();
   return inventory;
 };
+/**
+ * Update inventory by id
+ * @param {ObjectId} inventoryId
+ * @param {Object} updateBody
+ * @returns {Promise<Inventory>}
+ */
+const updateInventoryByReader = async (updateList) => {
+  Object.entries(updateList).forEach(async ([id, count]) => {
+    console.log(`ID: ${id}, Count: ${count}`);
+    const inventory = await getInventoryById(id);
+    inventory.stock += count;
+    inventory.inventory_update_history.push({
+      title: 'Auto update',
+      description: 'Auto update dari pembacaan reader',
+      personInCharge: 'Reader',
+      stockChange: count,
+      date: new Date(), // This will set the date to the current date and time
+    });
+    await inventory.save();
+    return inventory;
+  });
 
+  // // Determine if there is a stock change
+  // const stockChange = updateBody.stock ? updateBody.stock - inventory.stock : 0;
+
+  // // Add a new record to inventory_update_history if there is relevant info
+  // if (updateBody.title || updateBody.description || stockChange !== 0) {
+  //   inventory.inventory_update_history.push({
+  //     title: updateBody.title,
+  //     description: updateBody.description,
+
+  //     personInCharge: user.username,
+  //     stockChange,
+
+  //     date: new Date(), // This will set the date to the current date and time
+  //   });
+  // }
+  // // Update inventory fields (name and type)
+  // if (updateBody.name) inventory.name = updateBody.name;
+  // if (updateBody.type) inventory.type = updateBody.type;
+  // if (updateBody.stock) inventory.stock = updateBody.stock;
+
+  // await inventory.save();
+  // return inventory;
+};
 /**
  * Add tag id to inventory
  * @param {ObjectId} inventoryId
@@ -143,6 +187,7 @@ module.exports = {
   queryInventories,
   getInventoryById,
   updateInventoryById,
+  updateInventoryByReader,
   deleteInventoryById,
   getInventoryHistories,
   addTagId,

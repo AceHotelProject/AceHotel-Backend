@@ -23,7 +23,7 @@ const setQuery = async (req) => {
     method: 'setQuery',
     params: req.query.state,
   };
-  console.log(resultJson);
+  // console.log(resultJson);
   const result = JSON.stringify(resultJson);
   req.mqttPublish(`${topic + req.params.readerId}/rx`, result);
   return resultJson;
@@ -53,19 +53,19 @@ const getTagId = async (req) => {
     params: '',
   };
 
-  function generateRandomId(length = 10) {
-    let tid = '';
-    const characters = 'ABCDEF0123456789';
-    const charactersLength = characters.length;
-    for (let i = 0; i < length; i++) {
-      tid += characters.charAt(Math.floor(Math.random() * charactersLength));
-    }
-    return tid;
-  }
-  const dummyResponseJson = {
-    tid: [generateRandomId()],
-    status: '1',
-  };
+  // function generateRandomId(length = 10) {
+  //   let tid = '';
+  //   const characters = 'ABCDEF0123456789';
+  //   const charactersLength = characters.length;
+  //   for (let i = 0; i < length; i += 1) {
+  //     tid += characters.charAt(Math.floor(Math.random() * charactersLength));
+  //   }
+  //   return tid;
+  // }
+  // const dummyResponseJson = {
+  //   tid: [generateRandomId()],
+  //   status: '1',
+  // };
 
   const queryCommandJson = {
     method: 'setQuery',
@@ -86,7 +86,7 @@ const getTagId = async (req) => {
     throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, 'Failed to parse JSON data');
   }
   let result;
-  if (messageObj.status == 1) {
+  if (messageObj.status === 1) {
     result = {
       tagId: messageObj.tid,
       status: messageObj.status,
@@ -110,7 +110,28 @@ const getTagId = async (req) => {
 const getTagById = async (id) => {
   return Tag.findById(id);
 };
+/**
+ * Switch tag status by tid
+ * @param {ObjectId} id
+ * @returns {Promise<Tag>}
+ */
+const toggleTagStatus = async (tid) => {
+  const tag = await Tag.findOne({ tid });
+  if (!tag) {
+    return null; // Return null to indicate no update needed
+  }
 
+  // Toggle the status
+  tag.status = tag.status === 'IN' ? 'OUT' : 'IN';
+
+  // Determine increment based on the new status
+  const increment = tag.status === 'IN' ? 1 : -1;
+
+  await tag.save();
+
+  // Return the inventoryId and the increment value
+  return { inventoryId: tag.inventory_id, increment };
+};
 /**
  * Update tag by id
  * @param {ObjectId} tagId
@@ -147,6 +168,7 @@ module.exports = {
   createTag,
   queryTags,
   getTagById,
+  toggleTagStatus,
   updateTagById,
   deleteTagById,
 };

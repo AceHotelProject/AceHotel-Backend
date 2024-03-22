@@ -61,4 +61,10 @@ module.exports = {
     },
     from: envVars.EMAIL_FROM,
   },
+  mqtt: {
+    url: envVars.MQTT_URL,
+    clientId: envVars.MQTT_CLIENTID,
+    userName: envVars.MQTT_USERNAME,
+    pass: envVars.MQTT_PASS,
+  },
 };
