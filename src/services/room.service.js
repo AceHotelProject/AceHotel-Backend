@@ -214,7 +214,12 @@ const checkinById = async (roomId, checkinBody, user_id) => {
       }
       // eslint-disable-next-line no-param-reassign
       checkinBody.checkin_date = new Date(checkinBody.checkin_date);
-      checkinBody.checkin_date.setHours(14, 0, 0, 0);
+      const now = new Date();
+      const currentHour = now.getHours() + 7;
+      const currentMinute = now.getMinutes();
+      const currentSecond = now.getSeconds();
+      const currentMillisecond = now.getMilliseconds();
+      checkinBody.checkin_date.setHours(currentHour, currentMinute, currentSecond, currentMillisecond);
       if (checkinBody.checkin_date < booking.checkin_date || checkinBody.checkin_date > booking.checkout_date) {
         throw new ApiError(httpStatus.BAD_REQUEST, 'You must checkin between checkin date and checkout date');
       }
