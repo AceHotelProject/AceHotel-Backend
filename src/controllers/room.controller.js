@@ -191,7 +191,13 @@ const checkoutById = catchAsync(async (req, res) => {
           if (req.body.checkout_date < booking.checkin_date || req.body.checkout_date > booking.checkout_date) {
             throw new ApiError(httpStatus.BAD_REQUEST, 'Checkout date must be between checkin date and checkout date');
           }
-          r.actual_checkout = req.body.checkout_date;
+          r.actual_checkout = new Date(req.body.checkout_date);
+          const now = new Date();
+          const currentHour = now.getHours() + 7;
+          const currentMinute = now.getMinutes();
+          const currentSecond = now.getSeconds();
+          const currentMillisecond = now.getMilliseconds();
+          r.actual_checkout.setHours(currentHour, currentMinute, currentSecond, currentMillisecond);
           r.checkout_staff_id = req.user._id;
         }
       }
