@@ -48,10 +48,11 @@ if (config.env !== 'test') {
   app.use(morgan.errorHandler);
 }
 
-const host = '35.209.47.216';
+const host = config.mqtt.url;
 const port = '1883';
 
-const clientId = `backend1`;
+// eslint-disable-next-line prefer-destructuring
+const clientId = `${config.mqtt.clientId}`;
 
 // const timeOutValue = 3000;
 const connectUrl = `mqtt://${host}:${port}`;
@@ -66,8 +67,8 @@ const mqttClient = mqtt.connect(connectUrl, {
 
   clean: true,
   connectTimeout: 4000,
-  username: 'backend1',
-  password: 'an1m3w1bu',
+  username: `${config.mqtt.userName}`,
+  password: `${config.mqtt.pass}`,
   reconnectPeriod: 1000,
 });
 // Connect to the MQTT broker
