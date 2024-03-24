@@ -189,7 +189,7 @@ const checkoutById = catchAsync(async (req, res) => {
       for (const r of booking.room) {
         if (r.id.toString() === req.params.roomId.toString()) {
           if (req.body.checkout_date < booking.checkin_date || req.body.checkout_date > booking.checkout_date) {
-            throw new ApiError(httpStatus.BAD_REQUEST, 'Checkout date must be between checkin date and checkout date');
+            throw new ApiError(httpStatus.BAD_REQUEST, 'Checkout date must be between checkin date and checkSout date');
           }
           r.actual_checkout = new Date(req.body.checkout_date);
           const now = new Date();

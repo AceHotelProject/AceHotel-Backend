@@ -139,7 +139,7 @@ const updateHotel = catchAsync(async (req, res) => {
       for (const room of hotel.room_id) {
         // eslint-disable-next-line no-await-in-loop
         const roomObject = await roomService.getRoomById(room);
-        if (!roomObject.is_booked) {
+        if (!roomObject.is_booked && roomObject.type === 'regular') {
           // eslint-disable-next-line camelcase, no-await-in-loop
           hotel.room_id = await hotel.room_id.filter((room_id) => room_id !== room);
           // eslint-disable-next-line no-await-in-loop
@@ -180,7 +180,7 @@ const updateHotel = catchAsync(async (req, res) => {
       for (const room of hotel.room_id) {
         // eslint-disable-next-line no-await-in-loop
         const roomObject = await roomService.getRoomById(room);
-        if (!roomObject.is_booked) {
+        if (!roomObject.is_booked && roomObject.type === 'exclusive') {
           // eslint-disable-next-line camelcase, no-await-in-loop
           hotel.room_id = await hotel.room_id.filter((room_id) => room_id !== room);
           // eslint-disable-next-line no-await-in-loop
