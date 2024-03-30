@@ -20,7 +20,7 @@ const getReaders = catchAsync(async (req, res) => {
 });
 
 const getReader = catchAsync(async (req, res) => {
-  const reader = await readerService.getReaderByName(req.params.readerName);
+  const reader = await readerService.getReaderByName(req.params.reader_name);
   if (!reader) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Reader not found');
   }
@@ -28,12 +28,12 @@ const getReader = catchAsync(async (req, res) => {
 });
 
 const updateReader = catchAsync(async (req, res) => {
-  const reader = await readerService.updateReaderByName(req.params.readerName, req.body);
+  const reader = await readerService.updateReaderByName(req.params.reader_name, req.body);
   res.send(reader);
 });
 
 const deleteReader = catchAsync(async (req, res) => {
-  await readerService.deleteReaderByName(req.params.readerName);
+  await readerService.deleteReaderByName(req.params.reader_name);
   res.status(httpStatus.NO_CONTENT).send();
 });
 
