@@ -86,7 +86,8 @@ const getTagId = async (req) => {
     throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, 'Failed to parse JSON data');
   }
   let result;
-  if (messageObj.status === 1) {
+
+  if (messageObj.status === '1') {
     result = {
       tagId: messageObj.tid,
       status: messageObj.status,
@@ -95,6 +96,7 @@ const getTagId = async (req) => {
     result = {
       status: messageObj.status,
     };
+    console.log(result);
   }
   queryCommandJson.params = 'true';
   query = JSON.stringify(queryCommandJson);
