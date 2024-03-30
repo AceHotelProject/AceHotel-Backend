@@ -68,7 +68,7 @@ const updateReaderByName = async (readerName, updateBody) => {
  * @returns {Promise<Reader>}
  */
 const deleteReaderByName = async (readerName) => {
-  const reader = await getReaderById(readerName);
+  const reader = await getReaderByName(readerName);
   if (!reader) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Reader not found');
   }
