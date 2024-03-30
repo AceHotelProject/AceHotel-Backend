@@ -25,7 +25,7 @@ const setQuery = async (req) => {
   };
   // console.log(resultJson);
   const result = JSON.stringify(resultJson);
-  req.mqttPublish(`${topic + req.params.readerId}/rx`, result);
+  req.mqttPublish(`${topic + req.params.readerName}/rx`, result);
   return resultJson;
 };
 
@@ -72,15 +72,15 @@ const getTagId = async (req) => {
     params: 'false',
   };
   let query = JSON.stringify(queryCommandJson);
-  req.mqttPublish(`${topic + req.params.readerId}/rx`, query);
+  req.mqttPublish(`${topic + req.params.readerName}/rx`, query);
   const command = JSON.stringify(commandJson);
 
   // const dummy = JSON.stringify(dummyResponseJson);
   // req.mqttPublish(topicAdd, dummy);
 
-  const messageString = await req.mqttWaitMessage(`${topic + req.params.readerId}/add`, timeOutValue); // 3 seconds timeout
-  req.mqttPublish(`${topic + req.params.readerId}/rx`, command);
-  // req.mqttUnsubscribe(topic + req.params.readerId + '/add');
+  const messageString = await req.mqttWaitMessage(`${topic + req.params.readerName}/add`, timeOutValue); // 3 seconds timeout
+  req.mqttPublish(`${topic + req.params.readerName}/rx`, command);
+  // req.mqttUnsubscribe(topic + req.params.readerName + '/add');
   const messageObj = JSON.parse(messageString);
   if (!messageObj) {
     throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, 'Failed to parse JSON data');
@@ -96,11 +96,10 @@ const getTagId = async (req) => {
     result = {
       status: messageObj.status,
     };
-    console.log(result);
   }
   queryCommandJson.params = 'true';
   query = JSON.stringify(queryCommandJson);
-  req.mqttPublish(`${topic + req.params.readerId}/rx`, query);
+  req.mqttPublish(`${topic + req.params.readerName}/rx`, query);
 
   return result;
 };
