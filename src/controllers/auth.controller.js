@@ -4,7 +4,7 @@ const catchAsync = require('../utils/catchAsync');
 const ApiError = require('../utils/ApiError');
 const { authService, userService, tokenService, emailService } = require('../services');
 
-const AUTH_URL = 'http://ace-hotel-backend-auth-user.vercel.app/v1/auth';
+const AUTH_URL = 'http://ace-hotel-backend-authuser.vercel.app/v1/auth';
 const register = catchAsync(async (req, res) => {
   // const user = await userService.createUser(req.body);
   // const tokens = await tokenService.generateAuthTokens(user);
