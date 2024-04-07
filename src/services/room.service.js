@@ -220,9 +220,10 @@ const checkinById = async (roomId, checkinBody, user_id) => {
       const currentSecond = now.getSeconds();
       const currentMillisecond = now.getMilliseconds();
       checkinBody.checkin_date.setHours(currentHour, currentMinute, currentSecond, currentMillisecond);
-      if (checkinBody.checkin_date < booking.checkin_date || checkinBody.checkin_date > booking.checkout_date) {
-        throw new ApiError(httpStatus.BAD_REQUEST, 'You must checkin between checkin date and checkout date');
-      }
+      // Validasi checkin date
+      // if (checkinBody.checkin_date < booking.checkin_date || checkinBody.checkin_date > booking.checkout_date) {
+      //   throw new ApiError(httpStatus.BAD_REQUEST, 'You must checkin between checkin date and checkout date');
+      // }
       for (const r of booking.room) {
         if (r.id.toString() === roomId.toString()) {
           if (!r.actual_checkin || booking.actual_checkin === undefined) {
