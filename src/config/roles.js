@@ -19,6 +19,8 @@ const allRoles = {
     'manageReaders',
     'uploadFiles',
     'recap',
+    'getNotes',
+    'manageNotes',
   ],
   branch_manager: [
     'manageFinances',
