@@ -10,9 +10,8 @@ const createNote = catchAsync(async (req, res) => {
 });
 
 const getNotes = catchAsync(async (req, res) => {
-  const filter = pick(req.query, ['room_id']);
   const options = pick(req.query, ['sortBy', 'limit', 'page']);
-  const result = await noteService.queryNotes(filter, options);
+  const result = await noteService.queryNotes(options);
   res.send(result);
 });
 
