@@ -17,12 +17,16 @@ const getUsers = {
     sortBy: Joi.string(),
     limit: Joi.number().integer(),
     page: Joi.number().integer(),
+    hotel_id: Joi.string().custom(objectId),
   }),
 };
 
 const getUser = {
   params: Joi.object().keys({
     userId: Joi.string().custom(objectId),
+  }),
+  query: Joi.object().keys({
+    hotel_id: Joi.string().custom(objectId),
   }),
 };
 
@@ -38,11 +42,17 @@ const updateUser = {
       hotel_id: Joi.string().custom(objectId),
     })
     .min(1),
+  query: Joi.object().keys({
+    hotel_id: Joi.string().custom(objectId),
+  }),
 };
 
 const deleteUser = {
   params: Joi.object().keys({
     userId: Joi.string().custom(objectId),
+  }),
+  query: Joi.object().keys({
+    hotel_id: Joi.string().custom(objectId),
   }),
 };
 
