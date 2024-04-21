@@ -18,18 +18,24 @@ const createHotel = catchAsync(async (req, res) => {
     password: req.body.receptionist_password,
     role: 'receptionist',
   });
-  const cleaningStaff = await userService.createUser({
-    username: req.body.cleaning_staff_name,
-    email: req.body.cleaning_staff_email,
-    password: req.body.cleaning_staff_password,
-    role: 'cleaning_staff',
-  });
-  const inventoryStaff = await userService.createUser({
-    username: req.body.inventory_staff_name,
-    email: req.body.inventory_staff_email,
-    password: req.body.inventory_staff_password,
-    role: 'inventory_staff',
-  });
+  let cleaningStaff;
+  let inventoryStaff;
+  if (req.body.cleaning_staff_name && req.body.cleaning_staff_email && req.body.cleaning_staff_password) {
+    cleaningStaff = await userService.createUser({
+      username: req.body.cleaning_staff_name,
+      email: req.body.cleaning_staff_email,
+      password: req.body.cleaning_staff_password,
+      role: 'cleaning_staff',
+    });
+  }
+  if (req.body.inventory_staff_name && req.body.inventory_staff_email && req.body.inventory_staff_password) {
+    inventoryStaff = await userService.createUser({
+      username: req.body.inventory_staff_name,
+      email: req.body.inventory_staff_email,
+      password: req.body.inventory_staff_password,
+      role: 'inventory_staff',
+    });
+  }
   const hotel = await hotelService.createHotel(req.body);
   // Populate Some Rooms
   userService.addHotelId(req.user._id, hotel._id);
@@ -50,16 +56,20 @@ const createHotel = catchAsync(async (req, res) => {
   hotel.room_id.push(...exclusiveRoomId);
   hotel.owner_id = owner._id;
   hotel.receptionist_id = receptionist._id;
-  hotel.cleaning_staff_id = cleaningStaff._id;
-  hotel.inventory_staff_id = inventoryStaff._id;
+  if (cleaningStaff) {
+    hotel.cleaning_staff_id = cleaningStaff._id;
+    cleaningStaff.hotel_id.push(hotel._id);
+    await cleaningStaff.save();
+  }
+  if (inventoryStaff) {
+    hotel.inventory_staff_id = inventoryStaff._id;
+    inventoryStaff.hotel_id.push(hotel._id);
+    await inventoryStaff.save();
+  }
   owner.hotel_id.push(hotel._id);
   receptionist.hotel_id.push(hotel._id);
-  cleaningStaff.hotel_id.push(hotel._id);
-  inventoryStaff.hotel_id.push(hotel._id);
   await owner.save();
   await receptionist.save();
-  await cleaningStaff.save();
-  await inventoryStaff.save();
   await hotel.save();
   res.status(httpStatus.CREATED).send(hotel);
 });
