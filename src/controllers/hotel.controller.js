@@ -239,6 +239,38 @@ const deleteHotel = catchAsync(async (req, res) => {
       throw new ApiError(httpStatus.FORBIDDEN, 'Forbidden');
     }
   }
+  if (hotel.owner_id) {
+    const owner = await userService.getUserById(hotel.owner_id);
+    if (owner) {
+      owner.hotel_id = owner.hotel_id.filter((id) => id.toString() !== hotel._id.toString());
+      // eslint-disable-next-line no-await-in-loop
+      await owner.save();
+    }
+  }
+  if (hotel.receptionist_id) {
+    const receptionist = await userService.getUserById(hotel.receptionist_id);
+    if (receptionist) {
+      receptionist.hotel_id = receptionist.hotel_id.filter((id) => id.toString() !== hotel._id.toString());
+      // eslint-disable-next-line no-await-in-loop
+      await receptionist.save();
+    }
+  }
+  if (hotel.cleaning_staff_id) {
+    const cleaningStaff = await userService.getUserById(hotel.cleaning_staff_id);
+    if (cleaningStaff) {
+      cleaningStaff.hotel_id = cleaningStaff.hotel_id.filter((id) => id.toString() !== hotel._id.toString());
+      // eslint-disable-next-line no-await-in-loop
+      await cleaningStaff.save();
+    }
+  }
+  if (hotel.inventory_staff_id) {
+    const inventoryStaff = await userService.getUserById(hotel.inventory_staff_id);
+    if (inventoryStaff) {
+      inventoryStaff.hotel_id = inventoryStaff.hotel_id.filter((id) => id.toString() !== hotel._id.toString());
+      // eslint-disable-next-line no-await-in-loop
+      await inventoryStaff.save();
+    }
+  }
   // eslint-disable-next-line no-restricted-syntax
   for (const room of hotel.room_id) {
     // eslint-disable-next-line no-await-in-loop
