@@ -239,6 +239,11 @@ const deleteHotel = catchAsync(async (req, res) => {
       throw new ApiError(httpStatus.FORBIDDEN, 'Forbidden');
     }
   }
+  if (req.user.role === 'owner') {
+    const owner = await userService.getUserById(req.user._id);
+    owner.hotel_id = owner.hotel_id.filter((id) => id.toString() !== hotel._id.toString());
+    await owner.save();
+  }
   if (hotel.owner_id) {
     const owner = await userService.getUserById(hotel.owner_id);
     if (owner) {
