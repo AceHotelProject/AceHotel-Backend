@@ -56,12 +56,10 @@ const clientId = `${config.mqtt.clientId}`;
 
 // const timeOutValue = 3000;
 const connectUrl = `mqtt://${host}:${port}`;
-const topicReader = 'mqtt-integration/Reader/';
-const topicInventoryAdd = 'mqtt-integration/Inventory/+/add';
-const topicInventoryTag = 'mqtt-integration/Inventory/+/tag';
-const { readerService, inventoryService } = require('./services');
-const { tagService } = require('./services');
-// mosquitto_pub -d -q 1 -h 34.66.84.55 -p 1883 -t mqtt-integration/Reader/ACE-001/rx -i 'backend3' -u 'backend3' -P 'an1m3w1bu' -c -m 'Hello World'
+// const topicInventoryRx
+const { readerService, inventoryService, tagService } = require('./services');
+// const { tagService } = require('./services');
+// // mosquitto_pub -d -q 1 -h 34.66.84.55 -p 1883 -t mqtt-integration/Reader/ACE-001/rx -i 'backend3' -u 'backend3' -P 'an1m3w1bu' -c -m 'Hello World'
 const mqttClient = mqtt.connect(connectUrl, {
   clientId,
 
@@ -72,122 +70,76 @@ const mqttClient = mqtt.connect(connectUrl, {
   reconnectPeriod: 1000,
 });
 // Connect to the MQTT broker
+
 mqttClient.on('connect', function () {
   logger.info('Connected to MQTT broker');
-  mqttClient.subscribe(`${topicReader}+`);
-  mqttClient.subscribe(topicInventoryAdd);
-  mqttClient.subscribe(topicInventoryTag);
+  mqttClient.subscribe(`Inventory/+/tx`);
+  mqttClient.subscribe(`Reader/+`);
 });
 mqttClient.on('message', async (topic, message) => {
   let readerName;
-
+  const strMessage = message
+    .toString()
+    .replace(/\r?\n|\r/, '')
+    .trim();
   try {
-    // message is a Buffer
-    // let strTopic = topic.toString();
-
-    const strMessage = message
-      .toString()
-      .replace(/\r?\n|\r/, '')
-      .trim();
-    // console.log('msg: ', strMessage);
-    // let objMessage = JSON.parse(strMessage);
-    // Check if the topic starts with the prefix and then extract the specific part
-
-    if (topic.startsWith(topicReader)) {
-      readerName = topic.slice(topicReader.length);
-
+    if (topic.startsWith('Inventory/')) {
+      const topicPart = topic.split('/')[1];
+      readerName = topicPart;
       const reader = await readerService.getReaderByName(readerName);
-      // console.log(reader);
       if (!reader) {
         throw new Error('Reader Not Found');
       }
-      // console.log(readerName, strMessage);
       const messageObj = JSON.parse(strMessage);
+
       if (!messageObj) {
         throw new Error('Error Processing Reader, Check Synthax');
       }
-      // console.log(topic, strMessage);
       if (!messageObj.method) {
-        // console.log('not a method', messageObj);
-      }
-      if (messageObj.method && messageObj.method === 'getData') {
-        const pubMessage = {
-          name: readerName,
-          data: {
-            power_gain: reader.power_gain,
-            read_interval: reader.read_interval,
-          },
-          status: 1,
-        };
-        // console.log('success message: ', message);
+        throw new Error('Not a method');
+      } else if (messageObj.method === 'updateTag') {
+        const listOfTid = messageObj.tid;
+        const togglePromises = listOfTid.map((tid) => tagService.toggleTagStatus(tid));
+        const results = await Promise.all(togglePromises);
+        const inventoryCount = {};
+        results.forEach((result) => {
+          console.log(result);
+          if (result) {
+            const { inventoryId, increment } = result;
+            const inventoryIdStr = inventoryId.toString();
 
-        mqttClient.publish(`${topicReader + readerName}/rx`, JSON.stringify(pubMessage), {
-          qos: 0,
-          retain: false,
-        });
-      } else if (messageObj.method && messageObj.params && messageObj.method === 'updateData') {
-        // console.log(messageObj.params);
-        const data = messageObj.params;
-        // Convert string values to numbers
-        Object.keys(data).forEach((key) => {
-          if (!Number.isNaN(data[key])) {
-            data[key] = Number(data[key]);
+            // Initialize the count if not present
+            if (!inventoryCount[inventoryIdStr]) {
+              inventoryCount[inventoryIdStr] = 0;
+            }
+
+            // Update the count based on the increment (-1 for OUT, 1 for IN)
+            inventoryCount[inventoryIdStr] += increment;
           }
         });
-
-        // console.log(data);
-        Object.assign(reader, data);
-        await reader.save();
+        inventoryService.updateInventoryByReader(inventoryCount);
+        console.log(inventoryCount);
+        mqttClient.publish('Mqtt/debug', `Success: Update Tag. Updated ${Object.values(inventoryCount).length} data`, {
+          qos: 0,
+          retain: false,
+        });
+      } else if (messageObj.method === 'getData') {
         const pubMessage = {
-          name: readerName,
+          method: 'getData',
           data: {
             power_gain: reader.power_gain,
             read_interval: reader.read_interval,
           },
-          status: 1,
         };
         // console.log('success message: ', message);
 
-        mqttClient.publish(`${topicReader + readerName}/rx`, JSON.stringify(pubMessage), {
+        mqttClient.publish(`Inventory/${readerName}/rx`, JSON.stringify(pubMessage), {
           qos: 0,
           retain: false,
         });
       }
-    } else if (topic.startsWith('mqtt-integration/Inventory/') && topic.endsWith('/tag')) {
-      const topicRegex = /^mqtt-integration\/Inventory\/([^]+)\/tag$/;
-
-      const match = topic.match(topicRegex)[1];
-      readerName = match; // This is the captured READER_NAME
-      const messageObj = JSON.parse(strMessage);
-
-      if (!messageObj) {
-        throw new Error('Error Processing Reader, Check Synthax');
-      }
-      if (messageObj.status === '1') {
-        if (messageObj.tid) {
-          const listOfTid = messageObj.tid;
-          const togglePromises = listOfTid.map((tid) => tagService.toggleTagStatus(tid));
-          const results = await Promise.all(togglePromises);
-          const inventoryCount = {};
-
-          results.forEach((result) => {
-            if (result) {
-              const { inventoryId, increment } = result;
-              const inventoryIdStr = inventoryId.toString();
-
-              // Initialize the count if not present
-              if (!inventoryCount[inventoryIdStr]) {
-                inventoryCount[inventoryIdStr] = 0;
-              }
-
-              // Update the count based on the increment (-1 for OUT, 1 for IN)
-              inventoryCount[inventoryIdStr] += increment;
-            }
-          });
-          inventoryService.updateInventoryByReader(inventoryCount);
-          console.log(inventoryCount);
-        }
-      }
+    } else {
+      throw new Error('Topic not found');
     }
   } catch (error) {
     if (error.message) {
@@ -197,13 +149,45 @@ mqttClient.on('message', async (topic, message) => {
         status: 0,
       };
       // console.log('error message: ', message);
-      mqttClient.publish(`${topicReader + readerName}/rx`, JSON.stringify(pubMessage), {
+      mqttClient.publish('Mqtt/debug', JSON.stringify(pubMessage), {
         qos: 0,
         retain: false,
       });
     }
   }
 });
+// else if (topic.startsWith('Reader/')) {
+//       const topicPart = topic.split('/')[1];
+//       readerName = topicPart;
+//       const reader = await readerService.getReaderByName(readerName);
+//       if (!reader) {
+//         throw new Error('Reader Not Found');
+//       }
+//       const messageObj = JSON.parse(strMessage);
+
+//       if (!messageObj) {
+//         throw new Error('Error Processing Reader, Check Synthax');
+//       }
+//       if (!messageObj.method) {
+//         throw new Error('Not a method');
+//       } else if (messageObj.method === 'getData') {
+//         const pubMessage = {
+//           method: 'response',
+//           name: readerName,
+//           data: {
+//             power_gain: reader.power_gain,
+//             read_interval: reader.read_interval,
+//           },
+//           status: 1,
+//         };
+//         // console.log('success message: ', message);
+
+//         mqttClient.publish(`Reader/${readerName}`, JSON.stringify(pubMessage), {
+//           qos: 0,
+//           retain: false,
+//         });
+//       }
+//     }
 // MQTT middleware for publishing and subscribing
 app.use(function (req, res, next) {
   // Publish messages

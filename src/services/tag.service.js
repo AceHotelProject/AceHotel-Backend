@@ -2,8 +2,6 @@ const httpStatus = require('http-status');
 const { Tag } = require('../models');
 const ApiError = require('../utils/ApiError');
 
-const topic = 'mqtt-integration/Inventory/';
-
 const timeOutValue = 5000;
 /**
  * Create a tag
@@ -25,7 +23,7 @@ const setQuery = async (req) => {
   };
   // console.log(resultJson);
   const result = JSON.stringify(resultJson);
-  req.mqttPublish(`${topic + req.params.readerName}/rx`, result);
+  req.mqttPublish(`Inventory/${req.params.readerName}/rx`, result);
   return resultJson;
 };
 
@@ -48,46 +46,29 @@ const queryTags = async (filter, options) => {
  */
 
 const getTagId = async (req) => {
-  const commandJson = {
+  const addCommandJson = {
     method: 'getTag',
     params: '',
   };
-
-  // function generateRandomId(length = 10) {
-  //   let tid = '';
-  //   const characters = 'ABCDEF0123456789';
-  //   const charactersLength = characters.length;
-  //   for (let i = 0; i < length; i += 1) {
-  //     tid += characters.charAt(Math.floor(Math.random() * charactersLength));
-  //   }
-  //   return tid;
-  // }
-  // const dummyResponseJson = {
-  //   tid: [generateRandomId()],
-  //   status: '1',
-  // };
-
   const queryCommandJson = {
     method: 'setQuery',
     params: 'false',
   };
   let query = JSON.stringify(queryCommandJson);
-  req.mqttPublish(`${topic + req.params.readerName}/rx`, query);
-  const command = JSON.stringify(commandJson);
+  req.mqttPublish(`Inventory/${req.params.readerName}/rx`, query);
+  const command = JSON.stringify(addCommandJson);
 
-  // const dummy = JSON.stringify(dummyResponseJson);
-  // req.mqttPublish(topicAdd, dummy);
+  // wait then publish
+  const messageString = await req.mqttWaitMessage(`Inventory/${req.params.readerName}/tx`, timeOutValue); // 3 seconds timeout
+  req.mqttPublish(`Inventory/${req.params.readerName}/rx`, command);
 
-  const messageString = await req.mqttWaitMessage(`${topic + req.params.readerName}/add`, timeOutValue); // 3 seconds timeout
-  req.mqttPublish(`${topic + req.params.readerName}/rx`, command);
-  // req.mqttUnsubscribe(topic + req.params.readerName + '/add');
   const messageObj = JSON.parse(messageString);
   if (!messageObj) {
     throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, 'Failed to parse JSON data');
   }
   let result;
 
-  if (messageObj.status === '1') {
+  if (messageObj.status === '1' && messageObj.method === 'addTag') {
     result = {
       tagId: messageObj.tid,
       status: messageObj.status,
@@ -99,7 +80,7 @@ const getTagId = async (req) => {
   }
   queryCommandJson.params = 'true';
   query = JSON.stringify(queryCommandJson);
-  req.mqttPublish(`${topic + req.params.readerName}/rx`, query);
+  req.mqttPublish(`Inventory/${req.params.readerName}/rx`, query);
 
   return result;
 };
