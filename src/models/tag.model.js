@@ -2,6 +2,8 @@ const mongoose = require('mongoose');
 
 const { toJSON, paginate } = require('./plugins');
 
+const Inventory = require('./inventory.model');
+
 const tagSchema = mongoose.Schema(
   {
     tid: {
@@ -27,6 +29,15 @@ const tagSchema = mongoose.Schema(
 // add plugin that converts mongoose to json
 tagSchema.plugin(toJSON);
 tagSchema.plugin(paginate);
+
+tagSchema.pre('remove', async function (next) {
+  // 1 Tag - 1 Inventory
+  // 1 Inventory - Many Tag
+  // Ketika Tag dihapus, maka inventory yang tag_id nya include dipop
+  const tagId = this._id;
+  await Inventory.updateMany({ tag_id: { $in: tagId } }, { $pull: { tag_id: tagId } });
+  next();
+});
 
 /**
  * @typedef Tag

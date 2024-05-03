@@ -1,6 +1,8 @@
 const mongoose = require('mongoose');
 const { toJSON, paginate } = require('./plugins');
 
+const Booking = require('./booking.model');
+
 const noteSchema = mongoose.Schema(
   {
     detail: {
@@ -22,6 +24,19 @@ const noteSchema = mongoose.Schema(
 // add plugin that converts mongoose to json
 noteSchema.plugin(toJSON);
 noteSchema.plugin(paginate);
+
+noteSchema.pre('remove', async function (next) {
+  // 1 Note - Many Booking
+  // 1 Booking - Many Note (On Room)
+  // Ketika Note dihapus, Booking yang room.note_id nya sama dengan noteId diubah ke null
+  const noteId = this._id;
+  await Booking.updateMany(
+    { 'room.note_id': noteId },
+    { $set: { 'room.$[roomItem].note_id': null } },
+    { arrayFilters: [{ 'roomItem.note_id': noteId }] }
+  );
+  next();
+});
 
 /**
  * @typedef Note

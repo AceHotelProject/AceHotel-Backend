@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
 const { toJSON, paginate } = require('./plugins');
+const Booking = require('./booking.model');
 
 const visitorSchema = mongoose.Schema(
   {
@@ -75,6 +76,13 @@ visitorSchema.statics.isNIKTaken = async function (identity_num, excludeUserId) 
   return !!user;
 };
 
+// 1 Visitor - 1 Hotel
+
+visitorSchema.pre('remove', async function (next) {
+  const visitor = this;
+  await Booking.deleteMany({ visitor_id: visitor._id });
+  next();
+});
 /**
  * @typedef User
  */

@@ -234,7 +234,7 @@ const deleteBookingById = catchAsync(async (req, res) => {
     room.is_booked = room.bookings > 1;
     room.is_clean = true;
     // eslint-disable-next-line no-restricted-syntax
-    room.bookings = room.bookings.filter((b) => b.booking_id.toString() !== req.params.bookingId);
+    // room.bookings = room.bookings.filter((b) => b.booking_id.toString() !== req.params.bookingId);
     // eslint-disable-next-line no-await-in-loop
     await room.save();
   }

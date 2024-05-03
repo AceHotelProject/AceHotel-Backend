@@ -4,6 +4,8 @@ const bcrypt = require('bcryptjs');
 const { toJSON, paginate } = require('./plugins');
 const { roles } = require('../config/roles');
 
+const Hotel = require('./hotel.model');
+
 const userSchema = mongoose.Schema(
   {
     username: {
@@ -85,6 +87,22 @@ userSchema.pre('save', async function (next) {
   const user = this;
   if (user.isModified('password')) {
     user.password = await bcrypt.hash(user.password, 8);
+  }
+  next();
+});
+
+// 1 User - Many Hotel
+// 1 Hotel - Many User
+userSchema.pre('remove', async function (next) {
+  const user = this;
+  if (user.role === 'branch_manager') {
+    await Hotel.updateMany({ owner_id: user._id }, { $set: { owner_id: null } });
+  } else if (user.role === 'receptionist') {
+    await Hotel.updateMany({ receptionist_id: user._id }, { $set: { receptionist_id: null } });
+  } else if (user.role === 'cleaning_staff') {
+    await Hotel.updateMany({ cleaning_staff_id: user._id }, { $set: { cleaning_staff_id: null } });
+  } else if (user.role === 'inventory_staff') {
+    await Hotel.updateMany({ inventory_staff_id: user._id }, { $set: { inventory_staff_id: null } });
   }
   next();
 });

@@ -73,7 +73,7 @@ const deleteRoom = catchAsync(async (req, res) => {
   }
   const updateField = room.type === 'regular' ? 'regular_room_count' : 'exclusive_room_count';
   hotel[updateField] -= 1;
-  hotel.room_id = hotel.room_id.filter((h) => h._id.toString() !== room._id.toString());
+  // hotel.room_id = hotel.room_id.filter((h) => h._id.toString() !== room._id.toString());
   await hotel.save();
   await roomService.deleteRoomById(req.params.roomId);
   res.status(httpStatus.NO_CONTENT).send();
@@ -128,7 +128,7 @@ const deleteRoomByHotelId = catchAsync(async (req, res) => {
       throw new ApiError(httpStatus.FORBIDDEN, 'Forbidden');
     }
   }
-  await roomService.deleteRoomByHotelId(req.params.hotelId);
+  // await roomService.deleteRoomByHotelId(req.params.hotelId);
   hotel.room_id = [];
   hotel.regular_room_count = 0;
   hotel.exclusive_room_count = 0;

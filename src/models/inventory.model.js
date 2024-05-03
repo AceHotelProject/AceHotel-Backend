@@ -1,6 +1,8 @@
 const mongoose = require('mongoose');
 const { toJSON, paginate } = require('./plugins');
 const { types } = require('../config/inventory.types');
+const Tag = require('./tag.model');
+const Addon = require('./addon.model');
 
 const inventoryUpdateRecordSchema = mongoose.Schema({
   title: {
@@ -70,6 +72,16 @@ inventorySchema.plugin(paginate);
 //   return !!inventoryHistory;
 // };
 
+// 1 Inventory - Many Tag
+// 1 Tag - 1 Inventory
+// Ketika Inventory di hapus, maka tag yang inventory_id nya sesuai di hapus
+
+inventorySchema.pre('remove', async function (next) {
+  const inventoryId = this._id;
+  await Tag.deleteMany({ inventory_id: inventoryId });
+  await Addon.deleteMany({ inventory_id: inventoryId });
+  next();
+});
 /**
  * @typedef Inventory
  */
