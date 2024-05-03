@@ -9,6 +9,7 @@ const timeOutValue = 5000;
  * @returns {Promise<Tag>}
  */
 const createTag = async (tagBody) => {
+  console.log(Tag);
   return Tag.create(tagBody);
 };
 
@@ -50,17 +51,10 @@ const getTagId = async (req) => {
     method: 'getTag',
     params: '',
   };
-  const queryCommandJson = {
-    method: 'setQuery',
-    params: 'false',
-  };
-  let query = JSON.stringify(queryCommandJson);
-  req.mqttPublish(`Inventory/${req.params.readerName}/rx`, query);
   const command = JSON.stringify(addCommandJson);
-
+  req.mqttPublish(`Inventory/${req.params.readerName}/rx`, command);
   // wait then publish
   const messageString = await req.mqttWaitMessage(`Inventory/${req.params.readerName}/tx`, timeOutValue); // 3 seconds timeout
-  req.mqttPublish(`Inventory/${req.params.readerName}/rx`, command);
 
   const messageObj = JSON.parse(messageString);
   if (!messageObj) {
@@ -78,9 +72,6 @@ const getTagId = async (req) => {
       status: messageObj.status,
     };
   }
-  queryCommandJson.params = 'true';
-  query = JSON.stringify(queryCommandJson);
-  req.mqttPublish(`Inventory/${req.params.readerName}/rx`, query);
 
   return result;
 };
