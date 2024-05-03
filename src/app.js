@@ -199,7 +199,7 @@ app.use(function (req, res, next) {
   };
 
   // Subscribe to topic
-  req.mqttWaitMessage = function (topic, timeout = 6000) {
+  req.mqttWaitMessage = function (topic, timeout = 15000) {
     return new Promise((resolve) => {
       let timeoutHandle;
 
