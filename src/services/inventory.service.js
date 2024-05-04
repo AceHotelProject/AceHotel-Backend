@@ -1,3 +1,4 @@
+/* eslint-disable security/detect-non-literal-regexp */
 const httpStatus = require('http-status');
 const { Inventory } = require('../models');
 const ApiError = require('../utils/ApiError');
@@ -116,7 +117,6 @@ const updateInventoryById = async (inventoryId, updateBody, user) => {
  */
 const updateInventoryByReader = async (updateList) => {
   Object.entries(updateList).forEach(async ([id, count]) => {
-    console.log(`ID: ${id}, Count: ${count}`);
     const inventory = await getInventoryById(id);
     inventory.stock += count;
     inventory.inventory_update_history.push({

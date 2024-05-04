@@ -1,5 +1,5 @@
+/* eslint-disable camelcase */
 const mongoose = require('mongoose');
-const validator = require('validator');
 const { toJSON, paginate } = require('./plugins');
 
 const readerSchema = mongoose.Schema(
