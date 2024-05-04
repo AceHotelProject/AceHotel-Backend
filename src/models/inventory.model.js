@@ -1,8 +1,9 @@
+/* eslint-disable no-await-in-loop */
+/* eslint-disable no-restricted-syntax */
+/* eslint-disable global-require */
 const mongoose = require('mongoose');
 const { toJSON, paginate } = require('./plugins');
 const { types } = require('../config/inventory.types');
-const Tag = require('./tag.model');
-const Addon = require('./addon.model');
 
 const inventoryUpdateRecordSchema = mongoose.Schema({
   title: {
@@ -77,9 +78,17 @@ inventorySchema.plugin(paginate);
 // Ketika Inventory di hapus, maka tag yang inventory_id nya sesuai di hapus
 
 inventorySchema.pre('remove', async function (next) {
+  const { Tag } = require('.');
+  const { Addon } = require('.');
   const inventoryId = this._id;
-  await Tag.deleteMany({ inventory_id: inventoryId });
-  await Addon.deleteMany({ inventory_id: inventoryId });
+  const tag = await Tag.find({ inventory_id: inventoryId });
+  for (const t of tag) {
+    await t.remove();
+  }
+  const addon = await Addon.find({ inventory_id: inventoryId });
+  for (const a of addon) {
+    await a.remove();
+  }
   next();
 });
 /**

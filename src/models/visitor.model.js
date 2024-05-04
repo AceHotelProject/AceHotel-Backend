@@ -1,7 +1,9 @@
+/* eslint-disable no-await-in-loop */
+/* eslint-disable no-restricted-syntax */
+/* eslint-disable global-require */
 const mongoose = require('mongoose');
 const validator = require('validator');
 const { toJSON, paginate } = require('./plugins');
-const Booking = require('./booking.model');
 
 const visitorSchema = mongoose.Schema(
   {
@@ -79,8 +81,13 @@ visitorSchema.statics.isNIKTaken = async function (identity_num, excludeUserId) 
 // 1 Visitor - 1 Hotel
 
 visitorSchema.pre('remove', async function (next) {
+  const { Booking } = require('.');
+
   const visitor = this;
-  await Booking.deleteMany({ visitor_id: visitor._id });
+  const booking = await Booking.find({ visitor_id: visitor._id });
+  for (const b of booking) {
+    await b.remove();
+  }
   next();
 });
 /**

@@ -2,8 +2,6 @@ const mongoose = require('mongoose');
 
 const { toJSON, paginate } = require('./plugins');
 
-const Inventory = require('./inventory.model');
-
 const tagSchema = mongoose.Schema(
   {
     tid: {
@@ -31,6 +29,8 @@ tagSchema.plugin(toJSON);
 tagSchema.plugin(paginate);
 
 tagSchema.pre('remove', async function (next) {
+  // eslint-disable-next-line global-require
+  const { Inventory } = require('.');
   // 1 Tag - 1 Inventory
   // 1 Inventory - Many Tag
   // Ketika Tag dihapus, maka inventory yang tag_id nya include dipop

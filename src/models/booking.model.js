@@ -1,3 +1,5 @@
+/* eslint-disable no-await-in-loop */
+/* eslint-disable no-restricted-syntax */
 const mongoose = require('mongoose');
 const { toJSON, paginate } = require('./plugins');
 
@@ -119,9 +121,13 @@ bookingSchema.plugin(paginate);
 
 bookingSchema.pre('remove', async function (next) {
   const booking = this;
+  // Masih Salah Disini
   await Room.updateMany({ bookings: { $in: booking._id } }, { $pull: { bookings: booking._id } });
   await Note.updateMany({ booking_id: { $in: booking._id } }, { $pull: { booking_id: booking._id } });
-  await Addon.deleteMany({ booking_id: booking._id });
+  const addon = await Addon.find({ booking_id: booking._id });
+  for (const a of addon) {
+    await a.remove();
+  }
   next();
 });
 

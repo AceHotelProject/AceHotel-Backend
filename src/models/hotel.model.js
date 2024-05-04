@@ -1,3 +1,5 @@
+/* eslint-disable no-await-in-loop */
+/* eslint-disable no-restricted-syntax */
 const mongoose = require('mongoose');
 const { toJSON, paginate } = require('./plugins');
 const Room = require('./room.model');
@@ -111,16 +113,29 @@ hotelSchema.plugin(paginate);
 // Ketika Hotel dihapus, maka inventory yang hotel_id nya sesuai di hapus
 hotelSchema.pre('remove', async function (next) {
   const hotel = this;
-  await Room.deleteMany({ hotel_id: hotel._id });
+  const room = await Room.find({ hotel_id: hotel._id });
+  for (const r of room) {
+    await r.remove();
+  }
   const user = await User.find({ hotel_id: hotel._id });
-  await User.updateMany({ _id: { $in: user }, role: 'owner' }, { $pull: { hotel_id: hotel._id } });
-  await User.deleteMany({ _id: { $in: user }, role: { $ne: 'owner' } });
+  for (const u of user) {
+    if (u.role === 'owner') {
+      u.hotel_id = u.hotel_id.filter((h) => h.toString() !== hotel._id.toString());
+      await u.save();
+    } else {
+      u.remove();
+    }
+  }
   // eslint-disable-next-line no-restricted-syntax
   for (const i of hotel.inventory_id) {
     // eslint-disable-next-line no-await-in-loop
-    await Inventory.deleteOne({ _id: i });
+    const inventory = await Inventory.findById(i);
+    await inventory.remove();
   }
-  await Visitor.deleteMany({ hotel_id: hotel._id });
+  const visitor = await Visitor.find({ hotel_id: hotel._id });
+  for (const v of visitor) {
+    await v.remove();
+  }
   next();
 });
 

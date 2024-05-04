@@ -1,8 +1,6 @@
 const mongoose = require('mongoose');
 const { toJSON, paginate } = require('./plugins');
 
-const Booking = require('./booking.model');
-
 const noteSchema = mongoose.Schema(
   {
     detail: {
@@ -26,6 +24,9 @@ noteSchema.plugin(toJSON);
 noteSchema.plugin(paginate);
 
 noteSchema.pre('remove', async function (next) {
+  // eslint-disable-next-line global-require
+  const Booking = require('./booking.model');
+
   // 1 Note - Many Booking
   // 1 Booking - Many Note (On Room)
   // Ketika Note dihapus, Booking yang room.note_id nya sama dengan noteId diubah ke null
