@@ -21,7 +21,7 @@ const createNote = async (noteBody) => {
  * @returns {Promise<QueryResult>}
  */
 const queryNotes = async (options) => {
-  const notes = await Note.paginate('', options);
+  const notes = await Note.paginate({}, options);
   return notes;
 };
 
