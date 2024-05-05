@@ -1,11 +1,8 @@
+/* eslint-disable global-require */
 /* eslint-disable no-await-in-loop */
 /* eslint-disable no-restricted-syntax */
 const mongoose = require('mongoose');
 const { toJSON, paginate } = require('./plugins');
-const Room = require('./room.model');
-const User = require('./user.model');
-const Inventory = require('./inventory.model');
-const Visitor = require('./visitor.model');
 
 const hotelSchema = mongoose.Schema(
   {
@@ -112,6 +109,10 @@ hotelSchema.plugin(paginate);
 // 1 Inventory - 1 Hotel
 // Ketika Hotel dihapus, maka inventory yang hotel_id nya sesuai di hapus
 hotelSchema.pre('remove', async function (next) {
+  const { Room } = require('.');
+  const { User } = require('.');
+  const { Inventory } = require('.');
+  const { Visitor } = require('.');
   const hotel = this;
   const room = await Room.find({ hotel_id: hotel._id });
   for (const r of room) {
@@ -139,6 +140,37 @@ hotelSchema.pre('remove', async function (next) {
   next();
 });
 
+hotelSchema.pre('deleteMany', async function (next) {
+  const { Room } = require('.');
+  const { User } = require('.');
+  const { Inventory } = require('.');
+  const { Visitor } = require('.');
+  const hotel = this;
+  const room = await Room.find({ hotel_id: hotel._id });
+  for (const r of room) {
+    await r.remove();
+  }
+  const user = await User.find({ hotel_id: hotel._id });
+  for (const u of user) {
+    if (u.role === 'owner') {
+      u.hotel_id = u.hotel_id.filter((h) => h.toString() !== hotel._id.toString());
+      await u.save();
+    } else {
+      u.remove();
+    }
+  }
+  // eslint-disable-next-line no-restricted-syntax
+  for (const i of hotel.inventory_id) {
+    // eslint-disable-next-line no-await-in-loop
+    const inventory = await Inventory.findById(i);
+    await inventory.remove();
+  }
+  const visitor = await Visitor.find({ hotel_id: hotel._id });
+  for (const v of visitor) {
+    await v.remove();
+  }
+  next();
+});
 /**
  * @typedef Hotel
  */

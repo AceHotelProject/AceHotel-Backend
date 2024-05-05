@@ -39,6 +39,18 @@ noteSchema.pre('remove', async function (next) {
   next();
 });
 
+noteSchema.pre('deleteMany', async function (next) {
+  // eslint-disable-next-line global-require
+  const Booking = require('./booking.model');
+  const noteId = this._id;
+  await Booking.updateMany(
+    { 'room.note_id': noteId },
+    { $set: { 'room.$[roomItem].note_id': null } },
+    { arrayFilters: [{ 'roomItem.note_id': noteId }] }
+  );
+  next();
+});
+
 /**
  * @typedef Note
  */

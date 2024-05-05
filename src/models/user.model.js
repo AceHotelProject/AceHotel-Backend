@@ -107,6 +107,20 @@ userSchema.pre('remove', async function (next) {
   next();
 });
 
+userSchema.pre('deleteMany', async function (next) {
+  const user = this;
+  if (user.role === 'branch_manager') {
+    await Hotel.updateMany({ owner_id: user._id }, { $set: { owner_id: null } });
+  } else if (user.role === 'receptionist') {
+    await Hotel.updateMany({ receptionist_id: user._id }, { $set: { receptionist_id: null } });
+  } else if (user.role === 'cleaning_staff') {
+    await Hotel.updateMany({ cleaning_staff_id: user._id }, { $set: { cleaning_staff_id: null } });
+  } else if (user.role === 'inventory_staff') {
+    await Hotel.updateMany({ inventory_staff_id: user._id }, { $set: { inventory_staff_id: null } });
+  }
+  next();
+});
+
 /**
  * @typedef User
  */

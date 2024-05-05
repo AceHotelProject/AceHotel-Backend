@@ -123,7 +123,24 @@ bookingSchema.pre('remove', async function (next) {
   const booking = this;
   // Masih Salah Disini
   await Room.updateMany({ bookings: { $in: booking._id } }, { $pull: { bookings: booking._id } });
-  await Note.updateMany({ booking_id: { $in: booking._id } }, { $pull: { booking_id: booking._id } });
+  const note = await Note.find({ booking_id: booking._id });
+  for (const n of note) {
+    await n.remove();
+  }
+  const addon = await Addon.find({ booking_id: booking._id });
+  for (const a of addon) {
+    await a.remove();
+  }
+  next();
+});
+
+bookingSchema.pre('deleteMany', async function (next) {
+  const booking = this;
+  await Room.updateMany({ bookings: { $in: booking._id } }, { $pull: { bookings: booking._id } });
+  const note = await Note.find({ booking_id: booking._id });
+  for (const n of note) {
+    await n.remove();
+  }
   const addon = await Addon.find({ booking_id: booking._id });
   for (const a of addon) {
     await a.remove();

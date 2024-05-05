@@ -137,6 +137,23 @@ roomSchema.pre('remove', async function (next) {
   next();
 });
 
+roomSchema.pre('deleteMany', async function (next) {
+  const { Booking } = require('.');
+  const { Hotel } = require('.');
+  const { Addon } = require('.');
+  const roomId = this._id;
+  await Hotel.updateMany({ room_id: { $in: roomId } }, { $pull: { room_id: roomId } });
+  const booking = await Booking.find({ 'room.id': { $in: roomId } });
+  for (const b of booking) {
+    await b.remove();
+  }
+  const addon = await Addon.find({ room_id: { $in: roomId } });
+  for (const a of addon) {
+    await a.remove();
+  }
+  next();
+});
+
 /**
  * @typedef Room
  */

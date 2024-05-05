@@ -91,6 +91,21 @@ inventorySchema.pre('remove', async function (next) {
   }
   next();
 });
+
+inventorySchema.pre('deleteMany', async function (next) {
+  const { Tag } = require('.');
+  const { Addon } = require('.');
+  const inventoryId = this._id;
+  const tag = await Tag.find({ inventory_id: inventoryId });
+  for (const t of tag) {
+    await t.remove();
+  }
+  const addon = await Addon.find({ inventory_id: inventoryId });
+  for (const a of addon) {
+    await a.remove();
+  }
+  next();
+});
 /**
  * @typedef Inventory
  */

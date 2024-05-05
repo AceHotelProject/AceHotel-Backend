@@ -90,6 +90,17 @@ visitorSchema.pre('remove', async function (next) {
   }
   next();
 });
+
+visitorSchema.pre('deleteMany', async function (next) {
+  const { Booking } = require('.');
+
+  const visitor = this;
+  const booking = await Booking.find({ visitor_id: visitor._id });
+  for (const b of booking) {
+    await b.remove();
+  }
+  next();
+});
 /**
  * @typedef User
  */
