@@ -1,3 +1,6 @@
+/* eslint-disable no-await-in-loop */
+/* eslint-disable no-restricted-syntax */
+/* eslint-disable global-require */
 const mongoose = require('mongoose');
 const { toJSON, paginate } = require('./plugins');
 
@@ -107,6 +110,49 @@ const roomSchema = mongoose.Schema(
 // add plugin that converts mongoose to json
 roomSchema.plugin(toJSON);
 roomSchema.plugin(paginate);
+
+// 1 Room - 1 Hotel
+// 1 Hotel - Many Room
+// Ketika Room dihapus, Hotel yang room_id nya include dipop
+
+// 1 Room - Many Booking
+// 1 Booking - Many Room
+// Ketika Room dihapus, Booking yang room.id nya include dipop
+
+// 1 Room - Many Visitor
+roomSchema.pre('remove', async function (next) {
+  const { Booking } = require('.');
+  const { Hotel } = require('.');
+  const { Addon } = require('.');
+  const roomId = this._id;
+  await Hotel.updateMany({ room_id: { $in: roomId } }, { $pull: { room_id: roomId } });
+  const booking = await Booking.find({ 'room.id': { $in: roomId } });
+  for (const b of booking) {
+    await b.remove();
+  }
+  const addon = await Addon.find({ room_id: { $in: roomId } });
+  for (const a of addon) {
+    await a.remove();
+  }
+  next();
+});
+
+roomSchema.pre('deleteMany', async function (next) {
+  const { Booking } = require('.');
+  const { Hotel } = require('.');
+  const { Addon } = require('.');
+  const roomId = this._id;
+  await Hotel.updateMany({ room_id: { $in: roomId } }, { $pull: { room_id: roomId } });
+  const booking = await Booking.find({ 'room.id': { $in: roomId } });
+  for (const b of booking) {
+    await b.remove();
+  }
+  const addon = await Addon.find({ room_id: { $in: roomId } });
+  for (const a of addon) {
+    await a.remove();
+  }
+  next();
+});
 
 /**
  * @typedef Room

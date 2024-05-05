@@ -1,3 +1,6 @@
+/* eslint-disable no-await-in-loop */
+/* eslint-disable no-restricted-syntax */
+/* eslint-disable global-require */
 const mongoose = require('mongoose');
 const validator = require('validator');
 const { toJSON, paginate } = require('./plugins');
@@ -75,6 +78,29 @@ visitorSchema.statics.isNIKTaken = async function (identity_num, excludeUserId) 
   return !!user;
 };
 
+// 1 Visitor - 1 Hotel
+
+visitorSchema.pre('remove', async function (next) {
+  const { Booking } = require('.');
+
+  const visitor = this;
+  const booking = await Booking.find({ visitor_id: visitor._id });
+  for (const b of booking) {
+    await b.remove();
+  }
+  next();
+});
+
+visitorSchema.pre('deleteMany', async function (next) {
+  const { Booking } = require('.');
+
+  const visitor = this;
+  const booking = await Booking.find({ visitor_id: visitor._id });
+  for (const b of booking) {
+    await b.remove();
+  }
+  next();
+});
 /**
  * @typedef User
  */

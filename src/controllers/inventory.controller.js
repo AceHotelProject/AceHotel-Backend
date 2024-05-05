@@ -12,6 +12,7 @@ const createInventory = catchAsync(async (req, res) => {
 
 const getInventories = catchAsync(async (req, res) => {
   const hotel = await hotelService.getHotelById(req.query.hotel_id);
+  // eslint-disable-next-line camelcase
   const { inventory_id } = hotel;
   const filter = pick(req.query, ['name', 'type']);
   const combinedFilter = {
@@ -42,7 +43,7 @@ const updateInventory = catchAsync(async (req, res) => {
 });
 
 const deleteInventory = catchAsync(async (req, res) => {
-  await hotelService.removeInventoryId(req.query.hotel_id, req.query.inventory_id);
+  // await hotelService.removeInventoryId(req.query.hotel_id, req.query.inventory_id);
 
   await inventoryService.deleteInventoryById(req.query.inventory_id);
   res.status(httpStatus.NO_CONTENT).send();

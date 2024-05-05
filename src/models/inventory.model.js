@@ -1,3 +1,6 @@
+/* eslint-disable no-await-in-loop */
+/* eslint-disable no-restricted-syntax */
+/* eslint-disable global-require */
 const mongoose = require('mongoose');
 const { toJSON, paginate } = require('./plugins');
 const { types } = require('../config/inventory.types');
@@ -70,6 +73,39 @@ inventorySchema.plugin(paginate);
 //   return !!inventoryHistory;
 // };
 
+// 1 Inventory - Many Tag
+// 1 Tag - 1 Inventory
+// Ketika Inventory di hapus, maka tag yang inventory_id nya sesuai di hapus
+
+inventorySchema.pre('remove', async function (next) {
+  const { Tag } = require('.');
+  const { Addon } = require('.');
+  const inventoryId = this._id;
+  const tag = await Tag.find({ inventory_id: inventoryId });
+  for (const t of tag) {
+    await t.remove();
+  }
+  const addon = await Addon.find({ inventory_id: inventoryId });
+  for (const a of addon) {
+    await a.remove();
+  }
+  next();
+});
+
+inventorySchema.pre('deleteMany', async function (next) {
+  const { Tag } = require('.');
+  const { Addon } = require('.');
+  const inventoryId = this._id;
+  const tag = await Tag.find({ inventory_id: inventoryId });
+  for (const t of tag) {
+    await t.remove();
+  }
+  const addon = await Addon.find({ inventory_id: inventoryId });
+  for (const a of addon) {
+    await a.remove();
+  }
+  next();
+});
 /**
  * @typedef Inventory
  */

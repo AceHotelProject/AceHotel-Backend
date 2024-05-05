@@ -2,7 +2,7 @@ const httpStatus = require('http-status');
 const pick = require('../utils/pick');
 const ApiError = require('../utils/ApiError');
 const catchAsync = require('../utils/catchAsync');
-const { hotelService, roomService, userService } = require('../services');
+const { hotelService, roomService, userService, inventoryService } = require('../services');
 const { deleteFile } = require('../utils/cloudStorage');
 
 const createHotel = catchAsync(async (req, res) => {
@@ -239,48 +239,48 @@ const deleteHotel = catchAsync(async (req, res) => {
       throw new ApiError(httpStatus.FORBIDDEN, 'Forbidden');
     }
   }
-  if (req.user.role === 'owner') {
-    const owner = await userService.getUserById(req.user._id);
-    owner.hotel_id = owner.hotel_id.filter((id) => id.toString() !== hotel._id.toString());
-    await owner.save();
-  }
-  if (hotel.owner_id) {
-    const owner = await userService.getUserById(hotel.owner_id);
-    if (owner) {
-      owner.hotel_id = owner.hotel_id.filter((id) => id.toString() !== hotel._id.toString());
-      // eslint-disable-next-line no-await-in-loop
-      await owner.save();
-    }
-  }
-  if (hotel.receptionist_id) {
-    const receptionist = await userService.getUserById(hotel.receptionist_id);
-    if (receptionist) {
-      receptionist.hotel_id = receptionist.hotel_id.filter((id) => id.toString() !== hotel._id.toString());
-      // eslint-disable-next-line no-await-in-loop
-      await receptionist.save();
-    }
-  }
-  if (hotel.cleaning_staff_id) {
-    const cleaningStaff = await userService.getUserById(hotel.cleaning_staff_id);
-    if (cleaningStaff) {
-      cleaningStaff.hotel_id = cleaningStaff.hotel_id.filter((id) => id.toString() !== hotel._id.toString());
-      // eslint-disable-next-line no-await-in-loop
-      await cleaningStaff.save();
-    }
-  }
-  if (hotel.inventory_staff_id) {
-    const inventoryStaff = await userService.getUserById(hotel.inventory_staff_id);
-    if (inventoryStaff) {
-      inventoryStaff.hotel_id = inventoryStaff.hotel_id.filter((id) => id.toString() !== hotel._id.toString());
-      // eslint-disable-next-line no-await-in-loop
-      await inventoryStaff.save();
-    }
-  }
-  // eslint-disable-next-line no-restricted-syntax
-  for (const room of hotel.room_id) {
-    // eslint-disable-next-line no-await-in-loop
-    await roomService.deleteRoomById(room);
-  }
+  // if (req.user.role === 'owner') {
+  //   const owner = await userService.getUserById(req.user._id);
+  //   owner.hotel_id = owner.hotel_id.filter((id) => id.toString() !== hotel._id.toString());
+  //   await owner.save();
+  // }
+  // if (hotel.owner_id) {
+  //   const owner = await userService.getUserById(hotel.owner_id);
+  //   if (owner) {
+  //     owner.hotel_id = owner.hotel_id.filter((id) => id.toString() !== hotel._id.toString());
+  //     // eslint-disable-next-line no-await-in-loop
+  //     await owner.save();
+  //   }
+  // }
+  // if (hotel.receptionist_id) {
+  //   const receptionist = await userService.getUserById(hotel.receptionist_id);
+  //   if (receptionist) {
+  //     receptionist.hotel_id = receptionist.hotel_id.filter((id) => id.toString() !== hotel._id.toString());
+  //     // eslint-disable-next-line no-await-in-loop
+  //     await receptionist.save();
+  //   }
+  // }
+  // if (hotel.cleaning_staff_id) {
+  //   const cleaningStaff = await userService.getUserById(hotel.cleaning_staff_id);
+  //   if (cleaningStaff) {
+  //     cleaningStaff.hotel_id = cleaningStaff.hotel_id.filter((id) => id.toString() !== hotel._id.toString());
+  //     // eslint-disable-next-line no-await-in-loop
+  //     await cleaningStaff.save();
+  //   }
+  // }
+  // if (hotel.inventory_staff_id) {
+  //   const inventoryStaff = await userService.getUserById(hotel.inventory_staff_id);
+  //   if (inventoryStaff) {
+  //     inventoryStaff.hotel_id = inventoryStaff.hotel_id.filter((id) => id.toString() !== hotel._id.toString());
+  //     // eslint-disable-next-line no-await-in-loop
+  //     await inventoryStaff.save();
+  //   }
+  // }
+  // // eslint-disable-next-line no-restricted-syntax
+  // for (const room of hotel.room_id) {
+  //   // eslint-disable-next-line no-await-in-loop
+  //   await roomService.deleteRoomById(room);
+  // }
   // eslint-disable-next-line no-restricted-syntax
   for (const file of hotel.exclusive_room_image_path) {
     // eslint-disable-next-line no-await-in-loop
@@ -291,6 +291,11 @@ const deleteHotel = catchAsync(async (req, res) => {
     // eslint-disable-next-line no-await-in-loop
     await deleteFile(file);
   }
+  // // eslint-disable-next-line no-restricted-syntax
+  // for (const inventory of hotel.inventory_id) {
+  //   // eslint-disable-next-line no-await-in-loop
+  //   await inventoryService.deleteInventoryById(inventory);
+  // }
   await hotelService.deleteHotelById(req.params.hotelId);
   res.status(httpStatus.NO_CONTENT).send();
 });

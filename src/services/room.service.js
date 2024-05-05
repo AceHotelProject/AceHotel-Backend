@@ -126,14 +126,14 @@ const updateRoomByHotelId = async (hotelId, updateBody) => {
 };
 
 const deleteRoomByHotelId = async (hotelId) => {
-  const rooms = await getRoomsByHotelId(hotelId);
-  if (!rooms) {
-    throw new ApiError(httpStatus.NOT_FOUND, 'Room not found');
-  }
-  for (const room of rooms) {
-    await room.remove();
-  }
-  return rooms;
+  // const rooms = await getRoomsByHotelId(hotelId);
+  // if (!rooms) {
+  //   throw new ApiError(httpStatus.NOT_FOUND, 'Room not found');
+  // }
+  // for (const room of rooms) {
+  //   await room.remove();
+  // }
+  // return rooms;
 };
 
 const bookingRoomById = async (roomId, updateBody) => {

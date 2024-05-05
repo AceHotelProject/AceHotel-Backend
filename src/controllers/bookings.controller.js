@@ -4,8 +4,10 @@ const ApiError = require('../utils/ApiError');
 const catchAsync = require('../utils/catchAsync');
 const { bookingService, roomService, hotelService, visitorService, addonService } = require('../services');
 const { deleteFile } = require('../utils/cloudStorage');
+const { Inventory } = require('../models');
 
 const createBooking = catchAsync(async (req, res) => {
+  let inventory = 0;
   // Cek Hotel ID
   const hotel = await hotelService.getHotelById(req.body.hotel_id);
   if (!hotel) {
@@ -43,6 +45,12 @@ const createBooking = catchAsync(async (req, res) => {
   if (req.body.room.length === 0) {
     throw new ApiError(httpStatus.NOT_FOUND, 'No available room');
   }
+  if (req.body.extra_bed > 0) {
+    inventory = await Inventory.findOne({ type: 'kasur' });
+    if (!inventory) {
+      throw new ApiError(httpStatus.NOT_FOUND, 'Inventory not found');
+    }
+  }
   // Buat Booking
   const booking = await bookingService.createBooking(req.body);
   // Update Room Yang Dipilih Menjadi Booked
@@ -70,7 +78,8 @@ const createBooking = catchAsync(async (req, res) => {
       const addon = await addonService.createAddon({
         name: 'Extra Bed',
         booking_id: booking._id,
-        type: 'kasur',
+        room_id: room._id,
+        inventory_id: inventory._id,
         price: hotel.extra_bed_price,
       });
       add_on_id.push(addon._id);
@@ -234,7 +243,7 @@ const deleteBookingById = catchAsync(async (req, res) => {
     room.is_booked = room.bookings > 1;
     room.is_clean = true;
     // eslint-disable-next-line no-restricted-syntax
-    room.bookings = room.bookings.filter((b) => b.booking_id.toString() !== req.params.bookingId);
+    // room.bookings = room.bookings.filter((b) => b.booking_id.toString() !== req.params.bookingId);
     // eslint-disable-next-line no-await-in-loop
     await room.save();
   }

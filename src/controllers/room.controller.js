@@ -67,15 +67,21 @@ const deleteRoom = catchAsync(async (req, res) => {
       throw new ApiError(httpStatus.FORBIDDEN, 'Forbidden');
     }
   }
+  // eslint-disable-next-line no-restricted-syntax
+  for (const booking of room.bookings) {
+    if (booking.actual_checkout === null || booking.actual_checkout === undefined) {
+      throw new ApiError(httpStatus.BAD_REQUEST, 'Room has Booking that not checkout yet');
+    }
+  }
   const hotel = await hotelService.getHotelById(room.hotel_id);
   if (!hotel) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Hotel not found');
   }
+  // hotel.room_id = hotel.room_id.filter((h) => h._id.toString() !== room._id.toString());
+  await roomService.deleteRoomById(req.params.roomId);
   const updateField = room.type === 'regular' ? 'regular_room_count' : 'exclusive_room_count';
   hotel[updateField] -= 1;
-  hotel.room_id = hotel.room_id.filter((h) => h._id.toString() !== room._id.toString());
   await hotel.save();
-  await roomService.deleteRoomById(req.params.roomId);
   res.status(httpStatus.NO_CONTENT).send();
 });
 
@@ -128,7 +134,7 @@ const deleteRoomByHotelId = catchAsync(async (req, res) => {
       throw new ApiError(httpStatus.FORBIDDEN, 'Forbidden');
     }
   }
-  await roomService.deleteRoomByHotelId(req.params.hotelId);
+  // await roomService.deleteRoomByHotelId(req.params.hotelId);
   hotel.room_id = [];
   hotel.regular_room_count = 0;
   hotel.exclusive_room_count = 0;
