@@ -101,7 +101,7 @@ const payBooking = catchAsync(async (req, res) => {
   booking.is_proof_uploaded = true;
   // Save
   booking = await booking.save();
-  booking = await booking.populate('visitor_id', 'name').execPopulate();
+  booking = await booking.populate('visitor_id', 'name');
   res.status(httpStatus.OK).send(booking);
 });
 

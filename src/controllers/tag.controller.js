@@ -5,8 +5,15 @@ const catchAsync = require('../utils/catchAsync');
 const { tagService, inventoryService } = require('../services');
 
 const createTag = catchAsync(async (req, res) => {
+  // eslint-disable-next-line camelcase
+  const { inventory_id } = req.body;
+  const inventory = await inventoryService.getInventoryById(inventory_id);
+  if (!inventory) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Hotel not found');
+  }
   const tag = await tagService.createTag(req.body);
-  inventoryService.addTagId(req.body.inventory_id, tag._id);
+  inventory.tag_id.push(tag._id);
+  await inventory.save();
   res.status(httpStatus.CREATED).send(tag);
 });
 const getTagId = catchAsync(async (req, res) => {

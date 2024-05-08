@@ -128,10 +128,11 @@ const updateTagById = async (tagId, updateBody) => {
  */
 const deleteTagById = async (tagId) => {
   const tag = await getTagById(tagId);
+  console.log(tag);
   if (!tag) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Tag not found');
   }
-  await tag.remove();
+  await tag.deleteOne();
   return tag;
 };
 

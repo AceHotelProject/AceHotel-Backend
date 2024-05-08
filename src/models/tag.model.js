@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 
 const { toJSON, paginate } = require('./plugins');
+const Inventory = require('./inventory.model');
 
 const tagSchema = mongoose.Schema(
   {
@@ -28,6 +29,11 @@ const tagSchema = mongoose.Schema(
 tagSchema.plugin(toJSON);
 tagSchema.plugin(paginate);
 
+tagSchema.pre('deleteOne', async function (next) {
+  const tagId = this._id;
+  await Inventory.updateMany({ tag_id: { $in: tagId } }, { $pull: { tag_id: tagId } });
+  next();
+});
 /**
  * @typedef Tag
  */

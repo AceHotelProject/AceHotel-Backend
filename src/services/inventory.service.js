@@ -116,7 +116,7 @@ const updateInventoryById = async (inventoryId, updateBody, user) => {
  */
 const updateInventoryByReader = async (updateList) => {
   Object.entries(updateList).forEach(async ([id, count]) => {
-    console.log(`ID: ${id}, Count: ${count}`);
+    // console.log(`ID: ${id}, Count: ${count}`);
     const inventory = await getInventoryById(id);
     inventory.stock += count;
     inventory.inventory_update_history.push({
@@ -178,6 +178,7 @@ const deleteInventoryById = async (inventoryId) => {
   if (!inventory) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Inventory not found');
   }
+
   await inventory.remove();
   return inventory;
 };

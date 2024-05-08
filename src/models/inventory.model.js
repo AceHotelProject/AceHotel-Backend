@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const { toJSON, paginate } = require('./plugins');
 const { types } = require('../config/inventory.types');
+// const { Tag } = require('.');
 
 const inventoryUpdateRecordSchema = mongoose.Schema({
   title: {
@@ -60,6 +61,10 @@ const inventorySchema = mongoose.Schema(
     timestamps: true,
   }
 );
+// inventorySchema.pre('remove', async function (next) {
+//   await Tag.deleteMany({ inventory_id: this._id });
+//   next();
+// });
 
 // add plugin that converts mongoose to json
 inventorySchema.plugin(toJSON);

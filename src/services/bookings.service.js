@@ -28,7 +28,7 @@ const queryBookings = async (filter, options) => {
 
   // Manually populate the visitor_id field for each result
   for (const booking of bookings.results) {
-    await booking.populate('visitor_id', 'name').execPopulate();
+    await booking.populate('visitor_id', 'name');
   }
   return bookings;
 };
@@ -43,7 +43,7 @@ const getBookingById = async (id) => {
   if (!booking) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Booking not found');
   }
-  booking = booking.populate('visitor_id', 'name').execPopulate();
+  booking = booking.populate('visitor_id', 'name');
   return booking;
 };
 
@@ -93,7 +93,7 @@ const applyDiscount = async (bookingId, discountBody) => {
   }
   booking.total_price -= hotel.discount_amount * booking.room_count;
   await booking.save();
-  booking = await booking.populate('visitor_id', 'name').execPopulate();
+  booking = await booking.populate('visitor_id', 'name');
   return booking;
 };
 module.exports = {
