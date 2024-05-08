@@ -28,7 +28,7 @@ const getReader = catchAsync(async (req, res) => {
 });
 
 const updateReader = catchAsync(async (req, res) => {
-  const reader = await readerService.updateReaderByName(req.params.reader_name, req.body);
+  const reader = await readerService.updateReaderByName(req);
   res.send(reader);
 });
 
