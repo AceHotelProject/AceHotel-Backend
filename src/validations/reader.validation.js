@@ -28,7 +28,7 @@ const updateReader = {
   }),
   body: Joi.object()
     .keys({
-      power_gain: Joi.number(),
+      tag_expired: Joi.number(),
       read_interval: Joi.number(),
     })
     .min(1),
