@@ -85,6 +85,7 @@ const allRoles = {
     'manageRooms',
     'getInventory',
     'manageInventory',
+    'manageTags',
     'getNotes',
     'manageNotes',
     'uploadFiles',
