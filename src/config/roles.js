@@ -90,6 +90,7 @@ const allRoles = {
     'manageNotes',
     'uploadFiles',
     'recap',
+    'getFranchise'
   ],
   cleaning_staff: [
     'getRooms',
