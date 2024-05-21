@@ -2,7 +2,7 @@ const httpStatus = require('http-status');
 const pick = require('../utils/pick');
 const ApiError = require('../utils/ApiError');
 const catchAsync = require('../utils/catchAsync');
-const { hotelService, roomService, userService, inventoryService } = require('../services');
+const { hotelService, roomService, userService } = require('../services');
 const { deleteFile } = require('../utils/cloudStorage');
 
 const createHotel = catchAsync(async (req, res) => {
@@ -78,6 +78,7 @@ const getHotels = catchAsync(async (req, res) => {
   // eslint-disable-next-line camelcase
   const { hotel_id } = req.user; // Return only hotel that user can access
   const filter = pick(req.query, ['owner_id']);
+  // eslint-disable-next-line security/detect-non-literal-regexp
   const nameFilter = req.query.name ? { name: { $regex: new RegExp(req.query.name, 'i') } } : {};
   const combinedFilter = {
     ...filter,

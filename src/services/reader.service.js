@@ -42,8 +42,8 @@ const getReaderById = async (id) => {
  * @param {string} name
  * @returns {Promise<Reader>}
  */
-const getReaderByName = async (reader_name) => {
-  return Reader.findOne({ reader_name });
+const getReaderByName = async (readerName) => {
+  return Reader.findOne({ reader_name: readerName });
 };
 
 /**
@@ -53,8 +53,7 @@ const getReaderByName = async (reader_name) => {
  * @returns {Promise<Reader>}
  */
 const updateReaderByName = async (req) => {
-  const readerName = req.params.reader_name;
-  console.log(readerName);
+  const { readerName } = req.params;
   const updateBody = req.body;
   const reader = await getReaderByName(readerName);
   if (!reader) {
@@ -95,4 +94,5 @@ module.exports = {
   getReaderByName,
   updateReaderByName,
   deleteReaderByName,
+  getReaderById,
 };
