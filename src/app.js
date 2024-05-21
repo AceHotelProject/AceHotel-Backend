@@ -127,7 +127,7 @@ mqttClient.on('message', async (topic, message) => {
         const pubMessage = {
           method: 'getData',
           data: {
-            power_gain: reader.power_gain,
+            tag_expired: reader.tag_expired,
             read_interval: reader.read_interval,
           },
         };
