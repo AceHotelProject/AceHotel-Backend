@@ -77,7 +77,7 @@ const getRecap = catchAsync(async (req, res) => {
       revenue += booking.total_price;
       // eslint-disable-next-line no-restricted-syntax
       for (const r of booking.room) {
-        if (!r.actual_checkin) {
+        if (r.actual_checkin !== null || r.actual_checkin !== undefined) {
           checkinCount += 1;
         }
       }
