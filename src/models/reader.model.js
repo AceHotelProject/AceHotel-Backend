@@ -9,9 +9,9 @@ const readerSchema = mongoose.Schema(
       required: true,
       trim: true,
     },
-    power_gain: {
+    tag_expired: {
       type: Number,
-      default: 30,
+      default: 20000,
     },
     read_interval: {
       type: Number,

@@ -72,6 +72,16 @@ const getTagId = async (req) => {
       tagId: messageObj.tid,
       status: messageObj.status,
     };
+  } else if (messageObj.status === '251') {
+    result = {
+      status: messageObj.status,
+      data: 'Error: No tag detected',
+    };
+  } else if (messageObj.status === '33') {
+    result = {
+      status: messageObj.status,
+      data: 'Error: Multiple tag detected',
+    };
   } else {
     result = {
       status: messageObj.status,
