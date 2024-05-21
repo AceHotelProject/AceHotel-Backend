@@ -103,7 +103,6 @@ mqttClient.on('message', async (topic, message) => {
         const results = await Promise.all(togglePromises);
         const inventoryCount = {};
         results.forEach((result) => {
-          console.log(result);
           if (result) {
             const { inventoryId, increment } = result;
             const inventoryIdStr = inventoryId.toString();
@@ -118,7 +117,6 @@ mqttClient.on('message', async (topic, message) => {
           }
         });
         inventoryService.updateInventoryByReader(inventoryCount);
-        console.log(inventoryCount);
         mqttClient.publish('Mqtt/debug', `Success: Update Tag. Updated ${Object.values(inventoryCount).length} data`, {
           qos: 0,
           retain: false,

@@ -1,7 +1,7 @@
 const httpStatus = require('http-status');
 const { Tag } = require('../models');
 const ApiError = require('../utils/ApiError');
-const { readerService } = require('.');
+const { updateReaderByName } = require('./reader.service');
 
 const timeOutValue = 5000;
 /**
@@ -25,10 +25,16 @@ const setQuery = async (req) => {
   // console.log(resultJson);
   const result = JSON.stringify(resultJson);
   req.mqttPublish(`Inventory/${req.params.readerName}/rx`, result);
-  if (req.query.state === 'true') {
-    readerService.updateReaderByName(req.params.readerName, { status: 'on' });
-  } else if (req.query.state === 'false') {
-    readerService.updateReaderByName(req.params.readerName, { status: 'off' });
+  if (req.query.state) {
+    req.body = {
+      status: 'on',
+    };
+    await updateReaderByName(req);
+  } else {
+    req.body = {
+      status: 'off',
+    };
+    await updateReaderByName(req);
   }
   return resultJson;
 };
