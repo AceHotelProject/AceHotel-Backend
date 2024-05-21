@@ -17,6 +17,10 @@ const readerSchema = mongoose.Schema(
       type: Number,
       default: 1000,
     },
+    status: {
+      type: String,
+      default: 'off',
+    },
   },
   {
     timestamps: true,

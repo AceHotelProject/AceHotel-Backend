@@ -1,6 +1,7 @@
 const httpStatus = require('http-status');
 const { Tag } = require('../models');
 const ApiError = require('../utils/ApiError');
+const { readerService } = require('.');
 
 const timeOutValue = 5000;
 /**
@@ -9,7 +10,6 @@ const timeOutValue = 5000;
  * @returns {Promise<Tag>}
  */
 const createTag = async (tagBody) => {
-  console.log(Tag);
   return Tag.create(tagBody);
 };
 
@@ -25,6 +25,11 @@ const setQuery = async (req) => {
   // console.log(resultJson);
   const result = JSON.stringify(resultJson);
   req.mqttPublish(`Inventory/${req.params.readerName}/rx`, result);
+  if (req.query.state === 'true') {
+    readerService.updateReaderByName(req.params.readerName, { status: 'on' });
+  } else if (req.query.state === 'false') {
+    readerService.updateReaderByName(req.params.readerName, { status: 'off' });
+  }
   return resultJson;
 };
 
