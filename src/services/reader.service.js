@@ -53,9 +53,9 @@ const getReaderByName = async (readerName) => {
  * @returns {Promise<Reader>}
  */
 const updateReaderByName = async (req) => {
-  const { readerName } = req.params;
+  const { reader_name } = req.params;
   const updateBody = req.body;
-  const reader = await getReaderByName(readerName);
+  const reader = await getReaderByName(reader_name);
   if (!reader) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Reader not found');
   }
@@ -69,7 +69,7 @@ const updateReaderByName = async (req) => {
     },
   };
   const command = JSON.stringify(addCommandJson);
-  req.mqttPublish(`Inventory/${readerName}/rx`, command);
+  req.mqttPublish(`Inventory/${reader_name}/rx`, command);
   await reader.save();
   return reader;
 };
