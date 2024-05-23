@@ -18,8 +18,8 @@ const router = express.Router();
 //   .patch(auth('manageTags'), validate(tagValidation.updateTag), tagController.updateTag)
 //   .delete(auth('manageTags'), validate(tagValidation.deleteTag), tagController.deleteTag);
 router.route('/').post(auth('manageTags'), tagController.createTag).get(auth('manageTags'), tagController.getTags);
-router.route('/id/:readerName').get(auth('manageTags'), tagController.getTagId);
-router.route('/:readerName/query/').post(auth('manageTags'), validate(tagValidation.setQuery), tagController.setQuery);
+router.route('/id/:reader_name').get(auth('manageTags'), tagController.getTagId);
+router.route('/:reader_name/query/').post(auth('manageTags'), validate(tagValidation.setQuery), tagController.setQuery);
 router
   .route('/:tagId')
   .get(auth('manageTags'), tagController.getTag)

@@ -11,7 +11,7 @@ const setQuery = {
     state: Joi.bool().required(),
   }),
   params: Joi.object().keys({
-    readerName: Joi.string().required(),
+    reader_name: Joi.string().required(),
   }),
 };
 const getReaders = {
