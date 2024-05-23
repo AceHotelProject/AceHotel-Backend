@@ -24,7 +24,7 @@ const setQuery = async (req) => {
   };
   // console.log(resultJson);
   const result = JSON.stringify(resultJson);
-  req.mqttPublish(`Inventory/${req.params.readerName}/rx`, result);
+  req.mqttPublish(`Inventory/${req.params.reader_name}/rx`, result);
   if (req.query.state) {
     req.body = {
       status: 'on',
@@ -63,9 +63,9 @@ const getTagId = async (req) => {
     params: '',
   };
   const command = JSON.stringify(addCommandJson);
-  req.mqttPublish(`Inventory/${req.params.readerName}/rx`, command);
+  req.mqttPublish(`Inventory/${req.params.reader_name}/rx`, command);
   // wait then publish
-  const messageString = await req.mqttWaitMessage(`Inventory/${req.params.readerName}/tx`, timeOutValue); // 3 seconds timeout
+  const messageString = await req.mqttWaitMessage(`Inventory/${req.params.reader_name}/tx`, timeOutValue); // 3 seconds timeout
 
   const messageObj = JSON.parse(messageString);
   if (!messageObj) {
